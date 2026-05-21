@@ -27,11 +27,12 @@ func TestSelectTemplateUsesRandomChoice(t *testing.T) {
 
 func TestBuildMergeDataFallsBackToPopularFYP(t *testing.T) {
 	campaign := BirthdayCampaign{
-		Closing: "Selamat merayakan hari spesialmu di Kyou!",
+		Closing:   "Selamat merayakan hari spesialmu di Kyou!",
+		ActionURL: "https://kyou.id/account/vouchers",
 	}
 	user := domain.User{ID: "user-1", Name: "Ruby", Email: "ruby@example.test"}
-	wishlist := []domain.WishlistItem{{ID: "wish-1", Name: "Figure Ruby"}}
-	popular := []domain.FYPItem{{ID: "popular-1", Name: "Popular Chara", Kind: "character"}}
+	wishlist := []domain.WishlistItem{{ID: "wish-1", Name: "Figure <Ruby>", URL: "https://kyou.id/items/1?x=<bad>"}}
+	popular := []domain.FYPItem{{ID: "popular-1", Name: "Popular <Chara>", Kind: "character"}}
 
 	got := campaign.BuildMergeData(user, "HBD-RUBY-7K2M", wishlist, nil, popular)
 
@@ -48,4 +49,51 @@ func TestBuildMergeDataFallsBackToPopularFYP(t *testing.T) {
 	if len(fypItems) != 1 || fypItems[0].ID != "popular-1" {
 		t.Fatalf("expected popular fallback, got %#v", fypItems)
 	}
+	if got["action_url"] != "https://kyou.id/account/vouchers" {
+		t.Fatalf("expected action_url, got %#v", got["action_url"])
+	}
+	wishlistHTML, ok := got["wishlist_html"].(string)
+	if !ok {
+		t.Fatalf("expected wishlist_html string, got %T", got["wishlist_html"])
+	}
+	if wishlistHTML == "" || containsAny(wishlistHTML, []string{"Figure <Ruby>", "?x=<bad>"}) {
+		t.Fatalf("expected escaped wishlist html, got %q", wishlistHTML)
+	}
+	if !containsAll(wishlistHTML, []string{"Figure &lt;Ruby&gt;", "https://kyou.id/items/1?x=&lt;bad&gt;"}) {
+		t.Fatalf("expected wishlist html content, got %q", wishlistHTML)
+	}
+	fypHTML, ok := got["fyp_html"].(string)
+	if !ok {
+		t.Fatalf("expected fyp_html string, got %T", got["fyp_html"])
+	}
+	if !containsAll(fypHTML, []string{"Popular &lt;Chara&gt;", "character"}) {
+		t.Fatalf("expected fyp html content, got %q", fypHTML)
+	}
+}
+
+func containsAll(value string, needles []string) bool {
+	for _, needle := range needles {
+		if !contains(value, needle) {
+			return false
+		}
+	}
+	return true
+}
+
+func containsAny(value string, needles []string) bool {
+	for _, needle := range needles {
+		if contains(value, needle) {
+			return true
+		}
+	}
+	return false
+}
+
+func contains(value string, needle string) bool {
+	for i := 0; i+len(needle) <= len(value); i++ {
+		if value[i:i+len(needle)] == needle {
+			return true
+		}
+	}
+	return needle == ""
 }

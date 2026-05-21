@@ -21,6 +21,7 @@ type Config struct {
 	FromEmail          string
 	FromName           string
 	TemplateIDs        []string
+	ActionURL          string
 	KyouIDAPIBaseURL   string
 	KyouIDAPIToken     string
 	DiscordWebhookURL  string
@@ -43,6 +44,7 @@ func Load() Config {
 		FromEmail:          env("KIRIM_EMAIL_FROM_EMAIL", "nandayo@kyou.id"),
 		FromName:           env("KIRIM_EMAIL_FROM_NAME", "Kyou.id"),
 		TemplateIDs:        envList("MAKOTO_TEMPLATE_IDS", []string{"tpl_001", "tpl_002", "tpl_003"}),
+		ActionURL:          env("MAKOTO_ACTION_URL", "https://kyou.id/account/vouchers"),
 		KyouIDAPIBaseURL:   env("KYOU_ID_API_BASE_URL", "https://kyou.id"),
 		KyouIDAPIToken:     os.Getenv("KYOU_ID_API_TOKEN"),
 		DiscordWebhookURL:  os.Getenv("DISCORD_WEBHOOK_URL"),

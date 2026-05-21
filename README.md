@@ -43,6 +43,7 @@ KIRIM_EMAIL_FROM_EMAIL=nandayo@kyou.id
 KIRIM_EMAIL_FROM_NAME=Kyou.id
 
 MAKOTO_TEMPLATE_IDS=tpl_001,tpl_002,tpl_003
+MAKOTO_ACTION_URL=https://kyou.id/account/vouchers
 KYOU_ID_API_BASE_URL=https://kyou.id
 KYOU_ID_API_TOKEN=
 
@@ -70,6 +71,17 @@ Makoto expects JSON jobs in `birthday_email_jobs`:
   "popular_items": [],
   "attempt": 1
 }
+```
+
+Makoto converts wishlist and FYP items into HTML strings before sending. Kirim.email template variables expected:
+
+```text
+{{name}}
+{{voucher_code}}
+{{wishlist_html}}
+{{fyp_html}}
+{{action_url}}
+{{closing}}
 ```
 
 ## Coolify

@@ -25,6 +25,7 @@ func main() {
 	birthdayCampaign := campaign.BirthdayCampaign{
 		TemplateIDs: cfg.TemplateIDs,
 		Closing:     "Selamat merayakan hari spesialmu di Kyou!",
+		ActionURL:   cfg.ActionURL,
 	}
 	sender, validator := buildEmail(cfg)
 	voucherIssuer := buildVoucherIssuer(cfg)

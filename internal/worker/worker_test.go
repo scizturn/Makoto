@@ -78,6 +78,7 @@ func TestProcessorSendsFromFullRedisJobWithoutDatabaseStore(t *testing.T) {
 	processor := NewProcessor(nil, sender, fakeValidator{valid: true}, issuer, campaign.BirthdayCampaign{
 		TemplateIDs: []string{"tpl_001", "tpl_002", "tpl_003"},
 		Closing:     "Selamat merayakan hari spesialmu di Kyou!",
+		ActionURL:   "https://kyou.id/account/vouchers",
 		RandomIntn:  func(int) int { return 2 },
 	})
 	processor.Domain = "kyou.id"
@@ -110,6 +111,12 @@ func TestProcessorSendsFromFullRedisJobWithoutDatabaseStore(t *testing.T) {
 	}
 	if msg.SubstitutionData["voucher_code"] != "HBD-GARVIN-7K2M" {
 		t.Fatalf("expected generated voucher in merge data, got %#v", msg.SubstitutionData)
+	}
+	if msg.SubstitutionData["action_url"] != "https://kyou.id/account/vouchers" {
+		t.Fatalf("expected action_url merge data, got %#v", msg.SubstitutionData)
+	}
+	if msg.SubstitutionData["wishlist_html"] == "" || msg.SubstitutionData["fyp_html"] == "" {
+		t.Fatalf("expected html merge data, got %#v", msg.SubstitutionData)
 	}
 }
 
