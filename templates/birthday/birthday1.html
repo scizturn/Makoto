@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Selamat ulang tahun dari Kyou.id</title>
+</head>
+<body style="margin:0;background:#f6f7fb;font-family:Arial,Helvetica,sans-serif;color:#111827;">
+  <div style="max-width:640px;margin:0 auto;padding:28px 16px;">
+    <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;">
+      <div style="padding:28px;background:#111827;color:#ffffff;">
+        <p style="margin:0 0 8px 0;font-size:14px;color:#d1d5db;">Kyou.id Birthday Gift</p>
+        <h1 style="margin:0;font-size:28px;line-height:1.2;">Selamat ulang tahun, {{ .Name }}!</h1>
+      </div>
+      <div style="padding:28px;">
+        <p style="margin:0 0 18px 0;font-size:16px;line-height:1.6;">Kami siapin voucher spesial buat nemenin wishlist dan rekomendasi pilihanmu hari ini.</p>
+        <div style="padding:18px;border:1px dashed #9ca3af;border-radius:8px;background:#f9fafb;margin-bottom:22px;">
+          <p style="margin:0 0 6px 0;color:#6b7280;font-size:13px;">Kode voucher</p>
+          <p style="margin:0;font-size:24px;font-weight:700;letter-spacing:1px;">{{ .VoucherCode }}</p>
+        </div>
+        <h2 style="font-size:18px;margin:0 0 10px 0;">Wishlist kamu</h2>
+        <div style="margin-bottom:22px;">{{ .WishlistHTML }}</div>
+        <h2 style="font-size:18px;margin:0 0 10px 0;">FYP buat kamu</h2>
+        <div style="margin-bottom:24px;">{{ .FYPHTML }}</div>
+        <a href="{{ .ActionURL }}" style="display:inline-block;background:#2563eb;color:#ffffff;text-decoration:none;padding:12px 18px;border-radius:6px;font-weight:700;">Pakai voucher</a>
+        <p style="margin:24px 0 0 0;color:#4b5563;line-height:1.6;">{{ .Closing }}</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

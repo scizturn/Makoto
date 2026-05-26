@@ -33,11 +33,15 @@ func (q *RedisQueue) Close() error {
 }
 
 func (q *RedisQueue) Enqueue(ctx context.Context, job domain.BirthdayJob) error {
+	return q.EnqueueTo(ctx, q.name, job)
+}
+
+func (q *RedisQueue) EnqueueTo(ctx context.Context, name string, job domain.BirthdayJob) error {
 	payload, err := EncodeBirthdayJob(job)
 	if err != nil {
 		return err
 	}
-	return q.client.LPush(ctx, q.name, payload).Err()
+	return q.client.LPush(ctx, queueName(name), payload).Err()
 }
 
 func (q *RedisQueue) Dequeue(ctx context.Context, timeout time.Duration) (domain.BirthdayJob, error) {
@@ -49,4 +53,32 @@ func (q *RedisQueue) Dequeue(ctx context.Context, timeout time.Duration) (domain
 		return domain.BirthdayJob{}, fmt.Errorf("unexpected redis pop result: %#v", result)
 	}
 	return DecodeBirthdayJob(result[1])
+}
+
+func (q *RedisQueue) Jobs(ctx context.Context, name string) ([]domain.BirthdayJob, []string, error) {
+	payloads, err := q.client.LRange(ctx, queueName(name), 0, -1).Result()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	jobs := make([]domain.BirthdayJob, 0, len(payloads))
+	for _, payload := range payloads {
+		job, err := DecodeBirthdayJob(payload)
+		if err != nil {
+			return nil, nil, err
+		}
+		jobs = append(jobs, job)
+	}
+	return jobs, payloads, nil
+}
+
+func (q *RedisQueue) RemovePayload(ctx context.Context, name string, payload string) error {
+	return q.client.LRem(ctx, queueName(name), 1, payload).Err()
+}
+
+func queueName(name string) string {
+	if name == "" {
+		return "birthday_email_jobs"
+	}
+	return name
 }

@@ -40,6 +40,9 @@ type EmailMessage struct {
 	FromEmail        string
 	FromName         string
 	ToEmail          string
+	Subject          string
+	HTMLBody         string
+	TextBody         string
 	TemplateID       string
 	SubstitutionData map[string]any
 }

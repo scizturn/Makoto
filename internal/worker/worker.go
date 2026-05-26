@@ -27,10 +27,15 @@ type Processor struct {
 	validator email.Validator
 	vouchers  voucher.Issuer
 	campaign  campaign.BirthdayCampaign
+	Renderer  Renderer
 
 	Domain    string
 	FromEmail string
 	FromName  string
+}
+
+type Renderer interface {
+	Render(templateID string, mergeData map[string]any) (subject string, html string, err error)
 }
 
 func NewProcessor(store Store, sender email.Sender, validator email.Validator, vouchers voucher.Issuer, campaign campaign.BirthdayCampaign) *Processor {
@@ -86,13 +91,24 @@ func (p *Processor) Process(ctx context.Context, job domain.BirthdayJob) error {
 		return err
 	}
 
+	templateID := p.campaign.SelectTemplate(job.Date)
+	mergeData := p.campaign.BuildMergeData(user, voucherCode, wishlist, fyp, popular)
 	msg := domain.EmailMessage{
 		Domain:           p.Domain,
 		FromEmail:        p.FromEmail,
 		FromName:         p.FromName,
 		ToEmail:          user.Email,
-		TemplateID:       p.campaign.SelectTemplate(job.Date),
-		SubstitutionData: p.campaign.BuildMergeData(user, voucherCode, wishlist, fyp, popular),
+		TemplateID:       templateID,
+		SubstitutionData: mergeData,
+	}
+	if p.Renderer != nil {
+		subject, html, err := p.Renderer.Render(templateID, mergeData)
+		if err != nil {
+			return err
+		}
+		msg.Subject = subject
+		msg.HTMLBody = html
+		msg.TextBody = subject + "\n\n" + user.Name + ", voucher: " + voucherCode
 	}
 	_, err = p.sender.SendTemplate(ctx, msg)
 	return err

@@ -120,6 +120,48 @@ func TestProcessorSendsFromFullRedisJobWithoutDatabaseStore(t *testing.T) {
 	}
 }
 
+func TestProcessorRendersHTMLTemplateWhenRendererConfigured(t *testing.T) {
+	sender := &fakeSender{}
+	processor := NewProcessor(nil, sender, fakeValidator{valid: true}, &fakeVoucherIssuer{code: "HBD-GARVIN"}, campaign.BirthdayCampaign{
+		TemplateIDs: []string{"birthday1.html"},
+		ActionURL:   "https://kyou.id/account/vouchers",
+		RandomIntn:  func(int) int { return 0 },
+	})
+	processor.Domain = "kyou.id"
+	processor.FromEmail = "nandayo@kyou.id"
+	processor.FromName = "Kyou.id"
+	processor.Renderer = fakeRenderer{
+		subject: "Selamat ulang tahun, Garvin",
+		html:    "<h1>Happy birthday Garvin</h1>",
+	}
+
+	err := processor.Process(context.Background(), domain.BirthdayJob{
+		ID:     "birthday-2026-05-21-user-123",
+		UserID: "123",
+		Date:   time.Date(2026, 5, 21, 7, 0, 0, 0, time.UTC),
+		User: domain.User{
+			ID:       "123",
+			Name:     "Garvin",
+			Email:    "garvin@example.test",
+			IsActive: true,
+		},
+	})
+
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	msg := sender.messages[0]
+	if msg.TemplateID != "birthday1.html" {
+		t.Fatalf("expected selected template id, got %q", msg.TemplateID)
+	}
+	if msg.Subject != "Selamat ulang tahun, Garvin" || msg.HTMLBody != "<h1>Happy birthday Garvin</h1>" {
+		t.Fatalf("expected rendered email fields, got %#v", msg)
+	}
+	if msg.TextBody == "" {
+		t.Fatalf("expected plain text fallback")
+	}
+}
+
 type fakeRepository struct {
 	user      domain.User
 	wishlist  []domain.WishlistItem
@@ -181,4 +223,13 @@ type fakeVoucherIssuer struct {
 func (i *fakeVoucherIssuer) IssueBirthdayVoucher(context.Context, domain.User, time.Time) (string, error) {
 	i.requests++
 	return i.code, nil
+}
+
+type fakeRenderer struct {
+	subject string
+	html    string
+}
+
+func (r fakeRenderer) Render(_ string, _ map[string]any) (string, string, error) {
+	return r.subject, r.html, nil
 }

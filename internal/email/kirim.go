@@ -5,7 +5,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 
@@ -20,6 +22,10 @@ type KirimClient struct {
 }
 
 func (c KirimClient) SendTemplate(ctx context.Context, msg domain.EmailMessage) (domain.SendResult, error) {
+	if msg.HTMLBody != "" {
+		return c.sendTransactionalV4(ctx, msg)
+	}
+
 	payload := map[string]any{
 		"from_email":        msg.FromEmail,
 		"from_name":         msg.FromName,
@@ -53,7 +59,7 @@ func (c KirimClient) SendTemplate(ctx context.Context, msg domain.EmailMessage) 
 	defer resp.Body.Close()
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return domain.SendResult{}, fmt.Errorf("kirim.email template send failed: status=%d", resp.StatusCode)
+		return domain.SendResult{}, fmt.Errorf("kirim.email template send failed: status=%d body=%s", resp.StatusCode, readResponseBody(resp))
 	}
 
 	var result struct {
@@ -67,6 +73,57 @@ func (c KirimClient) SendTemplate(ctx context.Context, msg domain.EmailMessage) 
 		result.MessageID = result.ID
 	}
 	return domain.SendResult{MessageID: result.MessageID}, nil
+}
+
+func (c KirimClient) sendTransactionalV4(ctx context.Context, msg domain.EmailMessage) (domain.SendResult, error) {
+	form := url.Values{}
+	form.Set("from", formatFrom(msg.FromName, msg.FromEmail))
+	form.Set("to", msg.ToEmail)
+	form.Set("subject", msg.Subject)
+	form.Set("html", msg.HTMLBody)
+	if msg.TextBody != "" {
+		form.Set("text", msg.TextBody)
+	}
+
+	url := strings.TrimRight(c.BaseURL, "/") + "/api/v4/transactional/message"
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, strings.NewReader(form.Encode()))
+	if err != nil {
+		return domain.SendResult{}, err
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Set("domain", msg.Domain)
+	req.SetBasicAuth(c.Username, c.APIToken)
+
+	client := c.HTTPClient
+	if client == nil {
+		client = &http.Client{Timeout: 20 * time.Second}
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return domain.SendResult{}, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		return domain.SendResult{}, fmt.Errorf("kirim.email transactional send failed: status=%d body=%s", resp.StatusCode, readResponseBody(resp))
+	}
+
+	var result struct {
+		ID        string `json:"id"`
+		MessageID string `json:"message_id"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return domain.SendResult{}, nil
+	}
+	if result.MessageID == "" {
+		result.MessageID = result.ID
+	}
+	return domain.SendResult{MessageID: result.MessageID}, nil
+}
+
+func formatFrom(name string, email string) string {
+	return email
 }
 
 func (c KirimClient) Validate(ctx context.Context, email string) (bool, error) {
@@ -96,7 +153,7 @@ func (c KirimClient) Validate(ctx context.Context, email string) (bool, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return false, fmt.Errorf("kirim.email validation failed: status=%d", resp.StatusCode)
+		return false, fmt.Errorf("kirim.email validation failed: status=%d body=%s", resp.StatusCode, readResponseBody(resp))
 	}
 
 	var result struct {
@@ -110,4 +167,12 @@ func (c KirimClient) Validate(ctx context.Context, email string) (bool, error) {
 		return *result.Valid, nil
 	}
 	return strings.EqualFold(result.Status, "valid"), nil
+}
+
+func readResponseBody(resp *http.Response) string {
+	body, err := io.ReadAll(io.LimitReader(resp.Body, 4096))
+	if err != nil {
+		return err.Error()
+	}
+	return strings.TrimSpace(string(body))
 }

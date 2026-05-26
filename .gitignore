@@ -8,5 +8,6 @@
 
 *.log
 *.tmp
+dump.rdb
 .DS_Store
 .gocache/

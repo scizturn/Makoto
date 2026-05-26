@@ -14,13 +14,18 @@ type Config struct {
 	RedisPassword      string
 	RedisDB            int
 	QueueName          string
+	DeadLetterQueue    string
+	MaxAttempts        int
 	KirimEmailUsername string
 	KirimEmailAPIToken string
 	KirimEmailBaseURL  string
 	KirimEmailDomain   string
+	KirimEmailValidate bool
 	FromEmail          string
 	FromName           string
 	TemplateIDs        []string
+	EmailTemplateDir   string
+	EmailSubject       string
 	ActionURL          string
 	KyouIDAPIBaseURL   string
 	KyouIDAPIToken     string
@@ -37,13 +42,18 @@ func Load() Config {
 		RedisPassword:      os.Getenv("REDIS_PASSWORD"),
 		RedisDB:            envIntAllowZero("REDIS_DB", 0),
 		QueueName:          env("MAKOTO_QUEUE_NAME", "birthday_email_jobs"),
+		DeadLetterQueue:    env("MAKOTO_DEAD_LETTER_QUEUE", "birthday_email_jobs_dead"),
+		MaxAttempts:        envInt("MAKOTO_MAX_ATTEMPTS", 3),
 		KirimEmailUsername: os.Getenv("KIRIM_EMAIL_USERNAME"),
 		KirimEmailAPIToken: os.Getenv("KIRIM_EMAIL_API_TOKEN"),
 		KirimEmailBaseURL:  env("KIRIM_EMAIL_BASE_URL", "https://smtp-app.kirim.email"),
 		KirimEmailDomain:   env("KIRIM_EMAIL_DOMAIN", "kyou.id"),
+		KirimEmailValidate: envBool("KIRIM_EMAIL_VALIDATE", false),
 		FromEmail:          env("KIRIM_EMAIL_FROM_EMAIL", "nandayo@kyou.id"),
 		FromName:           env("KIRIM_EMAIL_FROM_NAME", "Kyou.id"),
 		TemplateIDs:        envList("MAKOTO_TEMPLATE_IDS", []string{"tpl_001", "tpl_002", "tpl_003"}),
+		EmailTemplateDir:   os.Getenv("MAKOTO_EMAIL_TEMPLATE_DIR"),
+		EmailSubject:       env("MAKOTO_EMAIL_SUBJECT", "Selamat ulang tahun, {{ .Name }}"),
 		ActionURL:          env("MAKOTO_ACTION_URL", "https://kyou.id/account/vouchers"),
 		KyouIDAPIBaseURL:   env("KYOU_ID_API_BASE_URL", "https://kyou.id"),
 		KyouIDAPIToken:     os.Getenv("KYOU_ID_API_TOKEN"),
