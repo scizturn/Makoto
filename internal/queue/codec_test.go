@@ -18,9 +18,26 @@ func TestEncodeDecodeBirthdayJob(t *testing.T) {
 			Email:    "garvin@example.test",
 			IsActive: true,
 		},
-		WishlistItems: []domain.WishlistItem{{ID: "wish-1", Name: "Figure"}},
-		FYPItems:      []domain.FYPItem{{ID: "fyp-1", Name: "Chara", Kind: "character"}},
-		Attempt:       1,
+		WishlistItems: []domain.WishlistItem{{
+			ID:           "wish-1",
+			Name:         "Figure",
+			ImageURL:     "https://kyoucdn.id/items/wish.jpg.webp",
+			Price:        850000,
+			Status:       "ready",
+			Manufacturer: "Vocaloid",
+			SeriesName:   "Zenless Zone Zero",
+		}},
+		FYPItems: []domain.FYPItem{{
+			ID:           "fyp-1",
+			Name:         "Chara",
+			Kind:         "character",
+			ImageURL:     "https://kyoucdn.id/items/fyp.jpg.webp",
+			Price:        150000,
+			Status:       "PO",
+			Manufacturer: "Good Smile Company",
+			SeriesName:   "Honkai: Star Rail",
+		}},
+		Attempt: 1,
 	}
 
 	payload, err := EncodeBirthdayJob(job)
@@ -34,5 +51,11 @@ func TestEncodeDecodeBirthdayJob(t *testing.T) {
 
 	if got.ID != job.ID || got.User.Email != job.User.Email || len(got.WishlistItems) != 1 || len(got.FYPItems) != 1 {
 		t.Fatalf("unexpected decoded job: %#v", got)
+	}
+	if got.WishlistItems[0].ImageURL != "https://kyoucdn.id/items/wish.jpg.webp" || got.FYPItems[0].ImageURL != "https://kyoucdn.id/items/fyp.jpg.webp" {
+		t.Fatalf("expected image urls to round trip, got %#v", got)
+	}
+	if got.WishlistItems[0].Price != 850000 || got.WishlistItems[0].Status != "ready" || got.WishlistItems[0].Manufacturer != "Vocaloid" || got.WishlistItems[0].SeriesName != "Zenless Zone Zero" || got.FYPItems[0].Price != 150000 || got.FYPItems[0].Status != "PO" || got.FYPItems[0].Manufacturer != "Good Smile Company" || got.FYPItems[0].SeriesName != "Honkai: Star Rail" {
+		t.Fatalf("expected commerce fields to round trip, got %#v", got)
 	}
 }

@@ -1,6 +1,7 @@
 package campaign
 
 import (
+	"os"
 	"testing"
 	"time"
 
@@ -31,7 +32,7 @@ func TestBuildMergeDataFallsBackToPopularFYP(t *testing.T) {
 		ActionURL: "https://kyou.id/account/vouchers",
 	}
 	user := domain.User{ID: "user-1", Name: "Ruby", Email: "ruby@example.test"}
-	wishlist := []domain.WishlistItem{{ID: "wish-1", Name: "Figure <Ruby>", URL: "https://kyou.id/items/1?x=<bad>"}}
+	wishlist := []domain.WishlistItem{{ID: "wish-1", Name: "Figure <Ruby>", URL: "https://kyou.id/items/1/"}}
 	popular := []domain.FYPItem{{ID: "popular-1", Name: "Popular <Chara>", Kind: "character"}}
 
 	got := campaign.BuildMergeData(user, "HBD-RUBY-7K2M", wishlist, nil, popular)
@@ -56,10 +57,10 @@ func TestBuildMergeDataFallsBackToPopularFYP(t *testing.T) {
 	if !ok {
 		t.Fatalf("expected wishlist_html string, got %T", got["wishlist_html"])
 	}
-	if wishlistHTML == "" || containsAny(wishlistHTML, []string{"Figure <Ruby>", "?x=<bad>"}) {
+	if wishlistHTML == "" || containsAny(wishlistHTML, []string{"Figure <Ruby>"}) {
 		t.Fatalf("expected escaped wishlist html, got %q", wishlistHTML)
 	}
-	if !containsAll(wishlistHTML, []string{"Figure &lt;Ruby&gt;", "https://kyou.id/items/1?x=&lt;bad&gt;"}) {
+	if !containsAll(wishlistHTML, []string{"Figure &lt;Ruby&gt;", "https://kyou.id/items/1/"}) {
 		t.Fatalf("expected wishlist html content, got %q", wishlistHTML)
 	}
 	fypHTML, ok := got["fyp_html"].(string)
@@ -69,6 +70,248 @@ func TestBuildMergeDataFallsBackToPopularFYP(t *testing.T) {
 	if !containsAll(fypHTML, []string{"Popular &lt;Chara&gt;", "character"}) {
 		t.Fatalf("expected fyp html content, got %q", fypHTML)
 	}
+}
+
+func TestBuildMergeDataTopsUpPartialFYPWithPopularItems(t *testing.T) {
+	campaign := BirthdayCampaign{}
+	user := domain.User{ID: "user-1", Name: "Ruby", Email: "ruby@example.test"}
+	fyp := []domain.FYPItem{{ID: "fyp-1", Name: "Dorothy", Kind: "character"}}
+	popular := []domain.FYPItem{
+		{ID: "popular-1", Name: "Frieren", Kind: "series"},
+		{ID: "popular-2", Name: "Miku", Kind: "series"},
+		{ID: "popular-3", Name: "Extra", Kind: "series"},
+	}
+
+	got := campaign.BuildMergeData(user, "HBD", nil, fyp, popular)
+
+	fypItems, ok := got["fyp_items"].([]domain.FYPItem)
+	if !ok {
+		t.Fatalf("expected fyp_items []domain.FYPItem, got %T", got["fyp_items"])
+	}
+	if len(fypItems) != 3 {
+		t.Fatalf("expected partial fyp to be topped up to 3 items, got %#v", fypItems)
+	}
+	if fypItems[0].ID != "fyp-1" || fypItems[1].ID != "popular-1" || fypItems[2].ID != "popular-2" {
+		t.Fatalf("expected fyp then popular top-up order, got %#v", fypItems)
+	}
+	fypHTML, ok := got["fyp_html"].(string)
+	if !ok {
+		t.Fatalf("expected fyp_html string, got %T", got["fyp_html"])
+	}
+	if countOccurrences(fypHTML, `<td width="230"`) != 3 {
+		t.Fatalf("expected three rendered cards, got %q", fypHTML)
+	}
+}
+
+func TestRenderWishlistHTMLUsesImageCardsWhenImageURLExists(t *testing.T) {
+	got := RenderWishlistHTML([]domain.WishlistItem{{
+		ID:           "wish-1",
+		Name:         "Vivian Banshee Mockingbird Q Series Acrylic Keychain - Zenless Zone Zero (7,4cm)",
+		URL:          "https://kyou.id/items/1/",
+		ImageURL:     "https://kyoucdn.id/items/figure.jpg.webp?x=<bad>",
+		Price:        850000,
+		Status:       "ready",
+		Manufacturer: "Vocaloid",
+		SeriesName:   "Zenless Zone Zero",
+	}})
+
+	if !containsAll(got, []string{
+		`<img src="https://kyoucdn.id/items/figure.jpg.webp?x=&lt;bad&gt;"`,
+		`alt="Vivian Banshee Mockingbird Q"`,
+		`Ready Stock`,
+		`background:#40b774`,
+		`Wishlist Pick`,
+		`Vivian Banshee Mockingbird Q`,
+		`ZENLESS ZONE ZERO`,
+		`margin:0 auto;width:600px;padding:26px 30px`,
+		`td width="170" valign="middle" style="width:170px;padding:0 42px 0 0;`,
+		`td width="404" valign="middle" style="width:404px;padding:0 0 0 0;`,
+		`margin:0 0 4px;color:#ffd68a;font-size:14px;font-weight:900;letter-spacing:3px;text-transform:uppercase;`,
+		`margin:0 0 16px;color:#f7dfce;font-size:16px;font-weight:650;line-height:1.52;`,
+		`font-size:19px;font-weight:800;line-height:1.22`,
+	}) {
+		t.Fatalf("expected wishlist image card html, got %q", got)
+	}
+	if containsAny(got, []string{"Vivian Banshee Mockingbird Q Series Acrylic Keychain", "Zenless Zone Zero (7,4cm)", `font-style:italic`, `font-size:22px;font-weight:900;line-height:1.18`}) {
+		t.Fatalf("expected escaped image card html, got %q", got)
+	}
+}
+
+func TestRenderFYPHTMLUsesImageCardsWhenImageURLExists(t *testing.T) {
+	got := RenderFYPHTML([]domain.FYPItem{
+		{
+			ID:         "fyp-1",
+			Name:       "PVC Figure Gift+ 1/8 Sunday - Star Rail LIVE Ver. Honkai: Star Rail",
+			Kind:       "character",
+			ImageURL:   "https://kyoucdn.id/items/chara.jpg.webp",
+			Price:      150000,
+			Status:     "PO",
+			SeriesName: "Honkai: Star Rail",
+		},
+		{
+			ID:         "fyp-2",
+			Name:       "[Random] Hatsune Miku Stellar Voice Series Can Badge Blind Box - Vocaloid",
+			Kind:       "series",
+			ImageURL:   "https://kyoucdn.id/items/series.jpg.webp",
+			Price:      650000,
+			Status:     "ready",
+			SeriesName: "Vocaloid",
+		},
+		{
+			ID:         "fyp-3",
+			Name:       "[Mono Goods] Protect Me Umbrella - Wind Breaker",
+			Kind:       "series",
+			ImageURL:   "https://kyoucdn.id/items/another.jpg.webp",
+			Price:      850000,
+			Status:     "ready",
+			SeriesName: "Wind Breaker",
+		},
+	})
+
+	if !containsAll(got, []string{
+		`<table role="presentation"`,
+		`width="690"`,
+		`align="center"`,
+		`<td width="230"`,
+		`width:180px;height:360px;margin:auto;padding:12px`,
+		`background:#ffe0cf url('https://kyoucdn.id/static/assets/item_bg.jpg') center/cover no-repeat`,
+		`display:block;margin:auto;width:180px;border-radius:4px;height:180px`,
+		`font-size:12px;font-weight:600;text-overflow:ellipsis;white-space:nowrap`,
+		`margin:0 0 48px 0;color:#0f172a;font-size:17px;font-weight:900;line-height:1.32;white-space:normal;word-break:break-word`,
+		`<img src="https://kyoucdn.id/items/chara.jpg.webp"`,
+		`alt="Sunday"`,
+		`Sunday`,
+		`Sunday<br>Star Rail LIVE Ver.`,
+		`https://kyou.id/items/fyp-1/`,
+		`Honkai: Star Rail`,
+		`Vocaloid`,
+		`Hatsune Miku<br>Stellar Voice Series`,
+		`Wind Breaker`,
+		`Protect Me Umbrella`,
+		`Ready Stock`,
+		`Late Pre-Order`,
+		`background:#40b774`,
+		`background:#d3647a`,
+	}) {
+		t.Fatalf("expected fyp image card html, got %q", got)
+	}
+	if containsAny(got, []string{"IDR 150.000", "IDR 650.000", "IDR 850.000", `font-style:italic`, `PVC Figure`, `Gift+`, `[Random]`, `Can Badge Blind Box`, `[Mono Goods]`}) {
+		t.Fatalf("expected fyp cards to omit prices and product noise, got %q", got)
+	}
+	if countOccurrences(got, `<a href="https://kyou.id/items/`) != 3 {
+		t.Fatalf("expected every fyp card to be wrapped in a link, got %q", got)
+	}
+	if containsAny(got, []string{"display:grid", "display:flex"}) {
+		t.Fatalf("expected table layout without grid/flex, got %q", got)
+	}
+	if countOccurrences(got, `<td width="230"`) != 3 {
+		t.Fatalf("expected exactly three table cells, got %q", got)
+	}
+	if countOccurrences(got, `width:180px;height:360px;margin:auto;padding:12px`) != 3 {
+		t.Fatalf("expected exactly three equal-size cards, got %q", got)
+	}
+	if countOccurrences(got, `margin:0 0 48px 0;color:#0f172a;font-size:17px;font-weight:900;line-height:1.32;white-space:normal;word-break:break-word`) != 3 {
+		t.Fatalf("expected one fixed-margin text block per card, got %q", got)
+	}
+}
+
+func TestItemStatusBadgesUseFixedLabelsAndColors(t *testing.T) {
+	got := RenderFYPHTML([]domain.FYPItem{
+		{ID: "po", Name: "PO Pick", Status: "PO", PODeadline: ptrTime(time.Date(2026, 6, 1, 0, 0, 0, 0, time.UTC))},
+		{ID: "ready", Name: "Ready Pick", Status: "ready"},
+		{ID: "lpo", Name: "LPO Pick", Status: "PO"},
+	})
+
+	if !containsAll(got, []string{
+		`Pre-Order`,
+		`Ready Stock`,
+		`Late Pre-Order`,
+		`background:#657996`,
+		`background:#40b774`,
+		`background:#d3647a`,
+	}) {
+		t.Fatalf("expected fixed status badges, got %q", got)
+	}
+	if containsAny(got, []string{`>PO<`, `>READY<`, `>LPO<`}) {
+		t.Fatalf("expected display labels instead of raw status codes, got %q", got)
+	}
+}
+
+func TestBirthdayTemplatesUseFixedEmailWidth(t *testing.T) {
+	for _, path := range []string{
+		"../../templates/birthday/birthday1.html",
+		"../../templates/preview/birthday-preview.html",
+	} {
+		t.Run(path, func(t *testing.T) {
+			content, err := os.ReadFile(path)
+			if err != nil {
+				t.Fatal(err)
+			}
+			html := string(content)
+			if containsAny(html, []string{
+				`<meta name="viewport"`,
+				`max-width: 720px`,
+				`max-width: 650px`,
+				`max-width: 560px`,
+				`width: 100%`,
+				`width:100%`,
+				`@media`,
+			}) {
+				t.Fatalf("expected fixed-width non-responsive template, got responsive content in %s", path)
+			}
+			if !containsAll(html, []string{
+				`<table role="presentation" width="720"`,
+				`style="width:720px;min-width:720px;`,
+				`width="720"`,
+			}) {
+				t.Fatalf("expected fixed 720px template, got %s", path)
+			}
+		})
+	}
+}
+
+func TestBirthdayTemplatesUseTextFooterDesign(t *testing.T) {
+	for _, path := range []string{
+		"../../templates/birthday/birthday1.html",
+		"../../templates/preview/birthday-preview.html",
+	} {
+		t.Run(path, func(t *testing.T) {
+			content, err := os.ReadFile(path)
+			if err != nil {
+				t.Fatal(err)
+			}
+			html := string(content)
+			if containsAny(html, []string{
+				`static/assets/footer.jpg`,
+			}) {
+				t.Fatalf("expected text footer instead of footer image in %s", path)
+			}
+			if !containsAll(html, []string{
+				`border-top: 6px solid #7a3b14`,
+				`background: #efad3e`,
+				`border-radius: 0 0 24px 24px`,
+				`Ayo cintai hobimu bareng Kyou!`,
+				`©2014–2026 Kyou Hobby Shop / Kyou Hobby Shop`,
+				`Kamu menerima email ini karena terdaftar sebagai Teman Kyou.`,
+				`margin:0 0 8px;color:#5a351d;font-size:20px;font-weight:900;line-height:1.2;`,
+				`margin:0 0 0px;color:#7b5c2b;font-size:16px;font-weight:500;line-height:1.4;`,
+				`margin:0;color:#8a6c36;font-size:16px;font-weight:500;line-height:1.55;`,
+			}) {
+				t.Fatalf("expected screenshot-style text footer in %s", path)
+			}
+			if containsAny(html, []string{
+				`Unsubscribe`,
+				`Update preferences`,
+				`user/notification`,
+			}) {
+				t.Fatalf("expected footer without unsubscribe/preferences links in %s", path)
+			}
+		})
+	}
+}
+
+func ptrTime(value time.Time) *time.Time {
+	return &value
 }
 
 func containsAll(value string, needles []string) bool {
@@ -96,4 +339,14 @@ func contains(value string, needle string) bool {
 		}
 	}
 	return needle == ""
+}
+
+func countOccurrences(value string, needle string) int {
+	count := 0
+	for i := 0; i+len(needle) <= len(value); i++ {
+		if value[i:i+len(needle)] == needle {
+			count++
+		}
+	}
+	return count
 }

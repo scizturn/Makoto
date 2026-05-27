@@ -89,6 +89,8 @@ Makoto converts wishlist and FYP items into HTML strings before sending. Kirim.e
 {{closing}}
 ```
 
+Wishlist and FYP item payloads can include `image_url`. When present, Makoto renders image cards with public HTTPS image URLs, for example `https://kyoucdn.id/items/example.jpg.webp`.
+
 ## Failed Jobs
 
 Makoto retries failed sends until `MAKOTO_MAX_ATTEMPTS`. If the job still fails, Makoto pushes the payload to `MAKOTO_DEAD_LETTER_QUEUE` and logs the failure to Discord.

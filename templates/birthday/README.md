@@ -14,8 +14,8 @@ Available variables:
 
 - `{{ .Name }}`: user display name.
 - `{{ .VoucherCode }}`: generated birthday voucher code, or `LOCAL-BIRTHDAY` when voucher API is disabled.
-- `{{ .WishlistHTML }}`: ready-to-insert wishlist HTML.
-- `{{ .FYPHTML }}`: ready-to-insert FYP HTML, with popular fallback handled before rendering.
+- `{{ .WishlistHTML }}`: ready-to-insert wishlist HTML. It renders image cards when `image_url` exists.
+- `{{ .FYPHTML }}`: ready-to-insert FYP HTML, with popular fallback handled before rendering. It renders image cards when `image_url` exists.
 - `{{ .ActionURL }}`: Kyou voucher/action page.
 - `{{ .Closing }}`: configured closing sentence.
 

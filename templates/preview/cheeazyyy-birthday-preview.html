@@ -1,0 +1,810 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cheeazyyy Birthday Email Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #e5e7eb;
+      color: #111827;
+      font-family: "Nunito", Arial, Helvetica, sans-serif;
+    }
+
+    .preview-shell {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 28px 18px 56px;
+    }
+
+    .preview-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .preview-header h1 {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1.25;
+    }
+
+    .preview-header p {
+      margin: 6px 0 0;
+      color: #4b5563;
+      font-size: 14px;
+    }
+
+    .preview-meta {
+      padding: 8px 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      background: #ffffff;
+      font-size: 13px;
+      color: #374151;
+      white-space: nowrap;
+    }
+
+    .email-frame {
+      max-width: 720px;
+      margin: 0 auto;
+      background: #f6f7fb;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 16px 36px rgba(15, 23, 42, 0.14);
+    }
+
+    .email-body {
+      padding: 28px 16px;
+    }
+
+    .email-card {
+      background: linear-gradient(135deg, #fff8ed 0%, #fff1df 100%);
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .email-brand-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 74px;
+      padding: 14px 24px;
+      background: #ff6b35;
+    }
+
+    .brand-logo {
+      display: block;
+      width: 60px;
+      max-width: 46%;
+      height: auto;
+    }
+
+    .email-banner {
+      display: block;
+      width: 100%;
+      aspect-ratio: 1761 / 880;
+      object-fit: cover;
+      background: #f3f4f6;
+    }
+
+    .title-section {
+      padding: 42px 44px 32px;
+      background: linear-gradient(135deg, #fff8ed 0%, #fff1df 100%);
+      text-align: center;
+    }
+
+    .birthday-title {
+      margin: 0 0 24px;
+      color: #5a351d;
+      font-size: 42px;
+      font-weight: 900;
+      line-height: 1.18;
+    }
+
+    .birthday-name {
+      color: #ff5a0a;
+    }
+
+    .title-section p {
+      max-width: 650px;
+      margin: 0 auto 22px;
+      color: #5a351d;
+      font-size: 18px;
+      font-weight: 600;
+      line-height: 1.75;
+    }
+
+    .title-section em {
+      color: #9d6a49;
+      font-style: italic;
+    }
+
+    .title-highlight {
+      color: #ff5a0a;
+      font-weight: 900;
+    }
+
+    .title-section p:last-child {
+      margin-bottom: 0;
+    }
+
+    .email-content {
+      padding: 42px 36px;
+      background: linear-gradient(135deg, #fff8ed 0%, #fff1df 100%);
+    }
+
+    .email-content p {
+      margin: 0 0 18px;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    .voucher {
+      padding: 0 44px 32px;
+      margin: 0;
+      background: linear-gradient(135deg, #fff8ed 0%, #fff1df 100%);
+      text-align: center;
+    }
+
+    .voucher span {
+      display: block;
+      margin-bottom: 14px;
+      color: #9d6a49;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .reward-button {
+      display: block;
+      width: min(100%, 380px);
+      margin: 0 auto;
+      padding: 22px 26px 20px;
+      border: 5px solid #5a351d;
+      border-radius: 999px;
+      background: #ff5a0a;
+      box-shadow: 0 8px 0 #5a351d;
+      color: #ffffff;
+      font-size: 24px;
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: 3px;
+      text-align: center;
+      text-decoration: none;
+    }
+
+    .voucher-note {
+      display: block;
+      max-width: 560px;
+      margin: 34px auto 0;
+      color: #9d6a49;
+      font-size: 15px;
+      font-style: italic;
+      font-weight: 600;
+      line-height: 1.45;
+    }
+
+    .section-title {
+      margin: 0 0 26px;
+      color: #5a351d;
+      font-size: 32px;
+      font-weight: 900;
+      line-height: 1.2;
+      text-align: center;
+    }
+
+    .section-kicker {
+      margin: 0 0 18px;
+      border-top: 2px dashed #d4a076;
+      padding-top: 42px;
+      color: #ff5a0a;
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: 6px;
+      text-align: center;
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+      margin: 0 0 28px;
+    }
+
+    .product-card {
+      overflow: hidden;
+      min-width: 0;
+      padding: 12px;
+      border: 1px solid #9ca3af;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #fff8ed 0%, #ffe0cf 100%);
+    }
+
+    .product-card img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      border-radius: 0;
+      background: #f3f4f6;
+    }
+
+    .product-info {
+      padding: 14px 8px 4px;
+    }
+
+    .product-series {
+      margin: 0 0 7px;
+      overflow: hidden;
+      color: #2f2b28;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0;
+      text-transform: none;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .product-name {
+      display: -webkit-box;
+      min-height: 46px;
+      margin: 0;
+      overflow: hidden;
+      color: #0f172a;
+      font-size: 16px;
+      font-weight: 900;
+      line-height: 1.28;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+    }
+
+    .product-version {
+      margin: 13px 0 0;
+      color: #ff5a0a;
+      font-size: 15px;
+      font-weight: 900;
+    }
+
+    .fyp-kicker {
+      margin-top: 44px;
+      border-top: 0;
+      padding-top: 0;
+    }
+
+    .wishlist-feature {
+      display: grid;
+      grid-template-columns: 170px 1fr;
+      gap: 26px;
+      align-items: center;
+      margin-bottom: 34px;
+      padding: 26px 30px;
+      border: 2px solid #7a4a24;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #5a2f19 0%, #321b10 100%);
+      color: #ffffff;
+    }
+
+    .wishlist-image-frame {
+      padding: 6px;
+      border: 5px solid #fff18f;
+      border-radius: 12px;
+      background: #fff8d1;
+    }
+
+    .wishlist-image-frame img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      border-radius: 6px;
+      object-fit: cover;
+      background: #f3e7d8;
+    }
+
+    .wishlist-series {
+      margin: 0 0 9px;
+      color: #ffd68a;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+    }
+
+    .wishlist-name {
+      margin: 0 0 12px;
+      color: #ffffff;
+      font-size: 20px;
+      font-weight: 900;
+      line-height: 1.2;
+    }
+
+    .wishlist-copy {
+      margin: 0 0 16px;
+      color: rgba(255, 255, 255, 0.82);
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.45;
+    }
+
+    .wishlist-meta {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .wishlist-price {
+      color: #ffbe72;
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: 2px;
+    }
+
+    .wishlist-status {
+      display: inline-block;
+      padding: 7px 12px;
+      border-radius: 7px;
+      background: #ff5a0a;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 2px;
+    }
+
+    .social-section {
+      padding: 34px 36px 40px;
+      background: linear-gradient(135deg, #fff8ed 0%, #fff1df 100%);
+    }
+
+    .social-image {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .social-actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+      margin-top: 28px;
+    }
+
+    .social-button {
+      display: block;
+      padding: 20px 18px 18px;
+      border: 4px solid #5a351d;
+      border-radius: 999px;
+      box-shadow: 0 7px 0 #5a351d;
+      color: #ffffff;
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: 1.5px;
+      line-height: 1;
+      text-align: center;
+      text-decoration: none;
+    }
+
+    .social-button.pos {
+      background: #ff5a0a;
+    }
+
+    .social-button.wa {
+      background: #2bd166;
+    }
+
+    .store-section {
+      padding: 36px;
+      background: #F5640A;
+      text-align: center;
+    }
+
+    .store-section h3 {
+      margin: 0 0 24px;
+      color: #ffffff;
+      font-size: 34px;
+      font-weight: 900;
+      line-height: 1.15;
+    }
+
+    .store-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .store-card {
+      display: block;
+      min-width: 0;
+      text-decoration: none;
+    }
+
+    .store-card img,
+    .store-placeholder {
+      display: block;
+      width: 100%;
+      border-radius: 10px;
+    }
+
+    .store-placeholder {
+      overflow: hidden;
+      background: #ffffff;
+      box-shadow: inset 0 0 0 2px #e5e7eb;
+      color: #111827;
+      text-align: left;
+    }
+
+    .store-placeholder-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px;
+      background: #8b5cf6;
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .store-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border: 2px solid #ffffff;
+      border-radius: 6px;
+      font-size: 12px;
+      line-height: 1;
+    }
+
+    .store-placeholder-body {
+      padding: 12px 10px 14px;
+      font-size: 13px;
+      font-weight: 900;
+      line-height: 1.35;
+    }
+
+    .interact-section {
+      padding: 42px 36px 46px;
+      background: #F5640A;
+      text-align: center;
+    }
+
+    .interact-section h3 {
+      margin: 0 0 42px;
+      color: #ffffff;
+      font-size: 40px;
+      font-weight: 900;
+      line-height: 1.15;
+    }
+
+    .interact-grid {
+      display: flex;
+      justify-content: center;
+      gap: 22px;
+      flex-wrap: wrap;
+    }
+
+    .interact-link {
+      display: block;
+      width: 70px;
+      height: 70px;
+      border-radius: 999px;
+      overflow: hidden;
+      text-decoration: none;
+    }
+
+    .interact-link img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .footer-section {
+      border-top: 4px solid #5c3a1e;
+      background: #F5640A;
+    }
+
+    .footer-image {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .cta {
+      display: inline-block;
+      margin-top: 2px;
+      padding: 12px 18px;
+      border-radius: 6px;
+      background: #2563eb;
+      color: #ffffff;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .closing {
+      margin: 24px 0 0;
+      color: #4b5563;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 680px) {
+      .preview-header {
+        flex-direction: column;
+      }
+
+      .preview-meta {
+        white-space: normal;
+      }
+
+      .email-brand-header,
+      .email-content {
+        padding: 22px;
+      }
+
+      .email-brand-header {
+        min-height: 66px;
+      }
+
+      .title-section {
+        padding: 32px 20px 24px;
+      }
+
+      .birthday-title {
+        font-size: 32px;
+      }
+
+      .title-section p {
+        font-size: 16px;
+        line-height: 1.65;
+      }
+
+      .voucher {
+        padding: 0 20px 28px;
+      }
+
+      .reward-button {
+        padding: 19px 18px 17px;
+        font-size: 19px;
+        letter-spacing: 2px;
+      }
+
+      .brand-logo {
+        width: 56px;
+      }
+
+      .product-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .product-info {
+        padding: 14px;
+      }
+
+      .product-name {
+        min-height: auto;
+      }
+
+      .section-kicker {
+        padding-top: 30px;
+        font-size: 12px;
+        letter-spacing: 3px;
+      }
+
+      .section-title {
+        font-size: 26px;
+      }
+
+      .wishlist-feature {
+        grid-template-columns: 1fr;
+        gap: 18px;
+        padding: 20px;
+      }
+
+      .wishlist-image-frame {
+        max-width: 190px;
+        margin: 0 auto;
+      }
+
+      .wishlist-name {
+        font-size: 18px;
+      }
+
+      .social-section {
+        padding: 28px 22px 34px;
+      }
+
+      .social-actions {
+        grid-template-columns: 1fr;
+      }
+
+      .social-button {
+        font-size: 16px;
+      }
+
+      .store-section {
+        padding: 30px 20px;
+      }
+
+      .store-section h3 {
+        font-size: 28px;
+      }
+
+      .store-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .interact-section {
+        padding: 34px 20px 38px;
+      }
+
+      .interact-section h3 {
+        margin-bottom: 28px;
+        font-size: 30px;
+      }
+
+      .interact-grid {
+        gap: 14px;
+      }
+
+      .interact-link {
+        width: 54px;
+        height: 54px;
+      }
+
+    }
+  </style>
+</head>
+<body>
+  <main class="preview-shell">
+    <header class="preview-header">
+      <div>
+        <h1>Cheeazyyy Birthday Email Preview</h1>
+        <p>Real DB text data for user <strong>Tegar (User View)</strong>. Images use real public Kyou CDN URLs from the birthday job payload.</p>
+      </div>
+      <div class="preview-meta">user_id=159502 / birthdate=2007-01-07</div>
+    </header>
+
+    <section class="email-frame" aria-label="Birthday email preview">
+      <div class="email-body">
+        <article class="email-card">
+          <div class="email-brand-header">
+            <img class="brand-logo" src="https://kyoucdn.id/static/assets/brand_logo.png" alt="Kyou.id">
+          </div>
+          <img class="email-banner" src="../Asset/Banner_Template_2.png" alt="Happy birthday banner">
+
+          <section class="title-section" aria-label="Birthday message title">
+            <h2 class="birthday-title">Happy Birthday, <span class="birthday-name">{{nama}}</span>!</h2>
+            <p><em>Otanjoubi omedetto gozaimasu, {{nama}}!</em> Hari ini harus hepi dong! Kyou doain semoga di umur yang baru ini rezeki kamu makin lancar, gacha selalu rate-up, dan semua wishlist idaman kamu bisa pelan-pelan ke-checkout semua!</p>
+            <p>ThanKyou ya udah selalu jadi <span class="title-highlight">Teman Kyou</span> buat ngurusin hobi kamu. Biar perayaan hari ini makin mantap, Kyou udah nyiapin kado khusus nih. Langsung cek dan klaim hadiahnya di bawah ya!</p>
+          </section>
+
+          <div class="voucher">
+            <a class="reward-button" href="https://kyou.id/account/vouchers">VIEW MY GIFT</a>
+            <p class="voucher-note">*Voucher berlaku selama 2 minggu sejak email ini dikirimkan yaa. Jangan<br>
+              lupa segera claim vouchernya sebelum expired.</p>
+          </div>
+
+          <div class="email-content">
+            <p class="section-kicker">★ BLESSINGS FROM YOUR COMPANIONS ★</p>
+            <h3 class="section-title">Wishlist terbaik pilihan kamu!</h3>
+            <article class="wishlist-feature">
+              <div class="wishlist-image-frame">
+                <img src="https://kyoucdn.id/items/441057-with-frame-vivian-banshee-mockingbird-cinema-series-acrylic-card-zenless-zone-zero-14x9cm.jpg.webp" alt="Vivian Banshee acrylic card preview">
+              </div>
+              <div>
+                <p class="wishlist-series">Zenless Zone Zero</p>
+                <h4 class="wishlist-name">[With Frame] Vivian Banshee Mockingbird Cinema Series Acrylic Card</h4>
+                <p class="wishlist-copy">Salah satu wishlist idaman kamu lagi nunggu buat jadi bagian dari koleksimu. Yuk, wujudkan bareng Kyou sekarang!</p>
+                <div class="wishlist-meta">
+                  <span class="wishlist-price">Wishlist Pick</span>
+                  <span class="wishlist-status">PRE-ORDER</span>
+                </div>
+              </div>
+            </article>
+
+            <p class="section-kicker fyp-kicker">FOR YOUR PAGE</p>
+            <h3 class="section-title">Item lainnya yang mungkin kamu sukai</h3>
+            <div class="product-grid">
+              <article class="product-card">
+                <img src="https://kyoucdn.id/items/424015-snail-shell-x-amiami-action-figure-non-scale-doro-goddess-of-victory-nikke-1850381616.jpg.webp" alt="Dorothy figure preview">
+                <div class="product-info">
+                  <p class="product-series">Dorothy</p>
+                  <p class="product-name">Snail Shell x AmiAmi Action Figure Non Scale Doro</p>
+                  <p class="product-version">IDR 850.000</p>
+                </div>
+              </article>
+
+              <article class="product-card">
+                <img src="https://kyoucdn.id/items/415977-artist-master-piece-amp-figure-frieren-sousou-no-frieren.jpg.webp" alt="Frieren figure preview">
+                <div class="product-info">
+                  <p class="product-series">Frieren</p>
+                  <p class="product-name">Artist Master Piece AMP Figure Frieren</p>
+                  <p class="product-version">IDR 650.000</p>
+                </div>
+              </article>
+
+              <article class="product-card">
+                <img src="https://kyoucdn.id/items/545446-random-hatsune-miku-stellar-voice-series-can-badge-blind-box-vocaloid.jpg.webp" alt="Hatsune Miku can badge preview">
+                <div class="product-info">
+                  <p class="product-series">Hatsune Miku</p>
+                  <p class="product-name">Random Hatsune Miku Stellar Voice Series Can Badge Blind Box</p>
+                  <p class="product-version">IDR 150.000</p>
+                </div>
+              </article>
+            </div>
+          </div>
+
+          <section class="social-section" aria-label="Tentang Kyou">
+            <img class="social-image" src="https://kyoucdn.id/static/assets/about_kyou.jpg" alt="Kyou mascot">
+            <div class="social-actions">
+              <a class="social-button pos" href="https://kyou.id/user/wishlist">Cek wishlist kamu lainnya!</a>
+              <a class="social-button wa" href="https://kyou.id/wa">Join WA Kamar Wibu!</a>
+            </div>
+          </section>
+
+          <section class="store-section" aria-label="Toko fisik Kyou">
+            <h3>Mampir ke Toko Fisik Kyou!</h3>
+            <div class="store-grid">
+              <a class="store-card" href="https://kyou.id/pos">
+                <img src="https://kyoucdn.id/static/assets/alpha.png" alt="Alpha Store">
+              </a>
+              <a class="store-card" href="https://kyou.id/pos">
+                <img src="https://kyoucdn.id/static/assets/beta.png" alt="Beta Store">
+              </a>
+              <a class="store-card" href="https://kyou.id/pos">
+                <img src="https://kyoucdn.id/static/assets/gamma.png" alt="Gamma Store">
+              </a>
+              <a class="store-card" href="https://kyou.id/pos">
+                <div class="store-placeholder" aria-label="Delta Store">
+                  <div class="store-placeholder-head"><span class="store-icon">⌂</span> Delta Store</div>
+                  <div class="store-placeholder-body">Coming Soon</div>
+                </div>
+              </a>
+            </div>
+          </section>
+
+          <section class="interact-section" aria-label="Interact with Kyou">
+            <h3>Interact with Kyou!</h3>
+            <div class="interact-grid">
+              <a class="interact-link" href="https://kyou.id/wa">
+                <img src="https://kyoucdn.id/static/assets/whatsapp.jpg" alt="WhatsApp">
+              </a>
+              <a class="interact-link" href="https://www.facebook.com/kyouhobbyshop">
+                <img src="https://kyoucdn.id/static/assets/facebook.jpg" alt="Facebook">
+              </a>
+              <a class="interact-link" href="https://m.me/kyouhobbyshop">
+                <img src="https://kyoucdn.id/static/assets/messenger.jpg" alt="Messenger">
+              </a>
+              <a class="interact-link" href="https://www.youtube.com/@KyouHobbyShop">
+                <img src="https://kyoucdn.id/static/assets/youtube.jpg" alt="YouTube">
+              </a>
+              <a class="interact-link" href="https://www.tiktok.com/@kyouhobbyshop">
+                <img src="https://kyoucdn.id/static/assets/tiktok.jpg" alt="TikTok">
+              </a>
+              <a class="interact-link" href="https://kyou.id">
+                <img src="https://kyoucdn.id/static/assets/kyou.jpg" alt="Kyou">
+              </a>
+            </div>
+          </section>
+
+          <footer class="footer-section">
+            <img class="footer-image" src="https://kyoucdn.id/static/assets/footer.jpg" alt="Ayo cintai hobimu bareng Kyou">
+          </footer>
+        </article>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
