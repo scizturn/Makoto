@@ -177,7 +177,8 @@ func renderProductCard(name string, seriesName string, fallbackLabel string, url
 	}
 	nameHTML := fmt.Sprintf(`<p style="%s">%s</p>`, nameStyle, displayText)
 
-	cardHTML := fmt.Sprintf(`<div style="overflow:hidden;width:180px;height:360px;margin:auto;padding:12px;border:1px solid #9ca3af;border-radius:12px;background:#ffe0cf url('https://kyoucdn.id/static/assets/item_bg.jpg') center/cover no-repeat;text-align:left;">%s<div style="padding:12px 8px 4px;"><p style="margin:0 0 4px 0;overflow:hidden;color:#2f2b28;font-size:12px;font-weight:600;text-overflow:ellipsis;white-space:nowrap;">%s</p>%s</div></div>`, imageHTML, safeSeries, nameHTML)
+	buttonHTML := `<img src="https://images2.imgbox.com/ef/f8/mAoUYtqE_o.png" alt="Cek item" width="142" style="display:block;width:142px;height:auto;margin:10px auto 0;border:0;">`
+	cardHTML := fmt.Sprintf(`<div style="overflow:hidden;width:180px;height:360px;margin:auto;padding:12px;border:1px solid #9ca3af;border-radius:12px;background:#ffe0cf url('https://kyoucdn.id/static/assets/item_bg.jpg') center/cover no-repeat;text-align:left;">%s<div style="padding:12px 8px 4px;"><p style="margin:0 0 4px 0;overflow:hidden;color:#2f2b28;font-size:12px;font-weight:600;text-overflow:ellipsis;white-space:nowrap;">%s</p>%s%s</div></div>`, imageHTML, safeSeries, nameHTML, buttonHTML)
 	if safeURL == "" {
 		return cardHTML
 	}

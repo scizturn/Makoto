@@ -221,6 +221,9 @@ func TestRenderFYPHTMLUsesImageCardsWhenImageURLExists(t *testing.T) {
 		`Sunday`,
 		`Sunday<br>Star Rail LIVE Ver.`,
 		`https://kyou.id/items/fyp-1/`,
+		`https://images2.imgbox.com/ef/f8/mAoUYtqE_o.png`,
+		`alt="Cek item"`,
+		`display:block;width:142px;height:auto;margin:10px auto 0;border:0;`,
 		`Honkai: Star Rail`,
 		`Vocaloid`,
 		`Hatsune Miku<br>Stellar Voice Series`,
@@ -243,6 +246,9 @@ func TestRenderFYPHTMLUsesImageCardsWhenImageURLExists(t *testing.T) {
 	}
 	if countOccurrences(got, `width:180px;height:360px;margin:auto;padding:12px`) != 3 {
 		t.Fatalf("expected exactly three equal-size cards, got %q", got)
+	}
+	if countOccurrences(got, `https://images2.imgbox.com/ef/f8/mAoUYtqE_o.png`) != 3 {
+		t.Fatalf("expected one image button per card, got %q", got)
 	}
 	if countOccurrences(got, `margin:0 0 48px 0;color:#0f172a;font-size:17px;font-weight:900;line-height:1.32;white-space:normal;word-break:break-word`) != 3 {
 		t.Fatalf("expected one fixed-margin text block per card, got %q", got)
