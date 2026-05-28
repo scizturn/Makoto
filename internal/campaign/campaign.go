@@ -125,7 +125,7 @@ func RenderFYPHTML(items []domain.FYPItem) string {
 			kind = "Recommended"
 		}
 		builder.WriteString(`<td width="230" valign="top" align="center" style="width:230px;padding:0;text-align:center;">`)
-		builder.WriteString(renderProductCard(item.Name, item.SeriesName, kind, itemURL(item.ID), item.ImageURL, itemDisplayStatus(item.Status, item.PODeadline)))
+		builder.WriteString(renderProductCard(item.Name, item.SeriesName, kind, itemURL(item.ID), item.ImageURL))
 		builder.WriteString(`</td>`)
 	}
 	builder.WriteString(`</tr></table>`)
@@ -146,29 +146,25 @@ func renderWishlistFeature(item domain.WishlistItem) string {
 	}
 
 	nameHTML := safeName
-	if safeURL != "" {
-		nameHTML = fmt.Sprintf(`<a href="%s" style="color:#ffffff;text-decoration:none;">%s</a>`, safeURL, safeName)
-	}
 	versionHTML := ""
 	if safeVersion != "" {
-		versionText := safeVersion
-		if safeURL != "" {
-			versionText = fmt.Sprintf(`<a href="%s" style="color:#ffffff;text-decoration:none;">%s</a>`, safeURL, safeVersion)
-		}
-		versionHTML = fmt.Sprintf(`<p style="margin:5px 0 0;color:#ffffff;font-size:19px;font-weight:800;line-height:1.22;">%s</p>`, versionText)
+		versionHTML = fmt.Sprintf(`<p style="margin:5px 0 0;color:#ffffff;font-size:19px;font-weight:800;line-height:1.22;">%s</p>`, safeVersion)
 	}
 
-	return fmt.Sprintf(`<div style="margin:0 auto;width:600px;padding:26px 30px;border:2px solid #7a4a24;border-radius:18px;background:#321b10;color:#ffffff;"><table role="presentation" width="600" cellspacing="0" cellpadding="0" style="width:600px;border-collapse:collapse;"><tr><td width="170" valign="middle" style="width:170px;padding:0 42px 0 0;"><div style="padding:6px;border:5px solid #fff18f;border-radius:12px;background:#fff8d1;">%s</div></td><td width="404" valign="middle" style="width:404px;padding:0 0 0 0;"><p style="margin:0 0 4px;color:#ffd68a;font-size:14px;font-weight:900;letter-spacing:3px;text-transform:uppercase;">%s</p><h3 style="margin:0 0 16px;color:#ffffff;font-size:19px;font-weight:800;line-height:1.22;">%s%s</h3><p style="margin:0 0 16px;color:#f7dfce;font-size:16px;font-weight:650;line-height:1.52;">Salah satu wishlist idaman kamu lagi nunggu buat jadi bagian dari koleksimu. Yuk, wujudkan bareng Kyou sekarang!</p><span style="display:inline-block;margin:0 12px 8px 0;color:#ffbe72;font-size:15px;font-weight:900;letter-spacing:2px;">Wishlist Pick</span>%s</td></tr></table></div>`, imageHTML, safeSeries, nameHTML, versionHTML, statusHTML)
+	cardHTML := fmt.Sprintf(`<div style="margin:0 auto;width:600px;padding:26px 30px;border:2px solid #7a4a24;border-radius:18px;background:#321b10;color:#ffffff;"><table role="presentation" width="600" cellspacing="0" cellpadding="0" style="width:600px;border-collapse:collapse;"><tr><td width="170" valign="middle" style="width:170px;padding:0 42px 0 0;"><div style="padding:6px;border:5px solid #fff18f;border-radius:12px;background:#fff8d1;">%s</div></td><td width="404" valign="middle" style="width:404px;padding:0 0 0 0;"><p style="margin:0 0 4px;color:#ffd68a;font-size:14px;font-weight:900;letter-spacing:3px;text-transform:uppercase;">%s</p><h3 style="margin:0 0 16px;color:#ffffff;font-size:19px;font-weight:800;line-height:1.22;">%s%s</h3><p style="margin:0 0 16px;color:#f7dfce;font-size:16px;font-weight:650;line-height:1.52;">Salah satu wishlist idaman kamu lagi nunggu buat jadi bagian dari koleksimu. Yuk, wujudkan bareng Kyou sekarang!</p><span style="display:inline-block;margin:0 12px 8px 0;color:#ffbe72;font-size:15px;font-weight:900;letter-spacing:2px;">Wishlist Pick</span>%s</td></tr></table></div>`, imageHTML, safeSeries, nameHTML, versionHTML, statusHTML)
+	if safeURL == "" {
+		return cardHTML
+	}
+	return fmt.Sprintf(`<a href="%s" style="display:block;color:inherit;text-decoration:none;">%s</a>`, safeURL, cardHTML)
 }
 
-func renderProductCard(name string, seriesName string, fallbackLabel string, url string, imageURL string, status string) string {
+func renderProductCard(name string, seriesName string, fallbackLabel string, url string, imageURL string) string {
 	displayName, version := splitItemDisplayName(name, seriesName)
 	safeName := html.EscapeString(displayName)
 	safeVersion := html.EscapeString(version)
 	safeSeries := html.EscapeString(displayManufacturerOrFallback(seriesName, fallbackLabel))
 	safeURL := html.EscapeString(url)
 	safeImageURL := html.EscapeString(imageURL)
-	statusHTML := statusBadgeHTML(status)
 	imageHTML := `<div style="display:block;margin:auto;width:180px;height:180px;border-radius:4px;background:#f3f4f6;"></div>`
 	if safeImageURL != "" {
 		imageHTML = fmt.Sprintf(`<img src="%s" alt="%s" width="180" height="180" style="display:block;margin:auto;width:180px;border-radius:4px;height:180px;object-fit:cover;background:#f3f4f6;border:0;">`, safeImageURL, safeName)
@@ -181,7 +177,7 @@ func renderProductCard(name string, seriesName string, fallbackLabel string, url
 	}
 	nameHTML := fmt.Sprintf(`<p style="%s">%s</p>`, nameStyle, displayText)
 
-	cardHTML := fmt.Sprintf(`<div style="overflow:hidden;width:180px;height:360px;margin:auto;padding:12px;border:1px solid #9ca3af;border-radius:12px;background:#ffe0cf url('https://kyoucdn.id/static/assets/item_bg.jpg') center/cover no-repeat;text-align:left;">%s<div style="padding:12px 8px 4px;"><p style="margin:0 0 4px 0;overflow:hidden;color:#2f2b28;font-size:12px;font-weight:600;text-overflow:ellipsis;white-space:nowrap;">%s</p>%s<div style="margin:10px 0 0;">%s</div></div></div>`, imageHTML, safeSeries, nameHTML, statusHTML)
+	cardHTML := fmt.Sprintf(`<div style="overflow:hidden;width:180px;height:360px;margin:auto;padding:12px;border:1px solid #9ca3af;border-radius:12px;background:#ffe0cf url('https://kyoucdn.id/static/assets/item_bg.jpg') center/cover no-repeat;text-align:left;">%s<div style="padding:12px 8px 4px;"><p style="margin:0 0 4px 0;overflow:hidden;color:#2f2b28;font-size:12px;font-weight:600;text-overflow:ellipsis;white-space:nowrap;">%s</p>%s</div></div>`, imageHTML, safeSeries, nameHTML)
 	if safeURL == "" {
 		return cardHTML
 	}

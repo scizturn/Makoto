@@ -166,10 +166,11 @@ func TestRenderWishlistHTMLUsesImageCardsWhenImageURLExists(t *testing.T) {
 		`margin:0 0 4px;color:#ffd68a;font-size:14px;font-weight:900;letter-spacing:3px;text-transform:uppercase;`,
 		`margin:0 0 16px;color:#f7dfce;font-size:16px;font-weight:650;line-height:1.52;`,
 		`font-size:19px;font-weight:800;line-height:1.22`,
+		`<a href="https://kyou.id/items/1/" style="display:block;color:inherit;text-decoration:none;">`,
 	}) {
 		t.Fatalf("expected wishlist image card html, got %q", got)
 	}
-	if containsAny(got, []string{"Vivian Banshee Mockingbird Q Series Acrylic Keychain", "Zenless Zone Zero (7,4cm)", `font-style:italic`, `font-size:22px;font-weight:900;line-height:1.18`}) {
+	if containsAny(got, []string{"Vivian Banshee Mockingbird Q Series Acrylic Keychain", "Zenless Zone Zero (7,4cm)", `font-style:italic`, `font-size:22px;font-weight:900;line-height:1.18`, `style="color:#ffffff;text-decoration:none;"`}) {
 		t.Fatalf("expected escaped image card html, got %q", got)
 	}
 }
@@ -225,14 +226,10 @@ func TestRenderFYPHTMLUsesImageCardsWhenImageURLExists(t *testing.T) {
 		`Hatsune Miku<br>Stellar Voice Series`,
 		`Wind Breaker`,
 		`Protect Me Umbrella`,
-		`Ready Stock`,
-		`Late Pre-Order`,
-		`background:#40b774`,
-		`background:#d3647a`,
 	}) {
 		t.Fatalf("expected fyp image card html, got %q", got)
 	}
-	if containsAny(got, []string{"IDR 150.000", "IDR 650.000", "IDR 850.000", `font-style:italic`, `PVC Figure`, `Gift+`, `[Random]`, `Can Badge Blind Box`, `[Mono Goods]`}) {
+	if containsAny(got, []string{"IDR 150.000", "IDR 650.000", "IDR 850.000", `font-style:italic`, `PVC Figure`, `Gift+`, `[Random]`, `Can Badge Blind Box`, `[Mono Goods]`, `Ready Stock`, `Pre-Order`, `Late Pre-Order`, `background:#40b774`, `background:#657996`, `background:#d3647a`}) {
 		t.Fatalf("expected fyp cards to omit prices and product noise, got %q", got)
 	}
 	if countOccurrences(got, `<a href="https://kyou.id/items/`) != 3 {
@@ -252,25 +249,15 @@ func TestRenderFYPHTMLUsesImageCardsWhenImageURLExists(t *testing.T) {
 	}
 }
 
-func TestItemStatusBadgesUseFixedLabelsAndColors(t *testing.T) {
+func TestFYPHTMLDoesNotRenderStatusBadges(t *testing.T) {
 	got := RenderFYPHTML([]domain.FYPItem{
 		{ID: "po", Name: "PO Pick", Status: "PO", PODeadline: ptrTime(time.Date(2026, 6, 1, 0, 0, 0, 0, time.UTC))},
 		{ID: "ready", Name: "Ready Pick", Status: "ready"},
 		{ID: "lpo", Name: "LPO Pick", Status: "PO"},
 	})
 
-	if !containsAll(got, []string{
-		`Pre-Order`,
-		`Ready Stock`,
-		`Late Pre-Order`,
-		`background:#657996`,
-		`background:#40b774`,
-		`background:#d3647a`,
-	}) {
-		t.Fatalf("expected fixed status badges, got %q", got)
-	}
-	if containsAny(got, []string{`>PO<`, `>READY<`, `>LPO<`}) {
-		t.Fatalf("expected display labels instead of raw status codes, got %q", got)
+	if containsAny(got, []string{`Pre-Order`, `Ready Stock`, `Late Pre-Order`, `>PO<`, `>READY<`, `>LPO<`, `background:#657996`, `background:#40b774`, `background:#d3647a`}) {
+		t.Fatalf("expected fyp cards without status badges, got %q", got)
 	}
 }
 
