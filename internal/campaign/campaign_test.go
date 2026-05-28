@@ -19,10 +19,36 @@ func TestSelectTemplateUsesRandomChoice(t *testing.T) {
 		},
 	}
 
-	got := campaign.SelectTemplate(time.Date(2026, 5, 21, 7, 0, 0, 0, time.UTC))
+	got := campaign.SelectTemplate(time.Date(2026, 5, 21, 7, 0, 0, 0, time.UTC), "job-1")
 
 	if got != "tpl_003" {
 		t.Fatalf("expected tpl_003, got %q", got)
+	}
+}
+
+func TestSelectTemplateUsesStablePerJobSeed(t *testing.T) {
+	campaign := BirthdayCampaign{TemplateIDs: []string{"tpl_001", "tpl_002", "tpl_003"}}
+	now := time.Date(2026, 5, 29, 0, 0, 0, 0, time.FixedZone("Asia/Jakarta", 7*60*60))
+
+	first := campaign.SelectTemplate(now, "birthday-2026-05-29-user-147044")
+	second := campaign.SelectTemplate(now, "birthday-2026-05-29-user-147044")
+	if first != second {
+		t.Fatalf("expected stable template for same job key, got %q then %q", first, second)
+	}
+
+	seen := map[string]bool{}
+	for _, key := range []string{
+		"birthday-2026-05-29-user-147044",
+		"birthday-2026-05-29-user-147045",
+		"birthday-2026-05-29-user-147046",
+		"birthday-2026-05-29-user-147047",
+		"birthday-2026-05-29-user-147048",
+		"birthday-2026-05-29-user-147049",
+	} {
+		seen[campaign.SelectTemplate(now, key)] = true
+	}
+	if len(seen) < 2 {
+		t.Fatalf("expected job keys to spread across templates, got %#v", seen)
 	}
 }
 

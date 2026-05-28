@@ -2,6 +2,7 @@ package campaign
 
 import (
 	"fmt"
+	"hash/fnv"
 	"html"
 	"math/rand"
 	"net/url"
@@ -18,15 +19,23 @@ type BirthdayCampaign struct {
 	RandomIntn  func(n int) int
 }
 
-func (c BirthdayCampaign) SelectTemplate(now time.Time) string {
+func (c BirthdayCampaign) SelectTemplate(now time.Time, key string) string {
 	if len(c.TemplateIDs) == 0 {
 		return ""
 	}
 	randomIntn := c.RandomIntn
 	if randomIntn == nil {
-		randomIntn = rand.New(rand.NewSource(now.UnixNano())).Intn
+		randomIntn = rand.New(rand.NewSource(templateSeed(now, key))).Intn
 	}
 	return c.TemplateIDs[randomIntn(len(c.TemplateIDs))]
+}
+
+func templateSeed(now time.Time, key string) int64 {
+	hash := fnv.New64a()
+	_, _ = hash.Write([]byte(now.Format(time.RFC3339Nano)))
+	_, _ = hash.Write([]byte("|"))
+	_, _ = hash.Write([]byte(strings.TrimSpace(key)))
+	return int64(hash.Sum64())
 }
 
 func (c BirthdayCampaign) BuildMergeData(user domain.User, voucherCode string, wishlist []domain.WishlistItem, fyp []domain.FYPItem, popular []domain.FYPItem) map[string]any {

@@ -57,22 +57,25 @@ func (c KirimClient) SendTemplate(ctx context.Context, msg domain.EmailMessage) 
 		return domain.SendResult{}, err
 	}
 	defer resp.Body.Close()
+	responseBody := readResponseBody(resp)
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return domain.SendResult{}, fmt.Errorf("kirim.email template send failed: status=%d body=%s", resp.StatusCode, readResponseBody(resp))
+		return domain.SendResult{StatusCode: resp.StatusCode, Response: responseBody}, fmt.Errorf("kirim.email template send failed: status=%d body=%s", resp.StatusCode, responseBody)
 	}
 
 	var result struct {
 		ID        string `json:"id"`
 		MessageID string `json:"message_id"`
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return domain.SendResult{}, nil
+	if responseBody != "" {
+		if err := json.NewDecoder(strings.NewReader(responseBody)).Decode(&result); err != nil {
+			return domain.SendResult{StatusCode: resp.StatusCode, Response: responseBody}, nil
+		}
 	}
 	if result.MessageID == "" {
 		result.MessageID = result.ID
 	}
-	return domain.SendResult{MessageID: result.MessageID}, nil
+	return domain.SendResult{MessageID: result.MessageID, StatusCode: resp.StatusCode, Response: responseBody}, nil
 }
 
 func (c KirimClient) sendTransactionalV4(ctx context.Context, msg domain.EmailMessage) (domain.SendResult, error) {
@@ -104,22 +107,25 @@ func (c KirimClient) sendTransactionalV4(ctx context.Context, msg domain.EmailMe
 		return domain.SendResult{}, err
 	}
 	defer resp.Body.Close()
+	responseBody := readResponseBody(resp)
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return domain.SendResult{}, fmt.Errorf("kirim.email transactional send failed: status=%d body=%s", resp.StatusCode, readResponseBody(resp))
+		return domain.SendResult{StatusCode: resp.StatusCode, Response: responseBody}, fmt.Errorf("kirim.email transactional send failed: status=%d body=%s", resp.StatusCode, responseBody)
 	}
 
 	var result struct {
 		ID        string `json:"id"`
 		MessageID string `json:"message_id"`
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return domain.SendResult{}, nil
+	if responseBody != "" {
+		if err := json.NewDecoder(strings.NewReader(responseBody)).Decode(&result); err != nil {
+			return domain.SendResult{StatusCode: resp.StatusCode, Response: responseBody}, nil
+		}
 	}
 	if result.MessageID == "" {
 		result.MessageID = result.ID
 	}
-	return domain.SendResult{MessageID: result.MessageID}, nil
+	return domain.SendResult{MessageID: result.MessageID, StatusCode: resp.StatusCode, Response: responseBody}, nil
 }
 
 func formatFrom(name string, email string) string {

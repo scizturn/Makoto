@@ -63,5 +63,7 @@ type EmailMessage struct {
 }
 
 type SendResult struct {
-	MessageID string
+	MessageID  string
+	StatusCode int
+	Response   string
 }

@@ -32,6 +32,15 @@ type Processor struct {
 	Domain    string
 	FromEmail string
 	FromName  string
+
+	BeforeSend func(ctx context.Context, job domain.BirthdayJob, result ProcessResult) error
+}
+
+type ProcessResult struct {
+	TemplateID string
+	Subject    string
+	ActionURL  string
+	SendResult domain.SendResult
 }
 
 type Renderer interface {
@@ -48,57 +57,61 @@ func NewProcessor(store Store, sender email.Sender, validator email.Validator, v
 	}
 }
 
-func (p *Processor) Process(ctx context.Context, job domain.BirthdayJob) error {
+func (p *Processor) Process(ctx context.Context, job domain.BirthdayJob) (ProcessResult, error) {
 	user, err := p.resolveUser(ctx, job)
 	if err != nil {
-		return err
+		return ProcessResult{}, err
 	}
 
 	if !user.IsActive || user.Email == "" {
-		return nil
+		return ProcessResult{}, nil
 	}
 
 	valid, err := p.validator.Validate(ctx, user.Email)
 	if err != nil {
-		return err
+		return ProcessResult{}, err
 	}
 	if !valid {
 		if p.store != nil {
-			return p.store.SuppressEmail(ctx, user.Email, "email validation failed")
+			return ProcessResult{}, p.store.SuppressEmail(ctx, user.Email, "email validation failed")
 		}
-		return nil
+		return ProcessResult{}, nil
 	}
 
 	start := time.Date(job.Date.Year(), job.Date.Month(), job.Date.Day(), 0, 0, 0, 0, job.Date.Location())
 	if p.store != nil {
 		converted, err := p.store.HasConverted(ctx, user.ID, start, start.Add(14*24*time.Hour))
 		if err != nil {
-			return err
+			return ProcessResult{}, err
 		}
 		if converted {
 			log.Printf("birthday email skipped because user converted: user_id=%s", user.ID)
-			return nil
+			return ProcessResult{}, nil
 		}
 	}
 
 	voucherCode := job.VoucherCode
 	if voucherCode == "" {
 		if p.vouchers == nil {
-			return fmt.Errorf("birthday job %q missing voucher_code", job.ID)
+			return ProcessResult{}, fmt.Errorf("birthday job %q missing voucher_code", job.ID)
 		}
 		voucherCode, err = p.vouchers.IssueBirthdayVoucher(ctx, user, job.Date)
 		if err != nil {
-			return err
+			return ProcessResult{}, err
 		}
 	}
 
 	wishlist, fyp, popular, err := p.resolvePersonalization(ctx, job, user.ID)
 	if err != nil {
-		return err
+		return ProcessResult{}, err
 	}
 
-	templateID := p.campaign.SelectTemplate(job.Date)
+	templateID := p.campaign.SelectTemplate(job.Date, templateSelectionKey(job, user))
 	mergeData := p.campaign.BuildMergeData(user, voucherCode, wishlist, fyp, popular)
+	result := ProcessResult{
+		TemplateID: templateID,
+		ActionURL:  mergeString(mergeData, "action_url"),
+	}
 	msg := domain.EmailMessage{
 		Domain:           p.Domain,
 		FromEmail:        p.FromEmail,
@@ -110,14 +123,21 @@ func (p *Processor) Process(ctx context.Context, job domain.BirthdayJob) error {
 	if p.Renderer != nil {
 		subject, html, err := p.Renderer.Render(templateID, mergeData)
 		if err != nil {
-			return err
+			return ProcessResult{}, err
 		}
 		msg.Subject = subject
 		msg.HTMLBody = html
 		msg.TextBody = subject + "\n\n" + user.Name + ", voucher: " + voucherCode
+		result.Subject = subject
 	}
-	_, err = p.sender.SendTemplate(ctx, msg)
-	return err
+	if p.BeforeSend != nil {
+		if err := p.BeforeSend(ctx, job, result); err != nil {
+			return ProcessResult{}, err
+		}
+	}
+	sendResult, err := p.sender.SendTemplate(ctx, msg)
+	result.SendResult = sendResult
+	return result, err
 }
 
 func (p *Processor) resolveUser(ctx context.Context, job domain.BirthdayJob) (domain.User, error) {
@@ -148,4 +168,19 @@ func (p *Processor) resolvePersonalization(ctx context.Context, job domain.Birth
 		return nil, nil, nil, err
 	}
 	return wishlist, fyp, popular, nil
+}
+
+func templateSelectionKey(job domain.BirthdayJob, user domain.User) string {
+	if job.ID != "" {
+		return job.ID
+	}
+	if user.ID != "" {
+		return user.ID
+	}
+	return job.UserID
+}
+
+func mergeString(values map[string]any, key string) string {
+	value, _ := values[key].(string)
+	return value
 }

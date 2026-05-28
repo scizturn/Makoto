@@ -16,7 +16,7 @@ func TestProcessorSkipsInactiveUser(t *testing.T) {
 	sender := &fakeSender{}
 	processor := NewProcessor(repo, sender, fakeValidator{valid: true}, &fakeVoucherIssuer{}, campaign.BirthdayCampaign{})
 
-	err := processor.Process(context.Background(), domain.BirthdayJob{UserID: "1", Date: time.Now()})
+	_, err := processor.Process(context.Background(), domain.BirthdayJob{UserID: "1", Date: time.Now()})
 
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
@@ -43,7 +43,7 @@ func TestProcessorSendsBirthdayTemplateMessage(t *testing.T) {
 	processor.FromEmail = "nandayo@kyou.id"
 	processor.FromName = "Kyou.id"
 
-	err := processor.Process(context.Background(), domain.BirthdayJob{
+	_, err := processor.Process(context.Background(), domain.BirthdayJob{
 		UserID: "1",
 		Date:   time.Date(2026, 5, 21, 7, 0, 0, 0, time.UTC),
 	})
@@ -85,7 +85,7 @@ func TestProcessorSendsFromFullRedisJobWithoutDatabaseStore(t *testing.T) {
 	processor.FromEmail = "nandayo@kyou.id"
 	processor.FromName = "Kyou.id"
 
-	err := processor.Process(context.Background(), domain.BirthdayJob{
+	_, err := processor.Process(context.Background(), domain.BirthdayJob{
 		ID:     "birthday-2026-05-21-user-123",
 		UserID: "123",
 		Date:   time.Date(2026, 5, 21, 7, 0, 0, 0, time.UTC),
@@ -128,7 +128,7 @@ func TestProcessorUsesVoucherCodeFromRedisJob(t *testing.T) {
 		RandomIntn:  func(int) int { return 0 },
 	})
 
-	err := processor.Process(context.Background(), domain.BirthdayJob{
+	_, err := processor.Process(context.Background(), domain.BirthdayJob{
 		ID:          "birthday-2026-05-21-user-123",
 		UserID:      "123",
 		Date:        time.Date(2026, 5, 21, 7, 0, 0, 0, time.UTC),
@@ -167,7 +167,7 @@ func TestProcessorRendersHTMLTemplateWhenRendererConfigured(t *testing.T) {
 		html:    "<h1>Happy birthday Garvin</h1>",
 	}
 
-	err := processor.Process(context.Background(), domain.BirthdayJob{
+	_, err := processor.Process(context.Background(), domain.BirthdayJob{
 		ID:     "birthday-2026-05-21-user-123",
 		UserID: "123",
 		Date:   time.Date(2026, 5, 21, 7, 0, 0, 0, time.UTC),

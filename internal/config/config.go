@@ -1,15 +1,19 @@
 package config
 
 import (
+	"net"
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/go-sql-driver/mysql"
 )
 
 type Config struct {
 	Mode               string
 	Timezone           string
 	RateLimitPerMinute int
+	DatabaseDSN        string
 	RedisAddr          string
 	RedisPassword      string
 	RedisDB            int
@@ -38,6 +42,7 @@ func Load() Config {
 		Mode:               env("MAKOTO_MODE", "run-once"),
 		Timezone:           env("MAKOTO_TIMEZONE", "Asia/Jakarta"),
 		RateLimitPerMinute: envInt("MAKOTO_RATE_LIMIT_PER_MINUTE", 100),
+		DatabaseDSN:        oldDatabaseDSN(),
 		RedisAddr:          env("REDIS_ADDR", "redis:6379"),
 		RedisPassword:      os.Getenv("REDIS_PASSWORD"),
 		RedisDB:            envIntAllowZero("REDIS_DB", 0),
@@ -60,6 +65,31 @@ func Load() Config {
 		DiscordWebhookURL:  os.Getenv("DISCORD_WEBHOOK_URL"),
 		DiscordEnabled:     envBool("DISCORD_WEBHOOK_ENABLED", true),
 	}
+}
+
+func oldDatabaseDSN() string {
+	host := env("OLD_DATABASE_HOST", "")
+	name := env("OLD_DATABASE_NAME", "")
+	username := env("OLD_DATABASE_USERNAME", "")
+	password := os.Getenv("OLD_DATABASE_PASSWORD")
+	if host == "" || name == "" || username == "" {
+		return ""
+	}
+
+	cfg := mysql.Config{
+		User:                 username,
+		Passwd:               password,
+		Net:                  "tcp",
+		Addr:                 net.JoinHostPort(host, env("OLD_DATABASE_PORT", "3306")),
+		DBName:               name,
+		ParseTime:            true,
+		AllowNativePasswords: true,
+		Params: map[string]string{
+			"charset":   "utf8mb4",
+			"collation": "utf8mb4_unicode_ci",
+		},
+	}
+	return cfg.FormatDSN()
 }
 
 func env(key, fallback string) string {

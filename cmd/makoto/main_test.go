@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/kyou-id/makoto/internal/audit"
 	"github.com/kyou-id/makoto/internal/domain"
 )
 
@@ -11,7 +12,7 @@ func TestHandleFailedJobRequeuesUntilMaxAttempts(t *testing.T) {
 	queue := &fakeRetryQueue{}
 	job := domain.BirthdayJob{ID: "job-1", Attempt: 1}
 
-	result, err := handleFailedJob(context.Background(), queue, job, senderConfig{
+	result, err := handleFailedJob(context.Background(), queue, nil, audit.MessageInfo{JobID: job.ID, Attempt: job.Attempt}, job, assertError("send failed"), senderConfig{
 		maxAttempts:     3,
 		deadLetterQueue: "birthday_email_jobs_dead",
 	})
@@ -34,7 +35,7 @@ func TestHandleFailedJobMovesToDeadLetterAtMaxAttempts(t *testing.T) {
 	queue := &fakeRetryQueue{}
 	job := domain.BirthdayJob{ID: "job-1", Attempt: 3}
 
-	result, err := handleFailedJob(context.Background(), queue, job, senderConfig{
+	result, err := handleFailedJob(context.Background(), queue, nil, audit.MessageInfo{JobID: job.ID, Attempt: job.Attempt}, job, assertError("send failed"), senderConfig{
 		maxAttempts:     3,
 		deadLetterQueue: "birthday_email_jobs_dead",
 	})
@@ -51,6 +52,12 @@ func TestHandleFailedJobMovesToDeadLetterAtMaxAttempts(t *testing.T) {
 	if len(queue.deadLetters) != 1 || queue.deadLetters[0].name != "birthday_email_jobs_dead" || queue.deadLetters[0].job.Attempt != 3 {
 		t.Fatalf("expected dead-letter job, got %#v", queue.deadLetters)
 	}
+}
+
+type assertError string
+
+func (e assertError) Error() string {
+	return string(e)
 }
 
 type fakeRetryQueue struct {

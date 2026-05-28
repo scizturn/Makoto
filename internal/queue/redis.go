@@ -2,6 +2,7 @@ package queue
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -12,6 +13,11 @@ import (
 type RedisQueue struct {
 	client *redis.Client
 	name   string
+}
+
+type ProcessingJob struct {
+	Job     domain.BirthdayJob
+	Payload string
 }
 
 func NewRedisQueue(addr, password string, db int, name string) *RedisQueue {
@@ -41,18 +47,46 @@ func (q *RedisQueue) EnqueueTo(ctx context.Context, name string, job domain.Birt
 	if err != nil {
 		return err
 	}
-	return q.client.LPush(ctx, queueName(name), payload).Err()
+	return q.client.RPush(ctx, queueName(name), payload).Err()
 }
 
-func (q *RedisQueue) Dequeue(ctx context.Context, timeout time.Duration) (domain.BirthdayJob, error) {
-	result, err := q.client.BLPop(ctx, timeout, q.name).Result()
+func (q *RedisQueue) Dequeue(ctx context.Context, timeout time.Duration) (ProcessingJob, error) {
+	payload, err := q.client.BLMove(ctx, q.name, q.processingName(), "LEFT", "RIGHT", timeout).Result()
 	if err != nil {
-		return domain.BirthdayJob{}, err
+		return ProcessingJob{}, err
 	}
-	if len(result) != 2 {
-		return domain.BirthdayJob{}, fmt.Errorf("unexpected redis pop result: %#v", result)
+	job, err := DecodeBirthdayJob(payload)
+	if err != nil {
+		return ProcessingJob{}, err
 	}
-	return DecodeBirthdayJob(result[1])
+	return ProcessingJob{Job: job, Payload: payload}, nil
+}
+
+func (q *RedisQueue) Ack(ctx context.Context, payload string) error {
+	removed, err := q.client.LRem(ctx, q.processingName(), 1, payload).Result()
+	if err != nil {
+		return err
+	}
+	if removed == 0 {
+		return fmt.Errorf("processing payload was not acknowledged")
+	}
+	return nil
+}
+
+func (q *RedisQueue) RecoverProcessing(ctx context.Context) (int64, error) {
+	var recovered int64
+	for {
+		payload, err := q.client.LMove(ctx, q.processingName(), q.name, "RIGHT", "LEFT").Result()
+		if errors.Is(err, redis.Nil) {
+			return recovered, nil
+		}
+		if err != nil {
+			return recovered, err
+		}
+		if payload != "" {
+			recovered++
+		}
+	}
 }
 
 func (q *RedisQueue) Jobs(ctx context.Context, name string) ([]domain.BirthdayJob, []string, error) {
@@ -81,4 +115,8 @@ func queueName(name string) string {
 		return "birthday_email_jobs"
 	}
 	return name
+}
+
+func (q *RedisQueue) processingName() string {
+	return queueName(q.name) + ":processing"
 }
