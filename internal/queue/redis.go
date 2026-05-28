@@ -45,7 +45,7 @@ func (q *RedisQueue) EnqueueTo(ctx context.Context, name string, job domain.Birt
 }
 
 func (q *RedisQueue) Dequeue(ctx context.Context, timeout time.Duration) (domain.BirthdayJob, error) {
-	result, err := q.client.BRPop(ctx, timeout, q.name).Result()
+	result, err := q.client.BLPop(ctx, timeout, q.name).Result()
 	if err != nil {
 		return domain.BirthdayJob{}, err
 	}

@@ -48,7 +48,7 @@ KIRIM_EMAIL_FROM_NAME=Kyou.id
 MAKOTO_TEMPLATE_IDS=birthday1.html,birthday2.html,birthday3.html
 MAKOTO_EMAIL_TEMPLATE_DIR=templates/birthday
 MAKOTO_EMAIL_SUBJECT='Selamat ulang tahun, {{ .Name }}'
-MAKOTO_ACTION_URL=https://kyou.id/account/vouchers
+MAKOTO_ACTION_URL=https://kyou.id/user/my-voucher
 KYOU_ID_API_BASE_URL=https://kyou.id
 KYOU_ID_API_TOKEN=
 

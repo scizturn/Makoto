@@ -17,7 +17,7 @@ func main() {
 	templateID := env("MAKOTO_PREVIEW_TEMPLATE_ID", "birthday1.html")
 	templateDir := env("MAKOTO_EMAIL_TEMPLATE_DIR", "templates/birthday")
 	subject := env("MAKOTO_EMAIL_SUBJECT", "Selamat ulang tahun, {{ .Name }}")
-	actionURL := env("MAKOTO_ACTION_URL", "https://kyou.id/account/vouchers")
+	actionURL := env("MAKOTO_ACTION_URL", "https://kyou.id/user/my-voucher")
 
 	payload, err := os.ReadFile(jobPath)
 	if err != nil {

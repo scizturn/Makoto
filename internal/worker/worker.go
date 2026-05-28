@@ -81,9 +81,15 @@ func (p *Processor) Process(ctx context.Context, job domain.BirthdayJob) error {
 		}
 	}
 
-	voucherCode, err := p.vouchers.IssueBirthdayVoucher(ctx, user, job.Date)
-	if err != nil {
-		return err
+	voucherCode := job.VoucherCode
+	if voucherCode == "" {
+		if p.vouchers == nil {
+			return fmt.Errorf("birthday job %q missing voucher_code", job.ID)
+		}
+		voucherCode, err = p.vouchers.IssueBirthdayVoucher(ctx, user, job.Date)
+		if err != nil {
+			return err
+		}
 	}
 
 	wishlist, fyp, popular, err := p.resolvePersonalization(ctx, job, user.ID)

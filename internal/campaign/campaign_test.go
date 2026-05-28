@@ -29,7 +29,7 @@ func TestSelectTemplateUsesRandomChoice(t *testing.T) {
 func TestBuildMergeDataFallsBackToPopularFYP(t *testing.T) {
 	campaign := BirthdayCampaign{
 		Closing:   "Selamat merayakan hari spesialmu di Kyou!",
-		ActionURL: "https://kyou.id/account/vouchers",
+		ActionURL: "https://kyou.id/user/my-voucher",
 	}
 	user := domain.User{ID: "user-1", Name: "Ruby", Email: "ruby@example.test"}
 	wishlist := []domain.WishlistItem{{ID: "wish-1", Name: "Figure <Ruby>", URL: "https://kyou.id/items/1/"}}
@@ -50,7 +50,7 @@ func TestBuildMergeDataFallsBackToPopularFYP(t *testing.T) {
 	if len(fypItems) != 1 || fypItems[0].ID != "popular-1" {
 		t.Fatalf("expected popular fallback, got %#v", fypItems)
 	}
-	if got["action_url"] != "https://kyou.id/account/vouchers" {
+	if got["action_url"] != "https://kyou.id/user/my-voucher?claim=HBD-RUBY-7K2M" {
 		t.Fatalf("expected action_url, got %#v", got["action_url"])
 	}
 	wishlistHTML, ok := got["wishlist_html"].(string)
@@ -69,6 +69,17 @@ func TestBuildMergeDataFallsBackToPopularFYP(t *testing.T) {
 	}
 	if !containsAll(fypHTML, []string{"Popular &lt;Chara&gt;", "character"}) {
 		t.Fatalf("expected fyp html content, got %q", fypHTML)
+	}
+}
+
+func TestBuildMergeDataAppendsClaimToExistingActionURLQuery(t *testing.T) {
+	campaign := BirthdayCampaign{ActionURL: "https://kyou.id/user/my-voucher?utm=email"}
+	user := domain.User{ID: "user-1", Name: "Ruby", Email: "ruby@example.test"}
+
+	got := campaign.BuildMergeData(user, "HBD RUBY/7K2M", nil, nil, nil)
+
+	if got["action_url"] != "https://kyou.id/user/my-voucher?claim=HBD+RUBY%2F7K2M&utm=email" {
+		t.Fatalf("expected encoded claim action_url, got %#v", got["action_url"])
 	}
 }
 

@@ -78,7 +78,7 @@ func TestProcessorSendsFromFullRedisJobWithoutDatabaseStore(t *testing.T) {
 	processor := NewProcessor(nil, sender, fakeValidator{valid: true}, issuer, campaign.BirthdayCampaign{
 		TemplateIDs: []string{"tpl_001", "tpl_002", "tpl_003"},
 		Closing:     "Selamat merayakan hari spesialmu di Kyou!",
-		ActionURL:   "https://kyou.id/account/vouchers",
+		ActionURL:   "https://kyou.id/user/my-voucher",
 		RandomIntn:  func(int) int { return 2 },
 	})
 	processor.Domain = "kyou.id"
@@ -112,7 +112,7 @@ func TestProcessorSendsFromFullRedisJobWithoutDatabaseStore(t *testing.T) {
 	if msg.SubstitutionData["voucher_code"] != "HBD-GARVIN-7K2M" {
 		t.Fatalf("expected generated voucher in merge data, got %#v", msg.SubstitutionData)
 	}
-	if msg.SubstitutionData["action_url"] != "https://kyou.id/account/vouchers" {
+	if msg.SubstitutionData["action_url"] != "https://kyou.id/user/my-voucher?claim=HBD-GARVIN-7K2M" {
 		t.Fatalf("expected action_url merge data, got %#v", msg.SubstitutionData)
 	}
 	if msg.SubstitutionData["wishlist_html"] == "" || msg.SubstitutionData["fyp_html"] == "" {
@@ -120,11 +120,43 @@ func TestProcessorSendsFromFullRedisJobWithoutDatabaseStore(t *testing.T) {
 	}
 }
 
+func TestProcessorUsesVoucherCodeFromRedisJob(t *testing.T) {
+	sender := &fakeSender{}
+	issuer := &fakeVoucherIssuer{code: "SHOULD-NOT-BE-USED"}
+	processor := NewProcessor(nil, sender, fakeValidator{valid: true}, issuer, campaign.BirthdayCampaign{
+		TemplateIDs: []string{"tpl_001"},
+		RandomIntn:  func(int) int { return 0 },
+	})
+
+	err := processor.Process(context.Background(), domain.BirthdayJob{
+		ID:          "birthday-2026-05-21-user-123",
+		UserID:      "123",
+		Date:        time.Date(2026, 5, 21, 7, 0, 0, 0, time.UTC),
+		VoucherCode: "BIRTHDAY_123_20260521",
+		User: domain.User{
+			ID:       "123",
+			Name:     "Garvin",
+			Email:    "garvin@example.test",
+			IsActive: true,
+		},
+	})
+
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if issuer.requests != 0 {
+		t.Fatalf("expected no voucher issue request, got %d", issuer.requests)
+	}
+	if sender.messages[0].SubstitutionData["voucher_code"] != "BIRTHDAY_123_20260521" {
+		t.Fatalf("expected job voucher code, got %#v", sender.messages[0].SubstitutionData)
+	}
+}
+
 func TestProcessorRendersHTMLTemplateWhenRendererConfigured(t *testing.T) {
 	sender := &fakeSender{}
 	processor := NewProcessor(nil, sender, fakeValidator{valid: true}, &fakeVoucherIssuer{code: "HBD-GARVIN"}, campaign.BirthdayCampaign{
 		TemplateIDs: []string{"birthday1.html"},
-		ActionURL:   "https://kyou.id/account/vouchers",
+		ActionURL:   "https://kyou.id/user/my-voucher",
 		RandomIntn:  func(int) int { return 0 },
 	})
 	processor.Domain = "kyou.id"

@@ -9,9 +9,11 @@ import (
 
 func TestEncodeDecodeBirthdayJob(t *testing.T) {
 	job := domain.BirthdayJob{
-		ID:     "birthday-2026-05-21-user-123",
-		UserID: "123",
-		Date:   time.Date(2026, 5, 21, 0, 0, 0, 0, time.UTC),
+		ID:          "birthday-2026-05-21-user-123",
+		UserID:      "123",
+		Date:        time.Date(2026, 5, 21, 0, 0, 0, 0, time.UTC),
+		VoucherCode: "BIRTHDAY_123_20260521",
+		VoucherID:   54,
 		User: domain.User{
 			ID:       "123",
 			Name:     "Garvin",
@@ -51,6 +53,9 @@ func TestEncodeDecodeBirthdayJob(t *testing.T) {
 
 	if got.ID != job.ID || got.User.Email != job.User.Email || len(got.WishlistItems) != 1 || len(got.FYPItems) != 1 {
 		t.Fatalf("unexpected decoded job: %#v", got)
+	}
+	if got.VoucherCode != "BIRTHDAY_123_20260521" || got.VoucherID != 54 {
+		t.Fatalf("expected voucher fields to round trip, got %#v", got)
 	}
 	if got.WishlistItems[0].ImageURL != "https://kyoucdn.id/items/wish.jpg.webp" || got.FYPItems[0].ImageURL != "https://kyoucdn.id/items/fyp.jpg.webp" {
 		t.Fatalf("expected image urls to round trip, got %#v", got)

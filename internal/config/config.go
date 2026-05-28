@@ -54,7 +54,7 @@ func Load() Config {
 		TemplateIDs:        envList("MAKOTO_TEMPLATE_IDS", []string{"tpl_001", "tpl_002", "tpl_003"}),
 		EmailTemplateDir:   os.Getenv("MAKOTO_EMAIL_TEMPLATE_DIR"),
 		EmailSubject:       env("MAKOTO_EMAIL_SUBJECT", "Selamat ulang tahun, {{ .Name }}"),
-		ActionURL:          env("MAKOTO_ACTION_URL", "https://kyou.id/account/vouchers"),
+		ActionURL:          env("MAKOTO_ACTION_URL", "https://kyou.id/user/my-voucher"),
 		KyouIDAPIBaseURL:   env("KYOU_ID_API_BASE_URL", "https://kyou.id"),
 		KyouIDAPIToken:     os.Getenv("KYOU_ID_API_TOKEN"),
 		DiscordWebhookURL:  os.Getenv("DISCORD_WEBHOOK_URL"),

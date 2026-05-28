@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"html"
 	"math/rand"
+	"net/url"
 	"strings"
 	"time"
 
@@ -38,9 +39,23 @@ func (c BirthdayCampaign) BuildMergeData(user domain.User, voucherCode string, w
 		"fyp_items":      fypItems,
 		"wishlist_html":  RenderWishlistHTML(wishlist),
 		"fyp_html":       RenderFYPHTML(fypItems),
-		"action_url":     c.ActionURL,
+		"action_url":     actionURLWithClaim(c.ActionURL, voucherCode),
 		"closing":        c.Closing,
 	}
+}
+
+func actionURLWithClaim(baseURL string, voucherCode string) string {
+	if strings.TrimSpace(baseURL) == "" || strings.TrimSpace(voucherCode) == "" {
+		return baseURL
+	}
+	parsed, err := url.Parse(baseURL)
+	if err != nil {
+		return baseURL
+	}
+	query := parsed.Query()
+	query.Set("claim", voucherCode)
+	parsed.RawQuery = query.Encode()
+	return parsed.String()
 }
 
 func topUpFYPItems(fyp []domain.FYPItem, popular []domain.FYPItem, limit int) []domain.FYPItem {
