@@ -10,6 +10,7 @@ RUN go build -o /out/makoto ./cmd/makoto
 
 FROM alpine:3.20
 
+RUN apk add --no-cache ca-certificates tzdata
 RUN addgroup -S makoto && adduser -S makoto -G makoto
 
 WORKDIR /app
