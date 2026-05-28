@@ -1,4 +1,4 @@
-FROM golang:1.22-alpine AS build
+FROM golang:1.24-alpine AS build
 
 WORKDIR /src
 
@@ -14,6 +14,7 @@ RUN addgroup -S makoto && adduser -S makoto -G makoto
 
 WORKDIR /app
 COPY --from=build /out/makoto /usr/local/bin/makoto
+COPY templates ./templates
 
 USER makoto
 
