@@ -214,8 +214,9 @@ func TestRenderFYPHTMLUsesImageCardsWhenImageURLExists(t *testing.T) {
 		`width:180px;height:360px;margin:auto;padding:12px`,
 		`background:#ffe0cf url('https://kyoucdn.id/static/assets/item_bg.jpg') center/cover no-repeat`,
 		`display:block;margin:auto;width:180px;border-radius:4px;height:180px`,
-		`font-size:12px;font-weight:600;text-overflow:ellipsis;white-space:nowrap`,
-		`margin:0 0 48px 0;color:#0f172a;font-size:17px;font-weight:900;line-height:1.32;white-space:normal;word-break:break-word`,
+		`height:18px;margin:0 0 4px 0;overflow:hidden;color:#2f2b28;font-size:12px;font-weight:600;text-overflow:ellipsis;white-space:nowrap`,
+		`height:94px;margin:0;color:#0f172a;font-size:17px;font-weight:900;line-height:1.32;white-space:normal;word-break:break-word;overflow:hidden`,
+		`height:144px;padding:12px 8px 4px;`,
 		`<img src="https://kyoucdn.id/items/chara.jpg.webp"`,
 		`alt="Sunday"`,
 		`Sunday`,
@@ -223,7 +224,7 @@ func TestRenderFYPHTMLUsesImageCardsWhenImageURLExists(t *testing.T) {
 		`https://kyou.id/items/fyp-1/`,
 		`https://images2.imgbox.com/ef/f8/mAoUYtqE_o.png`,
 		`alt="Cek item"`,
-		`display:block;width:142px;height:auto;margin:10px auto 0;border:0;`,
+		`display:block;width:142px;height:auto;margin:12px auto 0;border:0;`,
 		`Honkai: Star Rail`,
 		`Vocaloid`,
 		`Hatsune Miku<br>Stellar Voice Series`,
@@ -250,8 +251,11 @@ func TestRenderFYPHTMLUsesImageCardsWhenImageURLExists(t *testing.T) {
 	if countOccurrences(got, `https://images2.imgbox.com/ef/f8/mAoUYtqE_o.png`) != 3 {
 		t.Fatalf("expected one image button per card, got %q", got)
 	}
-	if countOccurrences(got, `margin:0 0 48px 0;color:#0f172a;font-size:17px;font-weight:900;line-height:1.32;white-space:normal;word-break:break-word`) != 3 {
-		t.Fatalf("expected one fixed-margin text block per card, got %q", got)
+	if countOccurrences(got, `height:94px;margin:0;color:#0f172a;font-size:17px;font-weight:900;line-height:1.32;white-space:normal;word-break:break-word;overflow:hidden`) != 3 {
+		t.Fatalf("expected one fixed-height text block per card, got %q", got)
+	}
+	if countOccurrences(got, `height:144px;padding:12px 8px 4px;`) != 3 {
+		t.Fatalf("expected one fixed-height content area per card, got %q", got)
 	}
 }
 

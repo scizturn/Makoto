@@ -170,15 +170,15 @@ func renderProductCard(name string, seriesName string, fallbackLabel string, url
 		imageHTML = fmt.Sprintf(`<img src="%s" alt="%s" width="180" height="180" style="display:block;margin:auto;width:180px;border-radius:4px;height:180px;object-fit:cover;background:#f3f4f6;border:0;">`, safeImageURL, safeName)
 	}
 
-	nameStyle := `margin:0 0 48px 0;color:#0f172a;font-size:17px;font-weight:900;line-height:1.32;white-space:normal;word-break:break-word;`
+	nameStyle := `height:94px;margin:0;color:#0f172a;font-size:17px;font-weight:900;line-height:1.32;white-space:normal;word-break:break-word;overflow:hidden;`
 	displayText := safeName
 	if safeVersion != "" {
 		displayText = fmt.Sprintf(`%s<br>%s`, safeName, safeVersion)
 	}
 	nameHTML := fmt.Sprintf(`<p style="%s">%s</p>`, nameStyle, displayText)
 
-	buttonHTML := `<img src="https://images2.imgbox.com/ef/f8/mAoUYtqE_o.png" alt="Cek item" width="142" style="display:block;width:142px;height:auto;margin:10px auto 0;border:0;">`
-	cardHTML := fmt.Sprintf(`<div style="overflow:hidden;width:180px;height:360px;margin:auto;padding:12px;border:1px solid #9ca3af;border-radius:12px;background:#ffe0cf url('https://kyoucdn.id/static/assets/item_bg.jpg') center/cover no-repeat;text-align:left;">%s<div style="padding:12px 8px 4px;"><p style="margin:0 0 4px 0;overflow:hidden;color:#2f2b28;font-size:12px;font-weight:600;text-overflow:ellipsis;white-space:nowrap;">%s</p>%s%s</div></div>`, imageHTML, safeSeries, nameHTML, buttonHTML)
+	buttonHTML := `<img src="https://images2.imgbox.com/ef/f8/mAoUYtqE_o.png" alt="Cek item" width="142" style="display:block;width:142px;height:auto;margin:12px auto 0;border:0;">`
+	cardHTML := fmt.Sprintf(`<div style="overflow:hidden;width:180px;height:360px;margin:auto;padding:12px;border:1px solid #9ca3af;border-radius:12px;background:#ffe0cf url('https://kyoucdn.id/static/assets/item_bg.jpg') center/cover no-repeat;text-align:left;">%s<div style="height:144px;padding:12px 8px 4px;"><p style="height:18px;margin:0 0 4px 0;overflow:hidden;color:#2f2b28;font-size:12px;font-weight:600;text-overflow:ellipsis;white-space:nowrap;">%s</p>%s%s</div></div>`, imageHTML, safeSeries, nameHTML, buttonHTML)
 	if safeURL == "" {
 		return cardHTML
 	}
