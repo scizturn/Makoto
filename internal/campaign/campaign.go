@@ -200,9 +200,9 @@ func renderProductCard(name string, seriesName string, fallbackLabel string, url
 	safeURL := html.EscapeString(url)
 	safeImageURL := html.EscapeString(imageURL)
 
-	imageHTML := `<div style="display:block;margin:0 auto;width:160px;height:160px;border-radius:4px;background:#f3f4f6;"></div>`
+	imageHTML := `<div style="display:block;margin:0;width:160px;height:160px;border-radius:4px;background:#f3f4f6;"></div>`
 	if safeImageURL != "" {
-		imageHTML = fmt.Sprintf(`<img src="%s" alt="%s" width="160" height="160" style="display:block;margin:0 auto;width:160px;border-radius:4px;height:160px;object-fit:cover;background:#f3f4f6;border:0;">`, safeImageURL, safeName)
+		imageHTML = fmt.Sprintf(`<img src="%s" alt="%s" width="160" height="160" style="display:block;margin:0;width:160px;border-radius:4px;height:160px;object-fit:cover;background:#f3f4f6;border:0;">`, safeImageURL, safeName)
 	}
 
 	seriesHTML := fmt.Sprintf(`<p style="margin:6px 0 0;color:#2f2b28;font-size:10px;font-weight:400;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">%s</p>`, safeSeries)
@@ -212,8 +212,8 @@ func renderProductCard(name string, seriesName string, fallbackLabel string, url
 		versionHTML = fmt.Sprintf(`<p style="margin:2px 0 0;color:#374151;font-size:10px;font-weight:600;line-height:1.3;">%s</p>`, safeVersion)
 	}
 
-	buttonHTML := `<img src="https://images2.imgbox.com/ef/f8/mAoUYtqE_o.png" alt="Cek item" width="142" style="display:block;width:142px;height:auto;margin:8px auto 0;border:0;">`
-	cardHTML := fmt.Sprintf(`<div style="overflow:hidden;width:180px;margin:auto;padding:10px;border:1px solid #9ca3af;border-radius:8px;background:url('https://kyoucdn.id/static/assets/item_bg.jpg') center/cover no-repeat;text-align:center;">%s%s%s%s%s</div>`, imageHTML, seriesHTML, nameHTML, versionHTML, buttonHTML)
+	buttonHTML := `<img src="https://images2.imgbox.com/ef/f8/mAoUYtqE_o.png" alt="Cek item" width="142" style="display:block;width:142px;height:auto;margin:8px 0 0;border:0;">`
+	cardHTML := fmt.Sprintf(`<div style="overflow:hidden;width:180px;height:266.58px;margin:auto;padding:10px;border:1px solid #9ca3af;border-radius:8px;background:url('https://kyoucdn.id/static/assets/item_bg.jpg') center/cover no-repeat;text-align:left;">%s%s%s%s%s</div>`, imageHTML, seriesHTML, nameHTML, versionHTML, buttonHTML)
 	if safeURL == "" {
 		return cardHTML
 	}
@@ -239,11 +239,11 @@ func abbreviateCardTitle(name, seriesName string) (string, string) {
 
 	var version string
 	if split := strings.LastIndex(name, " - "); split >= 0 && strings.Contains(strings.ToLower(name[split+3:]), "ver") {
-		version = strings.TrimSpace(strings.TrimRight(name[split+3:], "."))
+		version = cleanVersion(name[split+3:])
 		name = strings.TrimSpace(name[:split])
 	} else {
 		name, version = splitItemVersion(name)
-		version = strings.TrimRight(version, ".")
+		version = cleanVersion(version)
 	}
 	// strip any leftover " - Franchise" suffix that has no "ver"
 	if split := strings.LastIndex(name, " - "); split >= 0 {
@@ -252,10 +252,10 @@ func abbreviateCardTitle(name, seriesName string) (string, string) {
 			name = strings.TrimSpace(name[:split])
 		}
 	}
-	// handle "X Series" naming patterns (e.g. "Stellar Voice Series")
+	// handle "X Series" naming (only keep if it contains "Ver.")
 	name, sv := splitKnownSeriesVersion(name)
 	if version == "" {
-		version = sv
+		version = cleanVersion(sv)
 	}
 
 	prefix := ""
@@ -322,6 +322,24 @@ func abbreviateCardTitle(name, seriesName string) (string, string) {
 		return prefix + " " + shortChar, version
 	}
 	return shortChar, version
+}
+
+// cleanVersion returns "" if v has no "Ver", otherwise returns just the
+// "...Ver" part — stripping any trailing period and any series name that
+// appears after "Ver. SomethingElse".
+func cleanVersion(v string) string {
+	v = strings.TrimSpace(v)
+	lower := strings.ToLower(v)
+	vi := strings.Index(lower, "ver")
+	if vi < 0 {
+		return ""
+	}
+	// take only up to (and including) "Ver", drop anything after "Ver. X"
+	after := v[vi+3:]
+	if _, rest, found := strings.Cut(after, "."); found && strings.TrimSpace(rest) != "" {
+		v = strings.TrimSpace(v[:vi+3])
+	}
+	return strings.TrimRight(strings.TrimSpace(v), ".")
 }
 
 func displayManufacturer(manufacturer string) string {
