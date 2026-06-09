@@ -213,7 +213,9 @@ func renderProductCard(name string, seriesName string, fallbackLabel string, url
 	}
 
 	buttonHTML := `<div style="margin:10px 0 0;text-align:center;"><img src="https://images2.imgbox.com/ef/f8/mAoUYtqE_o.png" alt="Cek item" width="142" style="display:inline-block;width:142px;height:auto;border:0;"></div>`
-	textHTML := fmt.Sprintf(`<div style="padding:8px 10px 10px;text-align:left;">%s%s%s%s</div>`, seriesHTML, nameHTML, versionHTML, buttonHTML)
+	// fixed-height text block (52px) keeps button at the same Y position
+	// regardless of whether the version line is present
+	textHTML := fmt.Sprintf(`<div style="padding:8px 10px 10px;text-align:left;"><div style="height:52px;overflow:hidden;">%s%s%s</div>%s</div>`, seriesHTML, nameHTML, versionHTML, buttonHTML)
 	cardHTML := fmt.Sprintf(`<div style="overflow:hidden;width:180px;height:266.58px;margin:auto;border:1px solid #9ca3af;border-radius:8px;background:url('https://kyoucdn.id/static/assets/item_bg.jpg') center/cover no-repeat;">%s%s</div>`, imageHTML, textHTML)
 	if safeURL == "" {
 		return cardHTML
