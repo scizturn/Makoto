@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/kyou-id/makoto/internal/audit"
@@ -25,6 +26,7 @@ func main() {
 	ctx := context.Background()
 	cfg := config.Load()
 
+	// --- Birthday ---
 	birthdayCampaign := campaign.BirthdayCampaign{
 		TemplateIDs: cfg.TemplateIDs,
 		Closing:     "Selamat merayakan hari spesialmu di Kyou!",
@@ -43,6 +45,24 @@ func main() {
 		}
 	}
 
+	// --- Anniversary ---
+	anniversaryCampaign := campaign.AnniversaryCampaign{
+		TemplateIDs: cfg.AnniversaryTemplateIDs,
+		Closing:     "Terima kasih sudah menjadi bagian dari Kyou! 🎉",
+		ActionURL:   cfg.ActionURL,
+	}
+	anniversaryProcessor := worker.NewAnniversaryProcessor(nil, sender, validator, voucherIssuer, anniversaryCampaign)
+	anniversaryProcessor.Domain = cfg.KirimEmailDomain
+	anniversaryProcessor.FromEmail = cfg.FromEmail
+	anniversaryProcessor.FromName = cfg.FromName
+	if cfg.AnniversaryEmailTemplateDir != "" {
+		anniversaryProcessor.Renderer = emailtemplate.FileRenderer{
+			Dir:     cfg.AnniversaryEmailTemplateDir,
+			Subject: cfg.AnniversaryEmailSubject,
+		}
+	}
+
+	// --- Queues ---
 	redisQueue := queue.NewRedisQueue(cfg.RedisAddr, cfg.RedisPassword, cfg.RedisDB, cfg.QueueName)
 	defer func() {
 		if err := redisQueue.Close(); err != nil {
@@ -50,6 +70,14 @@ func main() {
 		}
 	}()
 
+	anniversaryQueue := queue.NewAnniversaryRedisQueue(cfg.RedisAddr, cfg.RedisPassword, cfg.RedisDB, cfg.AnniversaryQueueName)
+	defer func() {
+		if err := anniversaryQueue.Close(); err != nil {
+			log.Printf("anniversary redis close failed: %v", err)
+		}
+	}()
+
+	// --- Discord + Audit ---
 	discord := notify.DiscordLogger{
 		WebhookURL: cfg.DiscordWebhookURL,
 		Enabled:    cfg.DiscordEnabled,
@@ -71,12 +99,39 @@ func main() {
 		}
 		return nil
 	}
+	anniversaryProcessor.BeforeSend = func(ctx context.Context, job domain.AnniversaryJob, result worker.ProcessResult) error {
+		if err := auditLogger.MarkSending(ctx, auditInfoFromAnniversaryJob(job, result)); err != nil {
+			log.Printf("anniversary email audit sending update failed: job_id=%s user_id=%s err=%v", job.ID, job.UserID, err)
+		}
+		return nil
+	}
 
-	runSender(ctx, redisQueue, processor, discord, auditLogger, senderConfig{
-		rateLimitPerMinute: cfg.RateLimitPerMinute,
-		deadLetterQueue:    cfg.DeadLetterQueue,
-		maxAttempts:        cfg.MaxAttempts,
-	})
+	// --- Run both workers concurrently ---
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		runSender(ctx, redisQueue, processor, discord, auditLogger, senderConfig{
+			rateLimitPerMinute: cfg.RateLimitPerMinute,
+			deadLetterQueue:    cfg.DeadLetterQueue,
+			maxAttempts:        cfg.MaxAttempts,
+		})
+	}()
+
+	if cfg.AnniversaryEnabled {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			runAnniversarySender(ctx, anniversaryQueue, anniversaryProcessor, discord, auditLogger, senderConfig{
+				rateLimitPerMinute: cfg.RateLimitPerMinute,
+				deadLetterQueue:    cfg.AnniversaryDeadLetterQueue,
+				maxAttempts:        cfg.MaxAttempts,
+			})
+		}()
+	} else {
+		log.Print("MAKOTO_ANNIVERSARY_ENABLED is false; skipping anniversary sender")
+	}
+	wg.Wait()
 }
 
 func buildAuditLogger(cfg config.Config) (*audit.Logger, error) {
@@ -196,6 +251,73 @@ func runSender(ctx context.Context, redisQueue *queue.RedisQueue, processor *wor
 	}
 }
 
+func runAnniversarySender(ctx context.Context, redisQueue *queue.AnniversaryRedisQueue, processor *worker.AnniversaryProcessor, discord notify.DiscordLogger, auditLogger *audit.Logger, cfg senderConfig) {
+	if cfg.rateLimitPerMinute <= 0 {
+		cfg.rateLimitPerMinute = 100
+	}
+	if cfg.maxAttempts <= 0 {
+		cfg.maxAttempts = 3
+	}
+	if len(cfg.retryBackoffs) == 0 {
+		cfg.retryBackoffs = []time.Duration{5 * time.Minute, 15 * time.Minute}
+	}
+	if recovered, err := redisQueue.RecoverProcessing(ctx); err != nil {
+		log.Printf("anniversary redis processing recovery failed: %v", err)
+	} else if recovered > 0 {
+		log.Printf("anniversary redis processing recovery requeued %d job(s)", recovered)
+	}
+	interval := time.Minute / time.Duration(cfg.rateLimitPerMinute)
+	if interval <= 0 {
+		interval = time.Second
+	}
+	ticker := time.NewTicker(interval)
+	defer ticker.Stop()
+
+	for {
+		processingJob, err := redisQueue.Dequeue(ctx, 5*time.Second)
+		if errors.Is(err, redis.Nil) {
+			continue
+		}
+		if err != nil {
+			log.Printf("anniversary redis dequeue failed: %v", err)
+			continue
+		}
+		job := processingJob.Job
+
+		select {
+		case <-ctx.Done():
+			log.Print(ctx.Err())
+			return
+		case <-ticker.C:
+		}
+
+		processResult, err := processor.Process(ctx, job)
+		auditInfo := auditInfoFromAnniversaryJob(job, processResult)
+		if err != nil {
+			log.Printf("anniversary email failed: job_id=%s user_id=%s err=%v", job.ID, job.UserID, err)
+			_ = discord.Log(ctx, fmt.Sprintf("[Anniversary Email Failed]\nJob: %s\nUser: %s\nEmail: %s\nError: %v", job.ID, job.UserID, maskEmail(job.User.Email), err))
+			if ackErr := redisQueue.Ack(ctx, processingJob.Payload); ackErr != nil {
+				log.Printf("anniversary email failed but ack failed: job_id=%s err=%v ack_err=%v", job.ID, err, ackErr)
+			}
+			if err := auditLogger.MarkFailed(ctx, auditInfo); err != nil {
+				log.Printf("anniversary email audit failed update failed: job_id=%s err=%v", job.ID, err)
+			}
+			continue
+		}
+
+		if err := auditLogger.MarkSent(ctx, auditInfo); err != nil {
+			log.Printf("anniversary email audit sent update failed: job_id=%s user_id=%s err=%v", job.ID, job.UserID, err)
+		}
+		if err := redisQueue.Ack(ctx, processingJob.Payload); err != nil {
+			log.Printf("anniversary email sent but processing ack failed: job_id=%s user_id=%s err=%v", job.ID, job.UserID, err)
+			_ = discord.Log(ctx, fmt.Sprintf("[Anniversary Email Processing Ack Failed]\nJob: %s\nUser: %s\nEmail: %s\nAck error: %v", job.ID, job.UserID, maskEmail(job.User.Email), err))
+			continue
+		}
+		log.Printf("anniversary email sent: job_id=%s user_id=%s", job.ID, job.UserID)
+		_ = discord.Log(ctx, fmt.Sprintf("[Anniversary Email Sent]\nJob: %s\nUser: %s\nEmail: %s", job.ID, job.UserID, maskEmail(job.User.Email)))
+	}
+}
+
 type failedJobResult struct {
 	state   string
 	attempt int
@@ -250,6 +372,23 @@ func handleFailedJob(ctx context.Context, redisQueue retryQueue, auditLogger *au
 }
 
 func auditInfoFromJob(job domain.BirthdayJob, result worker.ProcessResult) audit.MessageInfo {
+	attempt := job.Attempt
+	if attempt <= 0 {
+		attempt = 1
+	}
+	return audit.MessageInfo{
+		JobID:             job.ID,
+		Attempt:           attempt,
+		TemplateID:        result.TemplateID,
+		Subject:           result.Subject,
+		ActionURL:         result.ActionURL,
+		ProviderMessageID: result.SendResult.MessageID,
+		ProviderStatus:    result.SendResult.StatusCode,
+		ProviderResponse:  result.SendResult.Response,
+	}
+}
+
+func auditInfoFromAnniversaryJob(job domain.AnniversaryJob, result worker.ProcessResult) audit.MessageInfo {
 	attempt := job.Attempt
 	if attempt <= 0 {
 		attempt = 1

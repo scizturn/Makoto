@@ -35,6 +35,12 @@ type Config struct {
 	KyouIDAPIToken     string
 	DiscordWebhookURL  string
 	DiscordEnabled     bool
+	AnniversaryEnabled          bool
+	AnniversaryQueueName        string
+	AnniversaryDeadLetterQueue  string
+	AnniversaryTemplateIDs      []string
+	AnniversaryEmailTemplateDir string
+	AnniversaryEmailSubject     string
 }
 
 func Load() Config {
@@ -64,6 +70,12 @@ func Load() Config {
 		KyouIDAPIToken:     os.Getenv("KYOU_ID_API_TOKEN"),
 		DiscordWebhookURL:  os.Getenv("DISCORD_WEBHOOK_URL"),
 		DiscordEnabled:     envBool("DISCORD_WEBHOOK_ENABLED", true),
+		AnniversaryEnabled:          envBool("MAKOTO_ANNIVERSARY_ENABLED", false),
+		AnniversaryQueueName:        env("MAKOTO_ANNIVERSARY_QUEUE_NAME", "anniversary_email_jobs"),
+		AnniversaryDeadLetterQueue:  env("MAKOTO_ANNIVERSARY_DEAD_LETTER_QUEUE", "anniversary_email_jobs_dead"),
+		AnniversaryTemplateIDs:      envList("MAKOTO_ANNIVERSARY_TEMPLATE_IDS", []string{"anniversary1.html", "anniversary2.html", "anniversary3.html"}),
+		AnniversaryEmailTemplateDir:  os.Getenv("MAKOTO_ANNIVERSARY_EMAIL_TEMPLATE_DIR"),
+		AnniversaryEmailSubject:      env("MAKOTO_ANNIVERSARY_EMAIL_SUBJECT", "Happy Anniversary, {{ .Name }}! 🎉"),
 	}
 }
 

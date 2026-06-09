@@ -1,0 +1,88 @@
+{
+    "job_id": "anniversary-preview-2026-06-09-user-31877",
+    "user_id": "31877",
+    "anniversary_date": "2026-06-09T11:56:09.090981+07:00",
+    "user": {
+        "id": "31877",
+        "name": "Abimanyu Nugroho",
+        "email": "preview@kyou.id",
+        "birthday": "0001-01-01T00:00:00Z",
+        "is_active": true
+    },
+    "years": 5,
+    "voucher_code": "ANNPREVIEW2026",
+    "historical_item": {
+        "name": "[FLASH PO] Nendoroid Rin Shima - Touring Ver.",
+        "image_url": "https://kyoucdn.id/items/64964-nendoroid-rin-shima-touring-ver.jpg.webp",
+        "order_date": "2020-09-26T09:18:53+07:00",
+        "days_ago": 2081
+    },
+    "wishlist_items": [
+        {
+            "id": "103969",
+            "name": "PVC Figure Mihono Bourbon - Uma Musume Pretty Derby (20cm)",
+            "url": "https://kyou.id/items/103969/",
+            "image_url": "https://kyoucdn.id/items/167314-revive-pvc-figure-mihono-bourbon-uma-musume-pretty-derby-20cm-1459445050.jpg.webp",
+            "price": 320000,
+            "status": "ready",
+            "manufacturer": "Bandai Spirits",
+            "series_name": "Uma Musume"
+        },
+        {
+            "id": "165913",
+            "name": "Espresto Figure Fujita Kotone - Charming Pose Ver. Gakuen iDOLM@STER (18cm)",
+            "url": "https://kyou.id/items/165913/",
+            "image_url": "https://kyoucdn.id/items/390842-espresto-figure-fujita-kotone-charming-pose-ver-gakuen-idolm-at-ster-size-tba.jpg.webp",
+            "price": 420000,
+            "status": "ready",
+            "manufacturer": "Bandai Spirits",
+            "series_name": "Gakuen iDOLM@STER"
+        },
+        {
+            "id": "158513",
+            "name": "Kuripan Plushie Awa Subaru - Girls Band Cry (17cm)",
+            "url": "https://kyou.id/items/158513/",
+            "image_url": "https://kyoucdn.id/items/452480-kuripan-plushie-awa-subaru-girls-band-cry-17cm.jpg.webp",
+            "price": 850000,
+            "status": "ready",
+            "manufacturer": "Good Smile Company",
+            "series_name": "Girls Band Cry"
+        }
+    ],
+    "popular_items": [
+        {
+            "id": "224347",
+            "name": "YURUCANA Plastic Model Kit Lumitea - ARCANADEA",
+            "kind": "character",
+            "series_id": "5665",
+            "image_url": "https://kyoucdn.id/items/yurucana-plastic-model-kit-lumitea-arcanadea-1a41a370.jpg.webp",
+            "price": 400000,
+            "status": "PO",
+            "manufacturer": "Kotobukiya",
+            "series_name": "Arcanadea"
+        },
+        {
+            "id": "224346",
+            "name": "PVC Figure non Scale Stylet - Swimsuit Ver. Frame Arms Girl Illustration by Humikane Shimada",
+            "kind": "character",
+            "series_id": "382",
+            "image_url": "https://kyoucdn.id/items/pvc-figure-non-scale-stylet-swimsuit-ver-frame-arms-girl-illustration-by-humikane-shimada-e5b721e1.jpg.webp",
+            "price": 2650000,
+            "status": "PO",
+            "manufacturer": "Kotobukiya",
+            "series_name": "Frame Arms Girl"
+        },
+        {
+            "id": "224345",
+            "name": "PVC Figure 1/8 Nakoruru & Mamahaha - The King of Fighters XV Ver. Samurai Spirits",
+            "kind": "character",
+            "series_id": "6026",
+            "image_url": "https://kyoucdn.id/items/pvc-figure-18-nakoruru-mamahaha-the-king-of-fighters-xv-ver-samurai-spirits-4a2cd8ac.jpg.webp",
+            "price": 2550000,
+            "status": "PO",
+            "manufacturer": "Kotobukiya",
+            "series_name": "Samurai Spirits"
+        }
+    ],
+    "attempt": 1
+}

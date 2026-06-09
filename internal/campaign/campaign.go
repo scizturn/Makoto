@@ -108,6 +108,40 @@ func RenderWishlistHTML(items []domain.WishlistItem) string {
 	return renderWishlistFeature(items[0])
 }
 
+func RenderWishlistGridHTML(items []domain.WishlistItem) string {
+	if len(items) == 0 {
+		return `<p style="margin:0;color:#6b7280;">Your wishlist is waiting for your next pick.</p>`
+	}
+
+	var builder strings.Builder
+	builder.WriteString(`<table role="presentation" width="690" cellspacing="0" cellpadding="0" align="center" style="width:690px;border-collapse:collapse;margin:0 auto;"><tr>`)
+	for i, item := range items {
+		if i >= 3 {
+			break
+		}
+		builder.WriteString(`<td width="230" valign="top" align="center" style="width:230px;padding:0;text-align:center;">`)
+		builder.WriteString(renderProductCard(item.Name, item.SeriesName, "Wishlist", item.URL, item.ImageURL))
+		builder.WriteString(`</td>`)
+	}
+	builder.WriteString(`</tr></table>`)
+	return builder.String()
+}
+
+func FYPToWishlistItem(p domain.FYPItem) domain.WishlistItem {
+	return domain.WishlistItem{
+		ID:          p.ID,
+		Name:        p.Name,
+		URL:         "https://kyou.id/items/" + p.ID + "/",
+		ImageURL:    p.ImageURL,
+		Price:       p.Price,
+		Status:      p.Status,
+		Manufacturer: p.Manufacturer,
+		SeriesName:  p.SeriesName,
+		PODeadline:  p.PODeadline,
+		POReleaseAt: p.POReleaseAt,
+	}
+}
+
 func RenderFYPHTML(items []domain.FYPItem) string {
 	if len(items) == 0 {
 		return `<p style="margin:0;color:#6b7280;">Recommended picks are being refreshed for you.</p>`
