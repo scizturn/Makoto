@@ -80,7 +80,10 @@ func (c KirimClient) SendTemplate(ctx context.Context, msg domain.EmailMessage) 
 
 func (c KirimClient) sendTransactionalV4(ctx context.Context, msg domain.EmailMessage) (domain.SendResult, error) {
 	form := url.Values{}
-	form.Set("from", formatFrom(msg.FromName, msg.FromEmail))
+	form.Set("from", msg.FromEmail)
+	if msg.FromName != "" {
+		form.Set("from_name", msg.FromName)
+	}
 	form.Set("to", msg.ToEmail)
 	form.Set("subject", msg.Subject)
 	form.Set("html", msg.HTMLBody)
@@ -128,12 +131,6 @@ func (c KirimClient) sendTransactionalV4(ctx context.Context, msg domain.EmailMe
 	return domain.SendResult{MessageID: result.MessageID, StatusCode: resp.StatusCode, Response: responseBody}, nil
 }
 
-func formatFrom(name string, email string) string {
-	if name == "" {
-		return email
-	}
-	return fmt.Sprintf("%s <%s>", name, email)
-}
 
 func (c KirimClient) Validate(ctx context.Context, email string) (bool, error) {
 	payload := map[string]string{"email": email}
