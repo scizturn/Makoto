@@ -129,7 +129,10 @@ func (c KirimClient) sendTransactionalV4(ctx context.Context, msg domain.EmailMe
 }
 
 func formatFrom(name string, email string) string {
-	return email
+	if name == "" {
+		return email
+	}
+	return fmt.Sprintf("%s <%s>", name, email)
 }
 
 func (c KirimClient) Validate(ctx context.Context, email string) (bool, error) {
