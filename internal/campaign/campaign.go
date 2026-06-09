@@ -193,30 +193,135 @@ func renderWishlistFeature(item domain.WishlistItem) string {
 }
 
 func renderProductCard(name string, seriesName string, fallbackLabel string, url string, imageURL string) string {
-	displayName, version := splitItemDisplayName(name, seriesName)
-	safeName := html.EscapeString(displayName)
+	mainName, version := abbreviateCardTitle(name, seriesName)
+	safeName := html.EscapeString(mainName)
 	safeVersion := html.EscapeString(version)
 	safeSeries := html.EscapeString(displayManufacturerOrFallback(seriesName, fallbackLabel))
 	safeURL := html.EscapeString(url)
 	safeImageURL := html.EscapeString(imageURL)
-	imageHTML := `<div style="display:block;margin:auto;width:180px;height:180px;border-radius:4px;background:#f3f4f6;"></div>`
+
+	imageHTML := `<div style="display:block;margin:0 auto;width:160px;height:160px;border-radius:4px;background:#f3f4f6;"></div>`
 	if safeImageURL != "" {
-		imageHTML = fmt.Sprintf(`<img src="%s" alt="%s" width="180" height="180" style="display:block;margin:auto;width:180px;border-radius:4px;height:180px;object-fit:cover;background:#f3f4f6;border:0;">`, safeImageURL, safeName)
+		imageHTML = fmt.Sprintf(`<img src="%s" alt="%s" width="160" height="160" style="display:block;margin:0 auto;width:160px;border-radius:4px;height:160px;object-fit:cover;background:#f3f4f6;border:0;">`, safeImageURL, safeName)
 	}
 
-	nameStyle := `height:94px;margin:0;color:#0f172a;font-size:17px;font-weight:900;line-height:1.32;white-space:normal;word-break:break-word;overflow:hidden;`
-	displayText := safeName
+	seriesHTML := fmt.Sprintf(`<p style="margin:6px 0 0;color:#2f2b28;font-size:10px;font-weight:400;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">%s</p>`, safeSeries)
+	nameHTML := fmt.Sprintf(`<p style="margin:3px 0 0;color:#0f172a;font-size:12px;font-weight:900;line-height:1.3;white-space:normal;word-break:break-word;">%s</p>`, safeName)
+	versionHTML := ""
 	if safeVersion != "" {
-		displayText = fmt.Sprintf(`%s<br>%s`, safeName, safeVersion)
+		versionHTML = fmt.Sprintf(`<p style="margin:2px 0 0;color:#374151;font-size:10px;font-weight:600;line-height:1.3;">%s</p>`, safeVersion)
 	}
-	nameHTML := fmt.Sprintf(`<p style="%s">%s</p>`, nameStyle, displayText)
 
-	buttonHTML := `<img src="https://images2.imgbox.com/ef/f8/mAoUYtqE_o.png" alt="Cek item" width="142" style="display:block;width:142px;height:auto;margin:12px auto 0;border:0;">`
-	cardHTML := fmt.Sprintf(`<div style="overflow:hidden;width:180px;height:360px;margin:auto;padding:12px;border:1px solid #9ca3af;border-radius:12px;background:#ffe0cf url('https://kyoucdn.id/static/assets/item_bg.jpg') center/cover no-repeat;text-align:left;">%s<div style="height:144px;padding:12px 8px 4px;"><p style="height:18px;margin:0 0 4px 0;overflow:hidden;color:#2f2b28;font-size:12px;font-weight:600;text-overflow:ellipsis;white-space:nowrap;">%s</p>%s%s</div></div>`, imageHTML, safeSeries, nameHTML, buttonHTML)
+	buttonHTML := `<img src="https://images2.imgbox.com/ef/f8/mAoUYtqE_o.png" alt="Cek item" width="142" style="display:block;width:142px;height:auto;margin:8px auto 0;border:0;">`
+	cardHTML := fmt.Sprintf(`<div style="overflow:hidden;width:180px;margin:auto;padding:10px;border:1px solid #9ca3af;border-radius:8px;background:url('https://kyoucdn.id/static/assets/item_bg.jpg') center/cover no-repeat;text-align:center;">%s%s%s%s%s</div>`, imageHTML, seriesHTML, nameHTML, versionHTML, buttonHTML)
 	if safeURL == "" {
 		return cardHTML
 	}
 	return fmt.Sprintf(`<a href="%s" style="display:block;width:230px;color:inherit;text-decoration:none;">%s</a>`, safeURL, cardHTML)
+}
+
+func abbreviateCardTitle(name, seriesName string) (string, string) {
+	// strip [TAG] prefixes, then size "(17cm)" BEFORE series suffix detection
+	name = strings.TrimSpace(name)
+	for strings.HasPrefix(name, "[") {
+		end := strings.Index(name, "]")
+		if end < 0 {
+			break
+		}
+		name = strings.TrimSpace(name[end+1:])
+	}
+	if i := strings.LastIndex(name, " ("); i >= 0 {
+		if suf := name[i:]; strings.HasSuffix(suf, ")") && strings.Contains(suf, "cm") {
+			name = strings.TrimSpace(name[:i])
+		}
+	}
+	name = stripItemNoise(name, seriesName)
+
+	var version string
+	if split := strings.LastIndex(name, " - "); split >= 0 && strings.Contains(strings.ToLower(name[split+3:]), "ver") {
+		version = strings.TrimSpace(strings.TrimRight(name[split+3:], "."))
+		name = strings.TrimSpace(name[:split])
+	} else {
+		name, version = splitItemVersion(name)
+		version = strings.TrimRight(version, ".")
+	}
+	// strip any leftover " - Franchise" suffix that has no "ver"
+	if split := strings.LastIndex(name, " - "); split >= 0 {
+		after := strings.TrimSpace(name[split+3:])
+		if !strings.Contains(strings.ToLower(after), "ver") {
+			name = strings.TrimSpace(name[:split])
+		}
+	}
+	// handle "X Series" naming patterns (e.g. "Stellar Voice Series")
+	name, sv := splitKnownSeriesVersion(name)
+	if version == "" {
+		version = sv
+	}
+
+	prefix := ""
+	remainder := name
+	for _, p := range []string{
+		"Nendoroid Doll", "Nendoroid",
+		"Figma",
+		"Kuripan Plushie",
+		"Xross Link Figure",
+		"Espresto Figure",
+		"YURUCANA Plastic Model Kit",
+		"Plastic Model Kit",
+	} {
+		if strings.HasPrefix(strings.ToLower(remainder), strings.ToLower(p)) {
+			prefix = p
+			remainder = strings.TrimSpace(remainder[len(p):])
+			break
+		}
+	}
+
+	if prefix == "" {
+		// strip product type prefixes sequentially (PVC Figure + Gift+ can appear together)
+		for _, strip := range []string{"PVC Figure", "Gift+"} {
+			if strings.HasPrefix(strings.ToLower(remainder), strings.ToLower(strip)) {
+				remainder = strings.TrimSpace(remainder[len(strip):])
+			}
+		}
+		// detect leading scale: "1/7", "1/8", "non Scale"
+		parts := strings.Fields(remainder)
+		if len(parts) > 1 && strings.Contains(parts[0], "/") {
+			prefix = parts[0]
+			remainder = strings.Join(parts[1:], " ")
+		} else if len(parts) > 2 && strings.EqualFold(parts[0], "non") && strings.EqualFold(parts[1], "scale") {
+			prefix = parts[0] + " " + parts[1]
+			remainder = strings.Join(parts[2:], " ")
+		}
+	} else {
+		// for named types (Nendoroid etc.), also strip a following scale token
+		parts := strings.Fields(remainder)
+		if len(parts) > 1 && strings.Contains(parts[0], "/") {
+			remainder = strings.Join(parts[1:], " ")
+		}
+	}
+
+	// take last meaningful word (skip trailing pure numbers like "1", "2")
+	words := strings.Fields(remainder)
+	shortChar := remainder
+	for i := len(words) - 1; i >= 0; i-- {
+		w := words[i]
+		isNum := len(w) > 0
+		for _, r := range w {
+			if r < '0' || r > '9' {
+				isNum = false
+				break
+			}
+		}
+		if !isNum || i == 0 {
+			shortChar = w
+			break
+		}
+	}
+
+	if prefix != "" {
+		return prefix + " " + shortChar, version
+	}
+	return shortChar, version
 }
 
 func displayManufacturer(manufacturer string) string {
