@@ -200,20 +200,21 @@ func renderProductCard(name string, seriesName string, fallbackLabel string, url
 	safeURL := html.EscapeString(url)
 	safeImageURL := html.EscapeString(imageURL)
 
-	imageHTML := `<div style="display:block;margin:0;width:160px;height:160px;border-radius:4px;background:#f3f4f6;"></div>`
+	imageHTML := `<div style="display:block;width:180px;height:160px;background:#f3f4f6;"></div>`
 	if safeImageURL != "" {
-		imageHTML = fmt.Sprintf(`<img src="%s" alt="%s" width="160" height="160" style="display:block;margin:0;width:160px;border-radius:4px;height:160px;object-fit:cover;background:#f3f4f6;border:0;">`, safeImageURL, safeName)
+		imageHTML = fmt.Sprintf(`<img src="%s" alt="%s" width="180" height="160" style="display:block;width:180px;height:160px;object-fit:cover;background:#f3f4f6;border:0;">`, safeImageURL, safeName)
 	}
 
-	seriesHTML := fmt.Sprintf(`<p style="margin:6px 0 0;color:#2f2b28;font-size:10px;font-weight:400;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">%s</p>`, safeSeries)
-	nameHTML := fmt.Sprintf(`<p style="margin:3px 0 0;color:#0f172a;font-size:12px;font-weight:900;line-height:1.3;white-space:normal;word-break:break-word;">%s</p>`, safeName)
+	seriesHTML := fmt.Sprintf(`<p style="margin:0 0 2px;color:#2f2b28;font-size:10px;font-weight:400;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">%s</p>`, safeSeries)
+	nameHTML := fmt.Sprintf(`<p style="margin:0 0 2px;color:#0f172a;font-size:12px;font-weight:900;line-height:1.3;white-space:normal;word-break:break-word;">%s</p>`, safeName)
 	versionHTML := ""
 	if safeVersion != "" {
-		versionHTML = fmt.Sprintf(`<p style="margin:2px 0 0;color:#374151;font-size:10px;font-weight:600;line-height:1.3;">%s</p>`, safeVersion)
+		versionHTML = fmt.Sprintf(`<p style="margin:0;color:#374151;font-size:10px;font-weight:600;line-height:1.3;">%s</p>`, safeVersion)
 	}
 
-	buttonHTML := `<img src="https://images2.imgbox.com/ef/f8/mAoUYtqE_o.png" alt="Cek item" width="142" style="display:block;width:142px;height:auto;margin:8px 0 0;border:0;">`
-	cardHTML := fmt.Sprintf(`<div style="overflow:hidden;width:180px;height:266.58px;margin:auto;padding:10px;border:1px solid #9ca3af;border-radius:8px;background:url('https://kyoucdn.id/static/assets/item_bg.jpg') center/cover no-repeat;text-align:left;">%s%s%s%s%s</div>`, imageHTML, seriesHTML, nameHTML, versionHTML, buttonHTML)
+	buttonHTML := `<div style="margin:10px 0 0;text-align:center;"><img src="https://images2.imgbox.com/ef/f8/mAoUYtqE_o.png" alt="Cek item" width="142" style="display:inline-block;width:142px;height:auto;border:0;"></div>`
+	textHTML := fmt.Sprintf(`<div style="padding:8px 10px 10px;text-align:left;">%s%s%s%s</div>`, seriesHTML, nameHTML, versionHTML, buttonHTML)
+	cardHTML := fmt.Sprintf(`<div style="overflow:hidden;width:180px;height:266.58px;margin:auto;border:1px solid #9ca3af;border-radius:8px;background:url('https://kyoucdn.id/static/assets/item_bg.jpg') center/cover no-repeat;">%s%s</div>`, imageHTML, textHTML)
 	if safeURL == "" {
 		return cardHTML
 	}
