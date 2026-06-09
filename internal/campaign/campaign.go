@@ -321,6 +321,18 @@ func abbreviateCardTitle(name, seriesName string) (string, string) {
 		}
 	}
 
+	// if last word is a generic product category (not a character name) and
+	// no product prefix was detected, the character name is at the front
+	productTerminals := map[string]bool{
+		"card": true, "cards": true,
+		"box": true, "set": true, "pack": true,
+		"badge": true, "plate": true, "stand": true,
+		"tapestry": true, "poster": true, "seal": true,
+	}
+	if prefix == "" && len(words) > 1 && productTerminals[strings.ToLower(shortChar)] {
+		shortChar = words[0]
+	}
+
 	if prefix != "" {
 		return prefix + " " + shortChar, version
 	}
