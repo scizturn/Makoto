@@ -67,7 +67,7 @@ func (p *AnniversaryProcessor) Process(ctx context.Context, job domain.Anniversa
 	}
 
 	templateID := p.campaign.SelectTemplate(job.Date, job.ID)
-	mergeData := p.campaign.BuildMergeData(user, voucherCode, wishlist, job.Years, job.HistoricalItem)
+	mergeData := p.campaign.BuildMergeData(user, voucherCode, wishlist, job.Years, job.HistoricalItem, job.Date)
 	result := ProcessResult{
 		TemplateID: templateID,
 		ActionURL:  mergeString(mergeData, "action_url"),

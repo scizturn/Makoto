@@ -1,179 +1,333 @@
 <!doctype html>
-<html lang="id">
+<html lang="id" xmlns="http://www.w3.org/1999/xhtml">
     <head>
         <meta charset="utf-8" />
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=720" />
         <title>Happy Anniversary dari Kyou.id</title>
     </head>
-    <body
-        style="
-            margin: 0;
-            background: #f6f7fb;
-            font-family: Nunito, Arial, Helvetica, sans-serif;
-            color: #111827;
-        "
-    >
-        <table role="presentation" width="720" cellspacing="0" cellpadding="0" align="center" style="width:720px;min-width:720px;margin:0 auto;border-collapse:collapse;"><tr><td width="720" style="width:720px;padding:28px 0;overflow:hidden;">
-            <div
-                style="
-                    width: 720px;
-                    background: #fff8ed;
-                    border: 0;
-                    border-radius: 8px;
-                    overflow: hidden;
-                "
-            >
-                <div
-                    style="
-                        min-height: 50px;
-                        width: 672px;
-                        padding: 10px 24px;
-                        background: #ff6b35;
-                        text-align: center;
-                    "
-                >
-                    <img
-                        src="https://kyoucdn.id/static/assets/brand_logo.png"
-                        alt="Kyou.id"
-                        width="50"
-                        style="
-                            display: block;
-                            width: 50px;
-                            height: auto;
-                            margin: 0 auto;
-                            border: 0;
-                        "
-                    />
-                </div>
+    <body style="margin:0;padding:0;background:#ffffff;font-family:Nunito,Arial,Helvetica,sans-serif;color:#111827;-webkit-text-size-adjust:none;text-size-adjust:none;">
+        <table role="presentation" width="720" cellspacing="0" cellpadding="0" align="center"
+               style="width:720px;min-width:720px;margin:0 auto;border-collapse:collapse;table-layout:fixed;background:#f2fafd url('https://kyoucdn.id/static/assets/EmailBG1.png') repeat top center;">
+        <tr><td style="padding:28px 0;">
 
-                <div
-                    style="
-                        padding: 36px 40px 28px;
-                        background: #fff1df;
-                        text-align: center;
-                    "
-                >
-                    <h1
-                        style="
-                            margin: 0 0 20px;
-                            color: #5a351d;
-                            font-size: 38px;
-                            font-weight: 900;
-                            line-height: 1.18;
-                        "
-                    >
-                        Happy Anniversary,
-                        <span style="color: #ff5a0a">{{ .Name }}</span>! 🎉
-                    </h1>
-                    <p
-                        style="
-                            width: 650px;
-                            margin: 0 auto 18px;
-                            color: #5a351d;
-                            font-size: 16px;
-                            font-weight: 600;
-                            line-height: 1.65;
-                        "
-                    >
-                        Ngga kerasa banget kamu udah {{ .Years }} tahun bareng Kyou! Makasih banyak ya udah setia percayain urusan khilaf kamu sama kita.
-                    </p>
-                    
-                    {{ .HistoricalHTML }}
-
-                    <p
-                        style="
-                            width: 650px;
-                            margin: 20px auto 0;
-                            color: #5a351d;
-                            font-size: 16px;
-                            font-weight: 600;
-                            line-height: 1.65;
-                        "
-                    >
-                        Sebagai bentuk terima kasih, Kyou udah nyiapin kado eksklusif nih buat kamu. Langsung klaim aja ya hadiahnya di bawah!
-                    </p>
-                </div>
-
-                <div
-                    style="
-                        padding: 0 40px 28px;
-                        background: #fff1df;
-                        text-align: center;
-                    "
-                >
-                    <a
-                        href="{{ .ActionURL }}"
-                        style="
-                            display: block;
-                            width: 350px;
-                            margin: 0 auto;
-                            padding: 19px 24px 17px;
-                            border: 4px solid #5a351d;
-                            border-radius: 999px;
-                            background: #ff5a0a;
-                            box-shadow: 0 7px 0 #5a351d;
-                            color: #ffffff;
-                            font-size: 22px;
-                            font-weight: 900;
-                            line-height: 1;
-                            letter-spacing: 2.5px;
-                            text-align: center;
-                            text-decoration: none;
-                        "
-                        >KLAIM VOUCHER</a
-                    >
-                    <p
-                        style="
-                            width: 560px;
-                            margin: 16px auto;
-                            margin-bottom: -40px;
-                            color: #9d6a49;
-                            font-size: 14px;
-                            font-style: italic;
-                            font-weight: 600;
-                            line-height: 1.45;
-                        "
-                    >
-                        *Voucher berlaku selama 2 minggu sejak email ini dikirimkan yaa.
-                        <br />Jangan lupa segera klaim vouchernya sebelum expired!
-                    </p>
-                </div>
-
-                <div style="padding: 42px 0; background: #fff1df">
-                    <p
-                        style="
-                            margin: 0 0 18px;
-                            border-top: 2px dashed #d4a076;
-                        "
-                    >
-                    </p>
-                    <h2
-                        style="
-                            color: #5a351d;
-                            font-size: 32px;
-                            font-weight: 900;
-                            line-height: 1.2;
-                            text-align: center;
-                        "
-                    >
-                        Nih wishlist kamu yang belum sempet kebeli!
-                    </h2>
-                    <div style="margin: 0 0 34px">{{ .WishlistHTML }}</div>
-                </div>
-
-                <!-- Footer (Same as Birthday) -->
-                <div style="width:720px;padding:46px 0 52px;border-top: 6px solid #7a3b14;border-radius: 0 0 24px 24px;background: #efad3e;text-align:center;">
-                    <img src="https://kyoucdn.id/static/assets/brand_logo.png" alt="Kyou.id" width="132" style="display:block;width:132px;height:auto;margin:0 auto 28px;border:0;" />
-                    <p style="margin:0 0 8px;color:#5a351d;font-size:20px;font-weight:900;line-height:1.2;">
-                        {{ .Closing }}
-                    </p>
-                    <p style="margin:0 0 0px;color:#7b5c2b;font-size:16px;font-weight:500;line-height:1.4;">
-                        ©2014–2026 Kyou Hobby Shop
-                    </p>
-                    <p style="margin:0;color:#8a6c36;font-size:16px;font-weight:500;line-height:1.55;">
-                        Kamu menerima email ini karena terdaftar sebagai Teman Kyou.
-                    </p>
-                </div>
+            <!-- ── LOGO ── -->
+            <div style="text-align:center;padding:0 0 20px;">
+                <a href="https://kyou.id/" style="display:inline-block;border:0;text-decoration:none;">
+                    <img src="https://kyoucdn.id/static/assets/brand_logo.png" alt="Kyou.id" width="72"
+                         style="display:block;width:72px;height:auto;border:0;" />
+                </a>
             </div>
-        </td></tr></table>
+
+            <!-- ── HERO ── -->
+            <table role="presentation" width="720" cellspacing="0" cellpadding="0"
+                   style="width:720px;border-collapse:collapse;">
+            <tr><td style="padding:0 20px;">
+                <table role="presentation" width="680" cellspacing="0" cellpadding="0"
+                       style="width:680px;border-collapse:collapse;border-radius:16px;overflow:hidden;
+                              background:linear-gradient(105deg,#2c2422,#56413a);">
+                    <tr>
+                        <td align="center" valign="top" style="padding:36px 28px 200px;width:680px;">
+                            <div style="color:#ffc600;font-size:13px;font-weight:800;letter-spacing:3px;text-transform:uppercase;line-height:1;margin:0 0 10px;">
+                                Member Anniversary
+                            </div>
+                            <div style="color:#ffffff;font-size:34px;font-weight:900;line-height:1.2;letter-spacing:-0.5px;margin:0 0 12px;">
+                                Nggak kerasa yah, udah {{ .Years }} tahun<br><span style="color:#ff5a0a;">{{ .Name }}</span> nemenin Kyou!
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </td></tr>
+            </table>
+
+            <!-- ── MEMBER CARD — 16:9, floating over hero bottom ── -->
+            <div style="margin-top:-180px;">
+            <table role="presentation" width="720" cellspacing="0" cellpadding="0"
+                   style="width:720px;border-collapse:collapse;">
+            <tr><td style="padding:0 40px;">
+                <!-- 640×260px -->
+                <table role="presentation" width="640" cellspacing="0" cellpadding="0"
+                       style="width:640px;height:260px;border-collapse:collapse;border-radius:14px;overflow:hidden;
+                              background:#ddeef7 url('https://images2.imgbox.com/dd/37/JfeXtEB4_o.png') no-repeat left center;
+                              background-size:cover;
+                              border:1px solid rgba(56,46,44,0.14);
+                              box-shadow:0 24px 48px rgba(56,46,44,0.38),0 8px 16px rgba(56,46,44,0.18);">
+                <tr>
+                    <td height="260" style="height:260px;background:linear-gradient(100deg,rgba(255,255,255,0) 38%,rgba(255,255,255,0.5) 60%,rgba(255,255,255,0.9) 100%);padding:0;">
+                        <table role="presentation" width="640" height="260" cellspacing="0" cellpadding="0"
+                               style="width:640px;height:260px;border-collapse:collapse;">
+                        <tr>
+                            <td width="370" height="260" style="padding:0;line-height:1;">&nbsp;</td>
+                            <td style="padding:24px 28px 22px;text-align:right;vertical-align:top;">
+                                <img src="https://kyoucdn.id/static/assets/brand_logo.png" alt="Kyou" height="26"
+                                     style="display:inline-block;height:26px;width:auto;border:0;" />
+                                <div style="font-family:'Courier New',Courier,monospace;font-size:26px;font-weight:700;
+                                            color:#382e2c;letter-spacing:5px;margin:60px 0 0;text-transform:uppercase;
+                                            line-height:1;white-space:nowrap;overflow:hidden;">
+                                    {{ .FirstName }}
+                                </div>
+                                <div style="font-size:10.5px;font-weight:800;color:#fc4c02;letter-spacing:2px;
+                                            margin:6px 0 0;text-transform:uppercase;line-height:1;">
+                                    {{ .AnniversaryEdition }}
+                                </div>
+                                <table role="presentation" cellspacing="0" cellpadding="0" align="right"
+                                       style="margin:20px 0 0;border-collapse:collapse;">
+                                <tr>
+                                    <td style="padding:0;text-align:right;vertical-align:bottom;">
+                                        <div style="font-size:9px;font-weight:700;color:rgba(56,46,44,0.55);
+                                                    text-transform:uppercase;letter-spacing:1.5px;line-height:1;">
+                                            Member sejak
+                                        </div>
+                                        <div style="font-family:'Courier New',Courier,monospace;font-size:13px;
+                                                    color:#382e2c;letter-spacing:1px;margin-top:3px;line-height:1;
+                                                    text-transform:uppercase;">
+                                            {{ .JoinDate }}
+                                        </div>
+                                    </td>
+                                </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        </table>
+                    </td>
+                </tr>
+                </table>
+            </td></tr>
+            </table>
+            </div>
+
+            <!-- ── TEXT BODY ── -->
+            <table role="presentation" width="720" cellspacing="0" cellpadding="0"
+                   style="width:720px;border-collapse:collapse;">
+            <tr><td style="padding:60px 40px;">
+                <p style="margin:0 0 16px;color:#565252;font-size:24px;font-weight:900;line-height:1.4;letter-spacing:-0.3px;">
+                    Halo {{ .Name }},
+                </p>
+                <p style="margin:0;color:#565252;font-size:16px;font-weight:600;line-height:1.65;letter-spacing:-0.3px;">
+                    Tepat {{ .Years }} tahun lalu, kamu pertama kali gabung jadi member Kyou. Dari koleksi pertama yang kamu bawa pulang, sampai semua wishlist yang nambah setelahnya, seru banget lihat perjalanan koleksimu berkembang.
+                    <br /><br />
+                    ThanKyou ya udah {{ .Years }} tahun milih Kyou jadi tempat khilafmu. Buat Kyou, member kayak kamu itu bukan sekadar pelanggan, tapi temen sesama kolektor.
+                </p>
+            </td></tr>
+            </table>
+
+            <!-- ── FLOATING PAPER SECTION ── -->
+            <table role="presentation" width="720" cellspacing="0" cellpadding="0"
+                   style="width:720px;border-collapse:collapse;">
+            <tr><td style="padding:0 20px 32px;">
+                <table role="presentation" width="680" cellspacing="0" cellpadding="0"
+                       style="width:680px;border-collapse:collapse;border-radius:20px;overflow:hidden;
+                              background:#ffffff url('https://images2.imgbox.com/7d/d5/vpx9c29H_o.png') no-repeat center bottom;
+                              background-size:cover;
+                              box-shadow:0 12px 48px rgba(0,0,0,0.10),0 4px 12px rgba(0,0,0,0.06);
+                              border:1px solid rgba(0,0,0,0.05);">
+
+                    <!-- heading -->
+                    <tr><td style="padding:36px 40px 0;text-align:center;">
+                        <h2 style="color:#382e2c;font-size:26px;font-weight:900;line-height:1.25;letter-spacing:-0.5px;text-align:center;margin:0 0 30px;">
+                            Ingat ga kamu pernah belanja ini?
+                        </h2>
+                    </td></tr>
+
+                    <!-- historical item -->
+                    {{ if .HistoricalHTML }}
+                    <tr><td style="padding:24px 32px 28px;">
+                        <div style="background:#ffffff;border-radius:16px;padding:28px 28px 28px 28px;box-shadow:0 4px 20px rgba(0,0,0,0.08),0 1px 4px rgba(0,0,0,0.05);">
+                            {{ .HistoricalHTML }}
+                        </div>
+                    </td></tr>
+                    {{ end }}
+
+                    <!-- divider -->
+                    <tr><td style="padding:0 20px;"><div style="height:1px;background:#ebebeb;font-size:0;line-height:0;">&nbsp;</div></td></tr>
+
+                    <!-- voucher — kartu gosok -->
+                    <tr><td style="padding:24px 32px 28px;text-align:center;">
+                        <div style="background:#e8f5fd;border:1.5px solid #b3dff7;border-radius:16px;padding:28px 32px;">
+
+                            <!-- label -->
+                            <div style="font-size:11px;font-weight:800;color:#3ab7f5;letter-spacing:2.5px;text-transform:uppercase;margin:0 0 18px;line-height:1;">
+                                KADO {{ .Years }} TAHUN
+                            </div>
+
+                            <!-- scratch card -->
+                            <div style="background:#c8c8c8;border-radius:12px;padding:14px 16px;margin:0 0 20px;
+                                        background-image:repeating-linear-gradient(-45deg,transparent,transparent 10px,rgba(255,255,255,0.18) 10px,rgba(255,255,255,0.18) 20px);">
+                                <div style="background:#ffffff;border:2px dashed #3ab7f5;border-radius:8px;padding:18px 24px;">
+                                    <div style="font-family:'Courier New',Courier,monospace;font-size:32px;font-weight:900;
+                                                color:#1a1a1a;letter-spacing:3px;line-height:1;">
+                                        {{ .VoucherCode }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- discount info -->
+                            <p style="margin:0 0 8px;color:#1a1a1a;font-size:15px;font-weight:500;line-height:1.5;">
+                                <strong>Diskon 15%</strong> untuk semua produk (maks. IDR 120.000)
+                            </p>
+                            <p style="margin:0 0 24px;color:#6b8fa8;font-size:13px;font-weight:500;line-height:1.6;">
+                                Udah kami gosokin biar kamu nggak capek masih ada waktu kok 14 Hari, tapi jangan kelamaan mikir ya.
+                            </p>
+
+                            <!-- claim button -->
+                            <a href="{{ .ActionURL }}"
+                               style="display:block;width:280px;margin:0 auto;padding:18px 24px 16px;
+                                      border:4px solid #5a351d;border-radius:999px;background:#ff5a0a;
+                                      box-shadow:0 7px 0 #5a351d;color:#ffffff;font-size:18px;font-weight:900;
+                                      line-height:1;letter-spacing:2.5px;text-align:center;text-decoration:none;">
+                                KLAIM VOUCHER
+                            </a>
+
+                        </div>
+                    </td></tr>
+
+                    <!-- divider -->
+                    <tr><td style="padding:0 20px;"><div style="height:1px;background:#ebebeb;font-size:0;line-height:0;">&nbsp;</div></td></tr>
+
+                    <!-- wishlist heading -->
+                    <tr><td style="padding:28px 40px 0;text-align:center;">
+                        <h2 style="color:#382e2c;font-size:26px;font-weight:900;line-height:1.25;letter-spacing:-0.5px;text-align:center;margin:0 0 30px;">
+                            Pilihan menarik buat lengkapi koleksi kamu
+                        </h2>
+                    </td></tr>
+
+                    <!-- wishlist grid -->
+                    <tr><td style="padding:0 22px 250px;">
+                        {{ .WishlistHTML }}
+                    </td></tr>
+
+                </table>
+            </td></tr>
+            </table>
+
+            <!-- ── TRIANGLE → DARK (overlap floating paper) ── -->
+            <div style="margin-top:-200px;">
+            <table role="presentation" width="720" cellspacing="0" cellpadding="0"
+                   style="width:720px;border-collapse:collapse;background:transparent;">
+            <tr><td align="center" style="padding:0;line-height:0;font-size:0;">
+                <div style="width:0;height:0;margin:0 auto;
+                            border-left:360px solid transparent;
+                            border-right:360px solid transparent;
+                            border-bottom:80px solid #2c2422;
+                            font-size:0;line-height:0;"></div>
+            </td></tr>
+            </table>
+            </div>
+
+            <!-- ── ABOUT KYOU IMAGE ── -->
+            <table role="presentation" width="720" cellspacing="0" cellpadding="0"
+                   style="width:720px;border-collapse:collapse;background:#2c2422;">
+            <tr><td style="padding:40px 52px 2px 52px;line-height:0;font-size:0;">
+                <img src="https://kyoucdn.id/static/assets/about_kyou.jpg" alt="About Kyou" width="616"
+                     style="display:block;width:616px;height:auto;border:0;border-radius:10px;" />
+            </td></tr>
+            </table>
+
+            <!-- ── 2 CTA BUTTONS ── -->
+            <table role="presentation" width="720" cellspacing="0" cellpadding="0"
+                   style="width:720px;border-collapse:collapse;background:#2c2422;">
+            <tr><td style="padding:32px 37px 32px;">
+                <table role="presentation" width="646" cellspacing="0" cellpadding="0"
+                       style="width:646px;border-collapse:collapse;">
+                <tr>
+                    <td width="50%" style="padding:0 4px 0 0;">
+                        <a href="https://kyou.id/user/wishlist"
+                           style="display:block;padding:20px 18px 18px;border:4px solid #5a351d;border-radius:999px;background:#ff5a0a;box-shadow:0 7px 0 #5a351d;color:#ffffff;font-size:16px;font-weight:900;letter-spacing:1px;line-height:1;text-align:center;text-decoration:none;">
+                            <img src="https://kyoucdn.id/static/assets/k-mail.png" alt="" width="24" height="24"
+                                 style="display:inline-block;width:24px;height:24px;margin:0 8px 0 0;border:0;vertical-align:middle;" />
+                            <span style="display:inline-block;vertical-align:middle;">Cek wishlist kamu lainnya!</span>
+                        </a>
+                    </td>
+                    <td width="50%" style="padding:0 0 0 4px;">
+                        <a href="https://chat.whatsapp.com/E3kCtsnUfN70QYuMCtPgpM"
+                           style="display:block;padding:20px 18px 18px;border:4px solid #5a351d;border-radius:999px;background:#2bd166;box-shadow:0 7px 0 #5a351d;color:#ffffff;font-size:16px;font-weight:900;letter-spacing:1px;line-height:1;text-align:center;text-decoration:none;">
+                            <img src="https://kyoucdn.id/static/assets/wa-email.png" alt="" width="24" height="24"
+                                 style="display:inline-block;width:24px;height:24px;margin:0 8px 0 0;border:0;vertical-align:middle;" />
+                            <span style="display:inline-block;vertical-align:middle;">Join WA Kamar Wibu!</span>
+                        </a>
+                    </td>
+                </tr>
+                </table>
+            </td></tr>
+            </table>
+
+            <!-- ── TOKO FISIK ── -->
+            <table role="presentation" width="720" cellspacing="0" cellpadding="0"
+                   style="width:720px;border-collapse:collapse;">
+            <tr><td style="padding:36px;background:#2c2422;border-top:1px dashed #7a3b14;border-bottom:1px dashed #7a3b14;text-align:center;">
+                <h2 style="margin:0 0 24px;color:#ffffff;font-size:34px;font-weight:900;line-height:1.15;">
+                    Mampir ke Toko Fisik Kyou!
+                </h2>
+                <table role="presentation" width="648" cellspacing="0" cellpadding="0"
+                       style="width:648px;border-collapse:collapse;">
+                <tr>
+                    <td width="25%" valign="top" style="width:25%;padding:0 7px 12px;">
+                        <a href="https://kyou.id/stores/alpha" style="display:block;text-decoration:none;">
+                            <img src="https://kyoucdn.id/static/assets/alpha.png" alt="Alpha Store" width="145"
+                                 style="display:block;width:145px;height:auto;border:0;border-radius:10px;" />
+                        </a>
+                    </td>
+                    <td width="25%" valign="top" style="width:25%;padding:0 7px 12px;">
+                        <a href="https://kyou.id/stores/beta" style="display:block;text-decoration:none;">
+                            <img src="https://kyoucdn.id/static/assets/beta.png" alt="Beta Store" width="145"
+                                 style="display:block;width:145px;height:auto;border:0;border-radius:10px;" />
+                        </a>
+                    </td>
+                    <td width="25%" valign="top" style="width:25%;padding:0 7px 12px;">
+                        <a href="https://kyou.id/stores/gamma" style="display:block;text-decoration:none;">
+                            <img src="https://kyoucdn.id/static/assets/gamma.png" alt="Gamma Store" width="145"
+                                 style="display:block;width:145px;height:auto;border:0;border-radius:10px;" />
+                        </a>
+                    </td>
+                    <td width="25%" valign="top" style="width:25%;padding:0 7px 12px;">
+                        <a href="https://maps.app.goo.gl/kwAtN6H3Kf7cVSA49" style="display:block;text-decoration:none;">
+                            <img src="https://kyoucdn.id/static/assets/delta.png" alt="Delta Store" width="145"
+                                 style="display:block;width:145px;height:auto;border:0;border-radius:10px;" />
+                        </a>
+                    </td>
+                </tr>
+                </table>
+            </td></tr>
+            </table>
+
+            <!-- ── SOCIAL MEDIA ── -->
+            <table role="presentation" width="720" cellspacing="0" cellpadding="0"
+                   style="width:720px;border-collapse:collapse;">
+            <tr><td style="padding:18px 36px 46px;background:#2c2422;border-top:1px dashed #7a3b14;border-bottom:1px dashed #7a3b14;text-align:center;">
+                <h2 style="margin:0 0 32px;color:#ffffff;font-size:40px;font-weight:900;line-height:1.15;">
+                    Interact with Kyou!
+                </h2>
+                <table role="presentation" cellspacing="0" cellpadding="0" align="center"
+                       style="margin:0 auto;border-collapse:collapse;">
+                <tr>
+                    <td style="padding:0 8px;"><a href="https://api.whatsapp.com/send/?phone=6281770092014&amp;text=Halo+Kyou"><img src="https://kyoucdn.id/static/assets/whatsapp.jpg" alt="WhatsApp" width="58" height="58" style="display:block;width:58px;height:58px;border:0;border-radius:999px;" /></a></td>
+                    <td style="padding:0 8px;"><a href="https://www.facebook.com/kyouhobbyshop"><img src="https://kyoucdn.id/static/assets/facebook.jpg" alt="Facebook" width="58" height="58" style="display:block;width:58px;height:58px;border:0;border-radius:999px;" /></a></td>
+                    <td style="padding:0 8px;"><a href="https://www.messenger.com/t/1466845816917156/"><img src="https://kyoucdn.id/static/assets/messenger.jpg" alt="Messenger" width="58" height="58" style="display:block;width:58px;height:58px;border:0;border-radius:999px;" /></a></td>
+                    <td style="padding:0 8px;"><a href="https://www.youtube.com/@ChannelWibunyaKyou"><img src="https://kyoucdn.id/static/assets/youtube.jpg" alt="YouTube" width="58" height="58" style="display:block;width:58px;height:58px;border:0;border-radius:999px;" /></a></td>
+                    <td style="padding:0 8px;"><a href="https://www.tiktok.com/@kyou.id?lang=en"><img src="https://kyoucdn.id/static/assets/tiktok.jpg" alt="TikTok" width="58" height="58" style="display:block;width:58px;height:58px;border:0;border-radius:999px;" /></a></td>
+                    <td style="padding:0 8px;"><a href="https://kyou.id"><img src="https://kyoucdn.id/static/assets/kyou.jpg" alt="Kyou" width="58" height="58" style="display:block;width:58px;height:58px;border:0;border-radius:999px;" /></a></td>
+                </tr>
+                </table>
+            </td></tr>
+            </table>
+
+            <!-- ── DARK CLOSING ── -->
+            <table role="presentation" width="720" cellspacing="0" cellpadding="0"
+                   style="width:720px;border-collapse:collapse;background:#2c2422;">
+            <tr><td style="padding:36px;border-top:1px dashed #7a3b14;border-bottom:1px dashed #7a3b14;text-align:center;">
+                <img src="https://kyoucdn.id/static/assets/brand_logo.png" alt="Kyou.id" width="132"
+                     style="display:block;width:132px;height:auto;margin:0 auto 28px;border:0;" />
+                <p style="margin:0 0 8px;color:#ffffff;font-size:20px;font-weight:900;line-height:1.2;">{{ .Closing }}</p>
+                <p style="margin:0 0 0;color:rgba(255,255,255,0.5);font-size:14px;font-weight:500;line-height:1.4;">
+                    ©2014–2026 Kyou Hobby Shop
+                </p>
+                <p style="margin:0;color:rgba(255,255,255,0.4);font-size:14px;font-weight:500;line-height:1.55;">
+                    Kamu menerima email ini karena terdaftar sebagai Teman Kyou.
+                </p>
+            </td></tr>
+            </table>
+
+        </td></tr>
+        </table>
     </body>
 </html>

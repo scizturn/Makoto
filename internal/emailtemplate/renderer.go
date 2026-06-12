@@ -54,26 +54,32 @@ func (r FileRenderer) Render(templateID string, mergeData map[string]any) (strin
 }
 
 type viewData struct {
-	Name           string
-	VoucherCode    string
-	WishlistHTML   template.HTML
-	FYPHTML        template.HTML
-	HistoricalHTML template.HTML
-	Years          string
-	ActionURL      string
-	Closing        string
+	Name               string
+	FirstName          string
+	VoucherCode        string
+	WishlistHTML       template.HTML
+	FYPHTML            template.HTML
+	HistoricalHTML     template.HTML
+	Years              string
+	JoinDate           string
+	AnniversaryEdition string
+	ActionURL          string
+	Closing            string
 }
 
 func viewDataFromMergeData(data map[string]any) viewData {
 	return viewData{
-		Name:           stringValue(data["name"]),
-		VoucherCode:    stringValue(data["voucher_code"]),
-		WishlistHTML:   template.HTML(stringValue(data["wishlist_html"])),
-		FYPHTML:        template.HTML(stringValue(data["fyp_html"])),
-		HistoricalHTML: template.HTML(stringValue(data["historical_html"])),
-		Years:          stringValue(data["years"]),
-		ActionURL:      stringValue(data["action_url"]),
-		Closing:        stringValue(data["closing"]),
+		Name:               stringValue(data["name"]),
+		FirstName:          stringValue(data["first_name"]),
+		VoucherCode:        stringValue(data["voucher_code"]),
+		WishlistHTML:       template.HTML(stringValue(data["wishlist_html"])),
+		FYPHTML:            template.HTML(stringValue(data["fyp_html"])),
+		HistoricalHTML:     template.HTML(stringValue(data["historical_html"])),
+		Years:              stringValue(data["years"]),
+		JoinDate:           stringValue(data["join_date"]),
+		AnniversaryEdition: stringValue(data["anniversary_edition"]),
+		ActionURL:          stringValue(data["action_url"]),
+		Closing:            stringValue(data["closing"]),
 	}
 }
 

@@ -114,16 +114,31 @@ func RenderWishlistGridHTML(items []domain.WishlistItem) string {
 	}
 
 	var builder strings.Builder
-	builder.WriteString(`<table role="presentation" width="690" cellspacing="0" cellpadding="0" align="center" style="width:690px;border-collapse:collapse;margin:0 auto;"><tr>`)
-	for i, item := range items {
-		if i >= 3 {
+	builder.WriteString(`<table role="presentation" width="636" cellspacing="0" cellpadding="0" align="center" style="width:636px;border-collapse:collapse;margin:0 auto;">`)
+
+	for row := 0; row < 2; row++ {
+		start := row * 3
+		if start >= len(items) {
 			break
 		}
-		builder.WriteString(`<td width="230" valign="top" align="center" style="width:230px;padding:0;text-align:center;">`)
-		builder.WriteString(renderProductCard(item.Name, item.SeriesName, "Wishlist", item.URL, item.ImageURL))
-		builder.WriteString(`</td>`)
+		end := start + 3
+		if end > len(items) {
+			end = len(items)
+		}
+		if row > 0 {
+			builder.WriteString(`<tr><td colspan="3" style="height:12px;line-height:12px;font-size:12px;">&nbsp;</td></tr>`)
+		}
+		builder.WriteString(`<tr>`)
+		for i := start; i < end; i++ {
+			item := items[i]
+			builder.WriteString(`<td width="212" valign="top" align="center" style="width:212px;padding:0;text-align:center;">`)
+			builder.WriteString(renderProductCard(item.Name, item.SeriesName, item.Status, item.URL, item.ImageURL))
+			builder.WriteString(`</td>`)
+		}
+		builder.WriteString(`</tr>`)
 	}
-	builder.WriteString(`</tr></table>`)
+
+	builder.WriteString(`</table>`)
 	return builder.String()
 }
 
@@ -192,35 +207,43 @@ func renderWishlistFeature(item domain.WishlistItem) string {
 	return fmt.Sprintf(`<a href="%s" style="display:block;color:inherit;text-decoration:none;">%s</a>`, safeURL, cardHTML)
 }
 
-func renderProductCard(name string, seriesName string, fallbackLabel string, url string, imageURL string) string {
+func renderProductCard(name string, seriesName string, status string, url string, imageURL string) string {
 	mainName, version := abbreviateCardTitle(name, seriesName)
 	safeName := html.EscapeString(mainName)
 	safeVersion := html.EscapeString(version)
-	safeSeries := html.EscapeString(displayManufacturerOrFallback(seriesName, fallbackLabel))
+	safeSeries := html.EscapeString(displayManufacturerOrFallback(seriesName, "Wishlist"))
 	safeURL := html.EscapeString(url)
 	safeImageURL := html.EscapeString(imageURL)
+	_ = status
 
-	imageHTML := `<div style="display:block;width:180px;height:160px;background:#f3f4f6;"></div>`
-	if safeImageURL != "" {
-		imageHTML = fmt.Sprintf(`<img src="%s" alt="%s" width="180" height="160" style="display:block;width:180px;height:160px;object-fit:cover;background:#f3f4f6;border:0;">`, safeImageURL, safeName)
+	imgHTML := fmt.Sprintf(
+		`<img src="%s" alt="%s" width="180" height="180" style="display:block;width:180px;height:180px;object-fit:cover;background:#f3f4f6;border:0;">`,
+		safeImageURL, safeName,
+	)
+	if safeImageURL == "" {
+		imgHTML = `<div style="width:180px;height:180px;background:#f3f4f6;"></div>`
 	}
 
-	seriesHTML := fmt.Sprintf(`<p style="margin:0 0 2px;color:#2f2b28;font-size:10px;font-weight:400;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">%s</p>`, safeSeries)
-	nameHTML := fmt.Sprintf(`<p style="margin:0 0 2px;color:#0f172a;font-size:12px;font-weight:900;line-height:1.3;white-space:normal;word-break:break-word;">%s</p>`, safeName)
-	versionHTML := ""
+	versionP := ""
 	if safeVersion != "" {
-		versionHTML = fmt.Sprintf(`<p style="margin:0;color:#374151;font-size:10px;font-weight:600;line-height:1.3;">%s</p>`, safeVersion)
+		versionP = fmt.Sprintf(
+			`<p style="margin:0;color:#374151;font-size:10px;font-weight:600;line-height:1.3;">%s</p>`,
+			safeVersion,
+		)
 	}
 
-	buttonHTML := `<div style="margin:10px 0 0;text-align:center;"><img src="https://images2.imgbox.com/ef/f8/mAoUYtqE_o.png" alt="Cek item" width="142" style="display:inline-block;width:142px;height:auto;border:0;"></div>`
-	// fixed-height text block (52px) keeps button at the same Y position
-	// regardless of whether the version line is present
-	textHTML := fmt.Sprintf(`<div style="padding:8px 10px 10px;text-align:left;"><div style="height:52px;overflow:hidden;">%s%s%s</div>%s</div>`, seriesHTML, nameHTML, versionHTML, buttonHTML)
-	cardHTML := fmt.Sprintf(`<div style="overflow:hidden;width:180px;height:266.58px;margin:auto;border:1px solid #9ca3af;border-radius:8px;background:url('https://kyoucdn.id/static/assets/item_bg.jpg') center/cover no-repeat;">%s%s</div>`, imageHTML, textHTML)
+	inner := fmt.Sprintf(
+		`<div style="overflow:hidden;width:180px;height:287px;border:1px solid #9ca3af;border-radius:8px;background:url('https://kyoucdn.id/static/assets/item%%20bg1.jpg') center/cover no-repeat;">%s<div style="padding:8px 10px 10px;text-align:left;"><div style="height:52px;overflow:hidden;"><p style="margin:0 0 2px;color:#2f2b28;font-size:10px;font-weight:400;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">%s</p><p style="margin:0 0 2px;color:#0f172a;font-size:12px;font-weight:900;line-height:1.3;white-space:normal;word-break:break-word;">%s</p>%s</div><div style="margin:10px 0 0;text-align:center;"><img src="https://images2.imgbox.com/ef/f8/mAoUYtqE_o.png" alt="Cek item" width="142" style="display:inline-block;width:142px;height:auto;border:0;"></div></div></div>`,
+		imgHTML, safeSeries, safeName, versionP,
+	)
+
 	if safeURL == "" {
-		return cardHTML
+		return inner
 	}
-	return fmt.Sprintf(`<a href="%s" style="display:block;width:230px;color:inherit;text-decoration:none;">%s</a>`, safeURL, cardHTML)
+	return fmt.Sprintf(
+		`<a href="%s" style="display:block;width:180px;margin:auto;color:inherit;text-decoration:none;">%s</a>`,
+		safeURL, inner,
+	)
 }
 
 func abbreviateCardTitle(name, seriesName string) (string, string) {
