@@ -27,74 +27,66 @@
                        style="width:680px;border-collapse:collapse;border-radius:16px;overflow:hidden;
                               background:linear-gradient(105deg,#2c2422,#56413a);">
                     <tr>
-                        <td align="center" valign="top" style="padding:36px 28px 200px;width:680px;">
+                        <td align="center" valign="top" style="padding:36px 28px 32px;width:680px;">
                             <div style="color:#ffc600;font-size:13px;font-weight:800;letter-spacing:3px;text-transform:uppercase;line-height:1;margin:0 0 10px;">
                                 Member Anniversary
                             </div>
-                            <div style="color:#ffffff;font-size:34px;font-weight:900;line-height:1.2;letter-spacing:-0.5px;margin:0 0 12px;">
+                            <div style="color:#ffffff;font-size:34px;font-weight:900;line-height:1.2;letter-spacing:-0.5px;margin:0 0 28px;">
                                 Dedikasi {{ .Years }} tahun <span style="color:#ff5a0a;">{{ .Name }}</span><br>sebagai kyoulector sejati!
+                            </div>
+                            <!-- member card inside hero — Gmail-safe, no negative margin -->
+                            <div style="border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,0.55),0 6px 20px rgba(0,0,0,0.35);overflow:hidden;">
+                            <table role="presentation" width="624" cellspacing="0" cellpadding="0"
+                                   style="width:624px;height:260px;border-collapse:collapse;border-radius:14px;overflow:hidden;
+                                          background:#ddeef7 url('https://images2.imgbox.com/38/9f/q0uVYVxf_o.png') no-repeat left center;
+                                          background-size:cover;
+                                          border:1px solid rgba(56,46,44,0.14);">
+                            <tr>
+                                <td height="260" style="height:260px;background:linear-gradient(100deg,rgba(255,255,255,0) 38%,rgba(255,255,255,0.5) 60%,rgba(255,255,255,0.9) 100%);padding:0;">
+                                    <table role="presentation" width="624" height="260" cellspacing="0" cellpadding="0"
+                                           style="width:624px;height:260px;border-collapse:collapse;">
+                                    <tr>
+                                        <td width="354" height="260" style="padding:0;line-height:1;">&nbsp;</td>
+                                        <td style="padding:24px 28px 22px;text-align:right;vertical-align:top;">
+                                            <img src="https://kyoucdn.id/static/assets/brand_logo.png" alt="Kyou" height="26"
+                                                 style="display:inline-block;height:26px;width:auto;border:0;" />
+                                            <div style="font-family:'Courier New',Courier,monospace;font-size:26px;font-weight:700;
+                                                        color:#382e2c;letter-spacing:5px;margin:60px 0 0;text-transform:uppercase;
+                                                        line-height:1;white-space:nowrap;overflow:hidden;">
+                                                {{ .FirstName }}
+                                            </div>
+                                            <div style="font-size:10.5px;font-weight:800;color:#fc4c02;letter-spacing:2px;
+                                                        margin:6px 0 0;text-transform:uppercase;line-height:1;">
+                                                {{ .AnniversaryEdition }}
+                                            </div>
+                                            <table role="presentation" cellspacing="0" cellpadding="0" align="right"
+                                                   style="margin:20px 0 0;border-collapse:collapse;">
+                                            <tr>
+                                                <td style="padding:0;text-align:right;vertical-align:bottom;">
+                                                    <div style="font-size:9px;font-weight:700;color:rgba(56,46,44,0.55);
+                                                                text-transform:uppercase;letter-spacing:1.5px;line-height:1;">
+                                                        Member sejak
+                                                    </div>
+                                                    <div style="font-family:'Courier New',Courier,monospace;font-size:13px;
+                                                                color:#382e2c;letter-spacing:1px;margin-top:3px;line-height:1;
+                                                                text-transform:uppercase;">
+                                                        {{ .JoinDate }}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            </table>
                             </div>
                         </td>
                     </tr>
                 </table>
             </td></tr>
             </table>
-
-            <!-- ── MEMBER CARD — 16:9, floating over hero bottom ── -->
-            <div style="margin-top:-180px;">
-            <table role="presentation" width="720" cellspacing="0" cellpadding="0"
-                   style="width:720px;border-collapse:collapse;">
-            <tr><td style="padding:0 40px;">
-                <!-- 640×260px -->
-                <table role="presentation" width="640" cellspacing="0" cellpadding="0"
-                       style="width:640px;height:260px;border-collapse:collapse;border-radius:14px;overflow:hidden;
-                              background:#ddeef7 url('https://images2.imgbox.com/38/9f/q0uVYVxf_o.png') no-repeat left center;
-                              background-size:cover;
-                              border:1px solid rgba(56,46,44,0.14);
-                              box-shadow:0 24px 48px rgba(56,46,44,0.38),0 8px 16px rgba(56,46,44,0.18);">
-                <tr>
-                    <td height="260" style="height:260px;background:linear-gradient(100deg,rgba(255,255,255,0) 38%,rgba(255,255,255,0.5) 60%,rgba(255,255,255,0.9) 100%);padding:0;">
-                        <table role="presentation" width="640" height="260" cellspacing="0" cellpadding="0"
-                               style="width:640px;height:260px;border-collapse:collapse;">
-                        <tr>
-                            <td width="370" height="260" style="padding:0;line-height:1;">&nbsp;</td>
-                            <td style="padding:24px 28px 22px;text-align:right;vertical-align:top;">
-                                <img src="https://kyoucdn.id/static/assets/brand_logo.png" alt="Kyou" height="26"
-                                     style="display:inline-block;height:26px;width:auto;border:0;" />
-                                <div style="font-family:'Courier New',Courier,monospace;font-size:26px;font-weight:700;
-                                            color:#382e2c;letter-spacing:5px;margin:60px 0 0;text-transform:uppercase;
-                                            line-height:1;white-space:nowrap;overflow:hidden;">
-                                    {{ .FirstName }}
-                                </div>
-                                <div style="font-size:10.5px;font-weight:800;color:#fc4c02;letter-spacing:2px;
-                                            margin:6px 0 0;text-transform:uppercase;line-height:1;">
-                                    {{ .AnniversaryEdition }}
-                                </div>
-                                <table role="presentation" cellspacing="0" cellpadding="0" align="right"
-                                       style="margin:20px 0 0;border-collapse:collapse;">
-                                <tr>
-                                    <td style="padding:0;text-align:right;vertical-align:bottom;">
-                                        <div style="font-size:9px;font-weight:700;color:rgba(56,46,44,0.55);
-                                                    text-transform:uppercase;letter-spacing:1.5px;line-height:1;">
-                                            Member sejak
-                                        </div>
-                                        <div style="font-family:'Courier New',Courier,monospace;font-size:13px;
-                                                    color:#382e2c;letter-spacing:1px;margin-top:3px;line-height:1;
-                                                    text-transform:uppercase;">
-                                            {{ .JoinDate }}
-                                        </div>
-                                    </td>
-                                </tr>
-                                </table>
-                            </td>
-                        </tr>
-                        </table>
-                    </td>
-                </tr>
-                </table>
-            </td></tr>
-            </table>
-            </div>
 
             <!-- ── TEXT BODY ── -->
             <table role="presentation" width="720" cellspacing="0" cellpadding="0"
@@ -192,7 +184,7 @@
                     </td></tr>
 
                     <!-- wishlist grid -->
-                    <tr><td style="padding:0 22px 250px;">
+                    <tr><td style="padding:0 22px 36px;">
                         {{ .WishlistHTML }}
                     </td></tr>
 
@@ -200,23 +192,9 @@
             </td></tr>
             </table>
 
-            <!-- ── TRIANGLE → DARK (overlap floating paper) ── -->
-            <div style="margin-top:-200px;">
-            <table role="presentation" width="720" cellspacing="0" cellpadding="0"
-                   style="width:720px;border-collapse:collapse;background:transparent;">
-            <tr><td align="center" style="padding:0;line-height:0;font-size:0;">
-                <div style="width:0;height:0;margin:0 auto;
-                            border-left:360px solid transparent;
-                            border-right:360px solid transparent;
-                            border-bottom:80px solid #2c2422;
-                            font-size:0;line-height:0;"></div>
-            </td></tr>
-            </table>
-            </div>
-
             <!-- ── ABOUT KYOU IMAGE ── -->
             <table role="presentation" width="720" cellspacing="0" cellpadding="0"
-                   style="width:720px;border-collapse:collapse;background:#2c2422;">
+                   style="width:720px;border-collapse:collapse;background:#2c2422;border-radius:20px 20px 0 0;overflow:hidden;">
             <tr><td style="padding:40px 52px 2px 52px;line-height:0;font-size:0;">
                 <img src="https://kyoucdn.id/static/assets/about_kyou.jpg" alt="About Kyou" width="616"
                      style="display:block;width:616px;height:auto;border:0;border-radius:10px;" />
