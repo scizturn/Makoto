@@ -85,6 +85,12 @@ func (p *AnniversaryProcessor) Process(ctx context.Context, job domain.Anniversa
 		if err != nil {
 			return ProcessResult{}, err
 		}
+		if subjectTpl := p.campaign.SelectSubject(job.Date, job.ID); subjectTpl != "" {
+			subject, err = p.campaign.RenderSubject(subjectTpl, user, job.Years)
+			if err != nil {
+				return ProcessResult{}, err
+			}
+		}
 		msg.Subject = subject
 		msg.HTMLBody = html
 		msg.TextBody = subject + "\n\n" + user.Name + ", voucher: " + voucherCode

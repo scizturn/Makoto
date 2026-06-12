@@ -35,12 +35,13 @@ type Config struct {
 	KyouIDAPIToken     string
 	DiscordWebhookURL  string
 	DiscordEnabled     bool
-	AnniversaryEnabled          bool
-	AnniversaryQueueName        string
-	AnniversaryDeadLetterQueue  string
-	AnniversaryTemplateIDs      []string
-	AnniversaryEmailTemplateDir string
-	AnniversaryEmailSubject     string
+	AnniversaryEnabled           bool
+	AnniversaryQueueName         string
+	AnniversaryDeadLetterQueue   string
+	AnniversaryTemplateIDs       []string
+	AnniversaryEmailTemplateDir  string
+	AnniversaryEmailSubject      string
+	AnniversaryEmailSubjects     []string
 }
 
 func Load() Config {
@@ -74,8 +75,13 @@ func Load() Config {
 		AnniversaryQueueName:        env("MAKOTO_ANNIVERSARY_QUEUE_NAME", "anniversary_email_jobs"),
 		AnniversaryDeadLetterQueue:  env("MAKOTO_ANNIVERSARY_DEAD_LETTER_QUEUE", "anniversary_email_jobs_dead"),
 		AnniversaryTemplateIDs:      envList("MAKOTO_ANNIVERSARY_TEMPLATE_IDS", []string{"anniversary1.html", "anniversary2.html", "anniversary3.html"}),
-		AnniversaryEmailTemplateDir:  os.Getenv("MAKOTO_ANNIVERSARY_EMAIL_TEMPLATE_DIR"),
-		AnniversaryEmailSubject:      env("MAKOTO_ANNIVERSARY_EMAIL_SUBJECT", "Happy Anniversary, {{ .Name }}! 🎉"),
+		AnniversaryEmailTemplateDir: os.Getenv("MAKOTO_ANNIVERSARY_EMAIL_TEMPLATE_DIR"),
+		AnniversaryEmailSubject:     env("MAKOTO_ANNIVERSARY_EMAIL_SUBJECT", "Happy Anniversary, {{ .Name }}! 🎉"),
+		AnniversaryEmailSubjects: envListPipe("MAKOTO_ANNIVERSARY_EMAIL_SUBJECTS", []string{
+			"Cieee anniversary! Cek hadiah dari Kyou buat nambahin khilafanmu!",
+			"Ada kado spesial buat anniversary ke-{{ .Years }}, {{ .FirstName }}!",
+			"Kejutan spesial untuk anniversary kamu, {{ .FirstName }}.",
+		}),
 	}
 }
 
@@ -142,6 +148,25 @@ func envBool(key string, fallback bool) bool {
 		return fallback
 	}
 	return value == "1" || value == "true" || value == "yes" || value == "on"
+}
+
+func envListPipe(key string, fallback []string) []string {
+	value := strings.TrimSpace(os.Getenv(key))
+	if value == "" {
+		return fallback
+	}
+	parts := strings.Split(value, "|")
+	items := make([]string, 0, len(parts))
+	for _, part := range parts {
+		item := strings.TrimSpace(part)
+		if item != "" {
+			items = append(items, item)
+		}
+	}
+	if len(items) == 0 {
+		return fallback
+	}
+	return items
 }
 
 func envList(key string, fallback []string) []string {

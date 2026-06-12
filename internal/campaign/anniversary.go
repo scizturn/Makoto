@@ -5,6 +5,7 @@ import (
 	"html"
 	"math/rand"
 	"strings"
+	texttemplate "text/template"
 	"time"
 
 	"github.com/kyou-id/makoto/internal/domain"
@@ -27,6 +28,7 @@ func joinDateFormatted(date time.Time, years int) string {
 
 type AnniversaryCampaign struct {
 	TemplateIDs []string
+	Subjects    []string
 	Closing     string
 	ActionURL   string
 	RandomIntn  func(n int) int
@@ -41,6 +43,39 @@ func (c AnniversaryCampaign) SelectTemplate(now time.Time, key string) string {
 		randomIntn = rand.New(rand.NewSource(templateSeed(now, key))).Intn
 	}
 	return c.TemplateIDs[randomIntn(len(c.TemplateIDs))]
+}
+
+func (c AnniversaryCampaign) SelectSubject(now time.Time, key string) string {
+	if len(c.Subjects) == 0 {
+		return ""
+	}
+	randomIntn := c.RandomIntn
+	if randomIntn == nil {
+		randomIntn = rand.New(rand.NewSource(templateSeed(now, key))).Intn
+	}
+	return c.Subjects[randomIntn(len(c.Subjects))]
+}
+
+type subjectData struct {
+	Name      string
+	FirstName string
+	Years     int
+}
+
+func (c AnniversaryCampaign) RenderSubject(tpl string, user domain.User, years int) (string, error) {
+	firstName := user.Name
+	if i := strings.Index(user.Name, " "); i > 0 {
+		firstName = user.Name[:i]
+	}
+	t, err := texttemplate.New("subject").Parse(tpl)
+	if err != nil {
+		return "", err
+	}
+	var buf strings.Builder
+	if err := t.Execute(&buf, subjectData{Name: user.Name, FirstName: firstName, Years: years}); err != nil {
+		return "", err
+	}
+	return buf.String(), nil
 }
 
 func ordinalSuffix(n int) string {

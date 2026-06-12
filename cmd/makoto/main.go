@@ -48,6 +48,7 @@ func main() {
 	// --- Anniversary ---
 	anniversaryCampaign := campaign.AnniversaryCampaign{
 		TemplateIDs: cfg.AnniversaryTemplateIDs,
+		Subjects:    cfg.AnniversaryEmailSubjects,
 		Closing:     "Terima kasih sudah menjadi bagian dari Kyou! 🎉",
 		ActionURL:   cfg.ActionURL,
 	}
