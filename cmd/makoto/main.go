@@ -63,6 +63,24 @@ func main() {
 		}
 	}
 
+	// --- Discounted Wishlist ---
+	discountedWishlistCampaign := campaign.DiscountedWishlistCampaign{
+		TemplateIDs: cfg.DiscountedWishlistTemplateIDs,
+		Greetings:   cfg.DiscountedWishlistGreetings,
+		WishlistURL: cfg.DiscountedWishlistURL,
+		Closing:     "Jangan sampai kehabisan — yuk cek wishlistmu sekarang di Kyou!",
+	}
+	discountedWishlistProcessor := worker.NewDiscountedWishlistProcessor(sender, validator, discountedWishlistCampaign)
+	discountedWishlistProcessor.Domain = cfg.KirimEmailDomain
+	discountedWishlistProcessor.FromEmail = cfg.FromEmail
+	discountedWishlistProcessor.FromName = cfg.FromName
+	if cfg.DiscountedWishlistEmailTemplateDir != "" {
+		discountedWishlistProcessor.Renderer = emailtemplate.FileRenderer{
+			Dir:     cfg.DiscountedWishlistEmailTemplateDir,
+			Subject: cfg.DiscountedWishlistEmailSubject,
+		}
+	}
+
 	// --- Leftover Cart ---
 	leftoverCartCampaign := campaign.LeftoverCartCampaign{
 		TemplateIDs: cfg.LeftoverCartTemplateIDs,
@@ -103,6 +121,13 @@ func main() {
 		}
 	}()
 
+	discountedWishlistQueue := queue.NewDiscountedWishlistRedisQueue(cfg.RedisAddr, cfg.RedisPassword, cfg.RedisDB, cfg.DiscountedWishlistQueueName)
+	defer func() {
+		if err := discountedWishlistQueue.Close(); err != nil {
+			log.Printf("discounted wishlist redis close failed: %v", err)
+		}
+	}()
+
 	// --- Discord + Audit ---
 	discord := notify.DiscordLogger{
 		WebhookURL: cfg.DiscordWebhookURL,
@@ -134,6 +159,12 @@ func main() {
 	leftoverCartProcessor.BeforeSend = func(ctx context.Context, job domain.LeftoverCartJob, result worker.ProcessResult) error {
 		if err := auditLogger.MarkSending(ctx, auditInfoFromLeftoverCartJob(job, result)); err != nil {
 			log.Printf("leftover cart email audit sending update failed: job_id=%s user_id=%s err=%v", job.ID, job.UserID, err)
+		}
+		return nil
+	}
+	discountedWishlistProcessor.BeforeSend = func(ctx context.Context, job domain.DiscountedWishlistJob, result worker.ProcessResult) error {
+		if err := auditLogger.MarkSending(ctx, auditInfoFromDiscountedWishlistJob(job, result)); err != nil {
+			log.Printf("discounted wishlist email audit sending update failed: job_id=%s user_id=%s err=%v", job.ID, job.UserID, err)
 		}
 		return nil
 	}
@@ -176,6 +207,20 @@ func main() {
 		}()
 	} else {
 		log.Print("MAKOTO_LEFTOVER_CART_ENABLED is false; skipping leftover cart sender")
+	}
+
+	if cfg.DiscountedWishlistEnabled {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			runDiscountedWishlistSender(ctx, discountedWishlistQueue, discountedWishlistProcessor, discord, auditLogger, senderConfig{
+				rateLimitPerMinute: cfg.RateLimitPerMinute,
+				deadLetterQueue:    cfg.DiscountedWishlistDeadLetterQueue,
+				maxAttempts:        cfg.MaxAttempts,
+			})
+		}()
+	} else {
+		log.Print("MAKOTO_DISCOUNTED_WISHLIST_ENABLED is false; skipping discounted wishlist sender")
 	}
 	wg.Wait()
 }
@@ -451,6 +496,23 @@ func auditInfoFromAnniversaryJob(job domain.AnniversaryJob, result worker.Proces
 	}
 }
 
+func auditInfoFromDiscountedWishlistJob(job domain.DiscountedWishlistJob, result worker.ProcessResult) audit.MessageInfo {
+	attempt := job.Attempt
+	if attempt <= 0 {
+		attempt = 1
+	}
+	return audit.MessageInfo{
+		JobID:             job.ID,
+		Attempt:           attempt,
+		TemplateID:        result.TemplateID,
+		Subject:           result.Subject,
+		ActionURL:         result.ActionURL,
+		ProviderMessageID: result.SendResult.MessageID,
+		ProviderStatus:    result.SendResult.StatusCode,
+		ProviderResponse:  result.SendResult.Response,
+	}
+}
+
 func auditInfoFromLeftoverCartJob(job domain.LeftoverCartJob, result worker.ProcessResult) audit.MessageInfo {
 	attempt := job.Attempt
 	if attempt <= 0 {
@@ -529,6 +591,70 @@ func runLeftoverCartSender(ctx context.Context, q *queue.LeftoverCartRedisQueue,
 		}
 		log.Printf("leftover cart email sent: job_id=%s user_id=%s", job.ID, job.UserID)
 		_ = discord.Log(ctx, fmt.Sprintf("[Leftover Cart Email Sent]\nJob: %s\nUser: %s\nEmail: %s", job.ID, job.UserID, maskEmail(job.User.Email)))
+	}
+}
+
+func runDiscountedWishlistSender(ctx context.Context, q *queue.DiscountedWishlistRedisQueue, processor *worker.DiscountedWishlistProcessor, discord notify.DiscordLogger, auditLogger *audit.Logger, cfg senderConfig) {
+	if cfg.rateLimitPerMinute <= 0 {
+		cfg.rateLimitPerMinute = 100
+	}
+	if cfg.maxAttempts <= 0 {
+		cfg.maxAttempts = 3
+	}
+	if recovered, err := q.RecoverProcessing(ctx); err != nil {
+		log.Printf("discounted wishlist redis processing recovery failed: %v", err)
+	} else if recovered > 0 {
+		log.Printf("discounted wishlist redis processing recovery requeued %d job(s)", recovered)
+	}
+	interval := time.Minute / time.Duration(cfg.rateLimitPerMinute)
+	if interval <= 0 {
+		interval = time.Second
+	}
+	ticker := time.NewTicker(interval)
+	defer ticker.Stop()
+
+	for {
+		processingJob, err := q.Dequeue(ctx, 5*time.Second)
+		if errors.Is(err, redis.Nil) {
+			continue
+		}
+		if err != nil {
+			log.Printf("discounted wishlist redis dequeue failed: %v", err)
+			continue
+		}
+		job := processingJob.Job
+
+		select {
+		case <-ctx.Done():
+			log.Print(ctx.Err())
+			return
+		case <-ticker.C:
+		}
+
+		processResult, err := processor.Process(ctx, job)
+		auditInfo := auditInfoFromDiscountedWishlistJob(job, processResult)
+		if err != nil {
+			log.Printf("discounted wishlist email failed: job_id=%s user_id=%s err=%v", job.ID, job.UserID, err)
+			_ = discord.Log(ctx, fmt.Sprintf("[Discounted Wishlist Email Failed]\nJob: %s\nUser: %s\nEmail: %s\nError: %v", job.ID, job.UserID, maskEmail(job.User.Email), err))
+			if ackErr := q.Ack(ctx, processingJob.Payload); ackErr != nil {
+				log.Printf("discounted wishlist email failed but ack failed: job_id=%s err=%v ack_err=%v", job.ID, err, ackErr)
+			}
+			if err := auditLogger.MarkFailed(ctx, auditInfo); err != nil {
+				log.Printf("discounted wishlist email audit failed update failed: job_id=%s err=%v", job.ID, err)
+			}
+			continue
+		}
+
+		if err := auditLogger.MarkSent(ctx, auditInfo); err != nil {
+			log.Printf("discounted wishlist email audit sent update failed: job_id=%s user_id=%s err=%v", job.ID, job.UserID, err)
+		}
+		if err := q.Ack(ctx, processingJob.Payload); err != nil {
+			log.Printf("discounted wishlist email sent but ack failed: job_id=%s user_id=%s err=%v", job.ID, job.UserID, err)
+			_ = discord.Log(ctx, fmt.Sprintf("[Discounted Wishlist Email Ack Failed]\nJob: %s\nUser: %s\nEmail: %s\nAck error: %v", job.ID, job.UserID, maskEmail(job.User.Email), err))
+			continue
+		}
+		log.Printf("discounted wishlist email sent: job_id=%s user_id=%s", job.ID, job.UserID)
+		_ = discord.Log(ctx, fmt.Sprintf("[Discounted Wishlist Email Sent]\nJob: %s\nUser: %s\nEmail: %s", job.ID, job.UserID, maskEmail(job.User.Email)))
 	}
 }
 

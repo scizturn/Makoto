@@ -50,6 +50,14 @@ type Config struct {
 	LeftoverCartEmailSubject     string
 	LeftoverCartGreetings        []string
 	LeftoverCartURL              string
+	DiscountedWishlistEnabled          bool
+	DiscountedWishlistQueueName        string
+	DiscountedWishlistDeadLetterQueue  string
+	DiscountedWishlistTemplateIDs      []string
+	DiscountedWishlistEmailTemplateDir string
+	DiscountedWishlistEmailSubject     string
+	DiscountedWishlistGreetings        []string
+	DiscountedWishlistURL              string
 }
 
 func Load() Config {
@@ -104,6 +112,20 @@ func Load() Config {
 			"{{ .FirstName }}, sayang banget kalau sampai kehabisan!",
 		}),
 		LeftoverCartURL: env("MAKOTO_LEFTOVER_CART_URL", "https://kyou.id/user/cart"),
+		DiscountedWishlistEnabled:          envBool("MAKOTO_DISCOUNTED_WISHLIST_ENABLED", false),
+		DiscountedWishlistQueueName:        env("MAKOTO_DISCOUNTED_WISHLIST_QUEUE_NAME", "discounted_wishlist_email_jobs"),
+		DiscountedWishlistDeadLetterQueue:  env("MAKOTO_DISCOUNTED_WISHLIST_DEAD_LETTER_QUEUE", "discounted_wishlist_email_jobs_dead"),
+		DiscountedWishlistTemplateIDs:      envList("MAKOTO_DISCOUNTED_WISHLIST_TEMPLATE_IDS", []string{"discounted_wishlist1.html", "discounted_wishlist2.html", "discounted_wishlist3.html"}),
+		DiscountedWishlistEmailTemplateDir: os.Getenv("MAKOTO_DISCOUNTED_WISHLIST_EMAIL_TEMPLATE_DIR"),
+		DiscountedWishlistEmailSubject:     env("MAKOTO_DISCOUNTED_WISHLIST_EMAIL_SUBJECT", "{{ .FirstName }}, wishlist kamu lagi diskon nih!"),
+		DiscountedWishlistGreetings: envListPipe("MAKOTO_DISCOUNTED_WISHLIST_GREETINGS", []string{
+			"Psst {{ .FirstName }}, wishlist incaran kamu lagi diskon nih!",
+			"Hei {{ .FirstName }}, ada kabar bagus buat koleksimu!",
+			"{{ .FirstName }}, saatnya checkout wishlist yang udah lama kamu incer!",
+			"Woi {{ .FirstName }}, item wishlist favoritmu lagi ada promo!",
+			"{{ .FirstName }}, jangan sampai nyesel — wishlistmu lagi diskon sekarang!",
+		}),
+		DiscountedWishlistURL: env("MAKOTO_DISCOUNTED_WISHLIST_URL", "https://kyou.id/user/wishlist"),
 	}
 }
 

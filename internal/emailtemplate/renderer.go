@@ -70,6 +70,9 @@ type viewData struct {
 	CartHTML template.HTML
 	RecoHTML template.HTML
 	CartURL  string
+	// Discounted Wishlist fields
+	FillHTML    template.HTML
+	WishlistURL string
 }
 
 func viewDataFromMergeData(data map[string]any) viewData {
@@ -89,6 +92,8 @@ func viewDataFromMergeData(data map[string]any) viewData {
 		CartHTML:           template.HTML(stringValue(data["cart_html"])),
 		RecoHTML:           template.HTML(stringValue(data["reco_html"])),
 		CartURL:            stringValue(data["cart_url"]),
+		FillHTML:           template.HTML(stringValue(data["fill_html"])),
+		WishlistURL:        stringValue(data["wishlist_url"]),
 	}
 }
 

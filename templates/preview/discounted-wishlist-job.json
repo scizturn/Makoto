@@ -1,0 +1,93 @@
+{
+  "job_id": "force-discounted-wishlist-2026-06-15-120000-user-12345",
+  "user_id": "12345",
+  "date": "2026-06-15T12:00:00+07:00",
+  "user": {
+    "id": "12345",
+    "name": "Aiko Suzuki",
+    "email": "aiko@example.com",
+    "birthday": "2000-03-15T00:00:00Z",
+    "is_active": true
+  },
+  "items": [
+    {
+      "id": "1001",
+      "name": "Nendoroid Hatsune Miku - SALE Ver.",
+      "url": "https://kyou.id/items/1001/",
+      "image_url": "https://kyoucdn.id/static/sample/miku.webp",
+      "original_price": 550000,
+      "discount_price": 440000,
+      "discount_name": "Chinowa SALE",
+      "status": "ready",
+      "manufacturer": "Good Smile Company",
+      "series_name": "Vocaloid",
+      "is_wishlisted": true
+    },
+    {
+      "id": "1002",
+      "name": "Figma Rem - Re:Zero - SALE Ver.",
+      "url": "https://kyou.id/items/1002/",
+      "image_url": "https://kyoucdn.id/static/sample/rem.webp",
+      "original_price": 720000,
+      "discount_price": 576000,
+      "discount_name": "Chinowa SALE",
+      "status": "ready",
+      "manufacturer": "Max Factory",
+      "series_name": "Re:Zero",
+      "is_wishlisted": true
+    },
+    {
+      "id": "1003",
+      "name": "1/7 Asuna - Sword Art Online",
+      "url": "https://kyou.id/items/1003/",
+      "image_url": "https://kyoucdn.id/static/sample/asuna.webp",
+      "original_price": 1200000,
+      "discount_price": 960000,
+      "discount_name": "Chinowa SALE",
+      "status": "ready",
+      "manufacturer": "Kotobukiya",
+      "series_name": "Sword Art Online",
+      "is_wishlisted": true
+    },
+    {
+      "id": "2001",
+      "name": "Nendoroid Kagamine Rin",
+      "url": "https://kyou.id/items/2001/",
+      "image_url": "https://kyoucdn.id/static/sample/rin.webp",
+      "original_price": 520000,
+      "discount_price": 416000,
+      "discount_name": "Chinowa SALE",
+      "status": "ready",
+      "manufacturer": "Good Smile Company",
+      "series_name": "Vocaloid",
+      "is_wishlisted": false
+    },
+    {
+      "id": "2002",
+      "name": "Nendoroid Kagamine Len",
+      "url": "https://kyou.id/items/2002/",
+      "image_url": "https://kyoucdn.id/static/sample/len.webp",
+      "original_price": 520000,
+      "discount_price": 416000,
+      "discount_name": "Chinowa SALE",
+      "status": "ready",
+      "manufacturer": "Good Smile Company",
+      "series_name": "Vocaloid",
+      "is_wishlisted": false
+    },
+    {
+      "id": "2003",
+      "name": "Nendoroid Meiko",
+      "url": "https://kyou.id/items/2003/",
+      "image_url": "https://kyoucdn.id/static/sample/meiko.webp",
+      "original_price": 520000,
+      "discount_price": 416000,
+      "discount_name": "Chinowa SALE",
+      "status": "ready",
+      "manufacturer": "Good Smile Company",
+      "series_name": "Vocaloid",
+      "is_wishlisted": false
+    }
+  ],
+  "attempt": 1
+}
