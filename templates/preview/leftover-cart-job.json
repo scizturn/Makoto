@@ -1,0 +1,87 @@
+{
+  "job_id": "preview-leftover-cart-2026-06-15-120000-user-31877",
+  "user_id": "31877",
+  "date": "2026-06-15T12:00:00+07:00",
+  "user": {
+    "id": "31877",
+    "name": "Abimanyu Nugroho",
+    "email": "manyu555abi@gmail.com",
+    "birthday": "2001-08-06T00:00:00Z",
+    "is_active": true
+  },
+  "cart_items": [
+    {
+      "id": "103969",
+      "name": "PVC Figure Mihono Bourbon - Uma Musume Pretty Derby (20cm)",
+      "url": "https://kyou.id/items/103969/",
+      "image_url": "https://kyoucdn.id/items/167314-revive-pvc-figure-mihono-bourbon-uma-musume-pretty-derby-20cm-1459445050.jpg.webp",
+      "price": 320000,
+      "status": "ready",
+      "manufacturer": "Bandai Spirits",
+      "series_name": "Uma Musume"
+    },
+    {
+      "id": "165913",
+      "name": "Espresto Figure Fujita Kotone - Charming Pose Ver. Gakuen iDOLM@STER (18cm)",
+      "url": "https://kyou.id/items/165913/",
+      "image_url": "https://kyoucdn.id/items/390842-espresto-figure-fujita-kotone-charming-pose-ver-gakuen-idolm-at-ster-size-tba.jpg.webp",
+      "price": 420000,
+      "status": "PO",
+      "manufacturer": "Bandai Spirits",
+      "series_name": "Gakuen iDOLM@STER",
+      "po_release_at": "2026-09-01T00:00:00Z"
+    },
+    {
+      "id": "158513",
+      "name": "Kuripan Plushie Awa Subaru - Girls Band Cry (17cm)",
+      "url": "https://kyou.id/items/158513/",
+      "image_url": "https://kyoucdn.id/items/kuripan-plushie-awa-subaru-girls-band-cry-17cm-e664c409.jpg.webp",
+      "price": 850000,
+      "status": "ready",
+      "manufacturer": "Good Smile Company",
+      "series_name": "Girls Band Cry"
+    }
+  ],
+  "reco_items": [
+    {
+      "id": "224515",
+      "name": "PVC Figure 1/6 Kitagawa Marin - Knit Ver. Sono Bisque Doll wa Koi wo Suru (16cm)",
+      "kind": "character",
+      "series_id": "4088",
+      "image_url": "https://kyoucdn.id/items/pvc-figure-16-marin-kitagawa-knit-ver-sono-bisque-doll-wa-koi-wo-suru-16cm-5d8f7ae5.jpg.webp",
+      "price": 3250000,
+      "status": "PO",
+      "manufacturer": "F:NEX",
+      "series_name": "Sono Bisque Doll wa Koi wo Suru",
+      "po_deadline": "2026-07-07T00:00:00Z",
+      "po_release_at": "2027-02-01T00:00:00Z"
+    },
+    {
+      "id": "224514",
+      "name": "TENITOL TALL Figure Yatogami Tohka - Race Queen Ver. Date A Live",
+      "kind": "character",
+      "series_id": "86",
+      "image_url": "https://kyoucdn.id/items/tenitol-tall-figure-yatogami-tohka-race-queen-ver-date-a-live-efae1ae9.jpg.webp",
+      "price": 1800000,
+      "status": "PO",
+      "manufacturer": "FuRyu",
+      "series_name": "Date A Live",
+      "po_deadline": "2026-07-14T00:00:00Z",
+      "po_release_at": "2026-12-01T00:00:00Z"
+    },
+    {
+      "id": "224513",
+      "name": "TENITOL TALL Figure Tokisaki Kurumi - Race Queen Ver. Date A Live",
+      "kind": "character",
+      "series_id": "86",
+      "image_url": "https://kyoucdn.id/items/tenitol-tall-figure-tokisaki-kurumi-race-queen-ver-date-a-live-37365d6f.jpg.webp",
+      "price": 1750000,
+      "status": "PO",
+      "manufacturer": "FuRyu",
+      "series_name": "Date A Live",
+      "po_deadline": "2026-07-14T00:00:00Z",
+      "po_release_at": "2026-12-01T00:00:00Z"
+    }
+  ],
+  "attempt": 1
+}

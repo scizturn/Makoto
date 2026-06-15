@@ -63,6 +63,24 @@ func main() {
 		}
 	}
 
+	// --- Leftover Cart ---
+	leftoverCartCampaign := campaign.LeftoverCartCampaign{
+		TemplateIDs: cfg.LeftoverCartTemplateIDs,
+		Greetings:   cfg.LeftoverCartGreetings,
+		CartURL:     cfg.LeftoverCartURL,
+		Closing:     "Sampai ketemu lagi di Kyou!",
+	}
+	leftoverCartProcessor := worker.NewLeftoverCartProcessor(sender, validator, leftoverCartCampaign)
+	leftoverCartProcessor.Domain = cfg.KirimEmailDomain
+	leftoverCartProcessor.FromEmail = cfg.FromEmail
+	leftoverCartProcessor.FromName = cfg.FromName
+	if cfg.LeftoverCartEmailTemplateDir != "" {
+		leftoverCartProcessor.Renderer = emailtemplate.FileRenderer{
+			Dir:     cfg.LeftoverCartEmailTemplateDir,
+			Subject: cfg.LeftoverCartEmailSubject,
+		}
+	}
+
 	// --- Queues ---
 	redisQueue := queue.NewRedisQueue(cfg.RedisAddr, cfg.RedisPassword, cfg.RedisDB, cfg.QueueName)
 	defer func() {
@@ -75,6 +93,13 @@ func main() {
 	defer func() {
 		if err := anniversaryQueue.Close(); err != nil {
 			log.Printf("anniversary redis close failed: %v", err)
+		}
+	}()
+
+	leftoverCartQueue := queue.NewLeftoverCartRedisQueue(cfg.RedisAddr, cfg.RedisPassword, cfg.RedisDB, cfg.LeftoverCartQueueName)
+	defer func() {
+		if err := leftoverCartQueue.Close(); err != nil {
+			log.Printf("leftover cart redis close failed: %v", err)
 		}
 	}()
 
@@ -106,6 +131,12 @@ func main() {
 		}
 		return nil
 	}
+	leftoverCartProcessor.BeforeSend = func(ctx context.Context, job domain.LeftoverCartJob, result worker.ProcessResult) error {
+		if err := auditLogger.MarkSending(ctx, auditInfoFromLeftoverCartJob(job, result)); err != nil {
+			log.Printf("leftover cart email audit sending update failed: job_id=%s user_id=%s err=%v", job.ID, job.UserID, err)
+		}
+		return nil
+	}
 
 	// --- Run both workers concurrently ---
 	var wg sync.WaitGroup
@@ -131,6 +162,20 @@ func main() {
 		}()
 	} else {
 		log.Print("MAKOTO_ANNIVERSARY_ENABLED is false; skipping anniversary sender")
+	}
+
+	if cfg.LeftoverCartEnabled {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			runLeftoverCartSender(ctx, leftoverCartQueue, leftoverCartProcessor, discord, auditLogger, senderConfig{
+				rateLimitPerMinute: cfg.RateLimitPerMinute,
+				deadLetterQueue:    cfg.LeftoverCartDeadLetterQueue,
+				maxAttempts:        cfg.MaxAttempts,
+			})
+		}()
+	} else {
+		log.Print("MAKOTO_LEFTOVER_CART_ENABLED is false; skipping leftover cart sender")
 	}
 	wg.Wait()
 }
@@ -403,6 +448,87 @@ func auditInfoFromAnniversaryJob(job domain.AnniversaryJob, result worker.Proces
 		ProviderMessageID: result.SendResult.MessageID,
 		ProviderStatus:    result.SendResult.StatusCode,
 		ProviderResponse:  result.SendResult.Response,
+	}
+}
+
+func auditInfoFromLeftoverCartJob(job domain.LeftoverCartJob, result worker.ProcessResult) audit.MessageInfo {
+	attempt := job.Attempt
+	if attempt <= 0 {
+		attempt = 1
+	}
+	return audit.MessageInfo{
+		JobID:             job.ID,
+		Attempt:           attempt,
+		TemplateID:        result.TemplateID,
+		Subject:           result.Subject,
+		ActionURL:         result.ActionURL,
+		ProviderMessageID: result.SendResult.MessageID,
+		ProviderStatus:    result.SendResult.StatusCode,
+		ProviderResponse:  result.SendResult.Response,
+	}
+}
+
+func runLeftoverCartSender(ctx context.Context, q *queue.LeftoverCartRedisQueue, processor *worker.LeftoverCartProcessor, discord notify.DiscordLogger, auditLogger *audit.Logger, cfg senderConfig) {
+	if cfg.rateLimitPerMinute <= 0 {
+		cfg.rateLimitPerMinute = 100
+	}
+	if cfg.maxAttempts <= 0 {
+		cfg.maxAttempts = 3
+	}
+	if recovered, err := q.RecoverProcessing(ctx); err != nil {
+		log.Printf("leftover cart redis processing recovery failed: %v", err)
+	} else if recovered > 0 {
+		log.Printf("leftover cart redis processing recovery requeued %d job(s)", recovered)
+	}
+	interval := time.Minute / time.Duration(cfg.rateLimitPerMinute)
+	if interval <= 0 {
+		interval = time.Second
+	}
+	ticker := time.NewTicker(interval)
+	defer ticker.Stop()
+
+	for {
+		processingJob, err := q.Dequeue(ctx, 5*time.Second)
+		if errors.Is(err, redis.Nil) {
+			continue
+		}
+		if err != nil {
+			log.Printf("leftover cart redis dequeue failed: %v", err)
+			continue
+		}
+		job := processingJob.Job
+
+		select {
+		case <-ctx.Done():
+			log.Print(ctx.Err())
+			return
+		case <-ticker.C:
+		}
+
+		processResult, err := processor.Process(ctx, job)
+		auditInfo := auditInfoFromLeftoverCartJob(job, processResult)
+		if err != nil {
+			log.Printf("leftover cart email failed: job_id=%s user_id=%s err=%v", job.ID, job.UserID, err)
+			_ = discord.Log(ctx, fmt.Sprintf("[Leftover Cart Email Failed]\nJob: %s\nUser: %s\nEmail: %s\nError: %v", job.ID, job.UserID, maskEmail(job.User.Email), err))
+			if ackErr := q.Ack(ctx, processingJob.Payload); ackErr != nil {
+				log.Printf("leftover cart email failed but ack failed: job_id=%s err=%v ack_err=%v", job.ID, err, ackErr)
+			}
+			if err := auditLogger.MarkFailed(ctx, auditInfo); err != nil {
+				log.Printf("leftover cart email audit failed update failed: job_id=%s err=%v", job.ID, err)
+			}
+			continue
+		}
+
+		if err := auditLogger.MarkSent(ctx, auditInfo); err != nil {
+			log.Printf("leftover cart email audit sent update failed: job_id=%s user_id=%s err=%v", job.ID, job.UserID, err)
+		}
+		if err := q.Ack(ctx, processingJob.Payload); err != nil {
+			log.Printf("leftover cart email sent but ack failed: job_id=%s user_id=%s err=%v", job.ID, job.UserID, err)
+			_ = discord.Log(ctx, fmt.Sprintf("[Leftover Cart Email Ack Failed]\nJob: %s\nUser: %s\nEmail: %s\nAck error: %v", job.ID, job.UserID, maskEmail(job.User.Email), err))
+			continue
+		}
+		log.Printf("leftover cart email sent: job_id=%s user_id=%s", job.ID, job.UserID)
+		_ = discord.Log(ctx, fmt.Sprintf("[Leftover Cart Email Sent]\nJob: %s\nUser: %s\nEmail: %s", job.ID, job.UserID, maskEmail(job.User.Email)))
 	}
 }
 

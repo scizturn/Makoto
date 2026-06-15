@@ -65,6 +65,11 @@ type viewData struct {
 	AnniversaryEdition string
 	ActionURL          string
 	Closing            string
+	// Leftover Cart fields
+	Greeting string
+	CartHTML template.HTML
+	RecoHTML template.HTML
+	CartURL  string
 }
 
 func viewDataFromMergeData(data map[string]any) viewData {
@@ -80,6 +85,10 @@ func viewDataFromMergeData(data map[string]any) viewData {
 		AnniversaryEdition: stringValue(data["anniversary_edition"]),
 		ActionURL:          stringValue(data["action_url"]),
 		Closing:            stringValue(data["closing"]),
+		Greeting:           stringValue(data["greeting"]),
+		CartHTML:           template.HTML(stringValue(data["cart_html"])),
+		RecoHTML:           template.HTML(stringValue(data["reco_html"])),
+		CartURL:            stringValue(data["cart_url"]),
 	}
 }
 

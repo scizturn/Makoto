@@ -42,6 +42,14 @@ type Config struct {
 	AnniversaryEmailTemplateDir  string
 	AnniversaryEmailSubject      string
 	AnniversaryEmailSubjects     []string
+	LeftoverCartEnabled          bool
+	LeftoverCartQueueName        string
+	LeftoverCartDeadLetterQueue  string
+	LeftoverCartTemplateIDs      []string
+	LeftoverCartEmailTemplateDir string
+	LeftoverCartEmailSubject     string
+	LeftoverCartGreetings        []string
+	LeftoverCartURL              string
 }
 
 func Load() Config {
@@ -82,6 +90,20 @@ func Load() Config {
 			"Ada kado spesial buat anniversary ke-{{ .Years }}, {{ .FirstName }}!",
 			"Kejutan spesial untuk anniversary kamu, {{ .FirstName }}.",
 		}),
+		LeftoverCartEnabled:          envBool("MAKOTO_LEFTOVER_CART_ENABLED", false),
+		LeftoverCartQueueName:        env("MAKOTO_LEFTOVER_CART_QUEUE_NAME", "leftover_cart_email_jobs"),
+		LeftoverCartDeadLetterQueue:  env("MAKOTO_LEFTOVER_CART_DEAD_LETTER_QUEUE", "leftover_cart_email_jobs_dead"),
+		LeftoverCartTemplateIDs:      envList("MAKOTO_LEFTOVER_CART_TEMPLATE_IDS", []string{"leftover_cart1.html", "leftover_cart2.html", "leftover_cart3.html"}),
+		LeftoverCartEmailTemplateDir: os.Getenv("MAKOTO_LEFTOVER_CART_EMAIL_TEMPLATE_DIR"),
+		LeftoverCartEmailSubject:     env("MAKOTO_LEFTOVER_CART_EMAIL_SUBJECT", "Eh {{ .FirstName }}, keranjangmu masih nunggu nih!"),
+		LeftoverCartGreetings: envListPipe("MAKOTO_LEFTOVER_CART_GREETINGS", []string{
+			"Hei {{ .FirstName }}, kamu lagi sibuk ya?",
+			"Woi {{ .FirstName }}, jangan lupa sama keranjangmu!",
+			"{{ .FirstName }}, barang incaran kamu masih ada nih!",
+			"Psst {{ .FirstName }}, keranjangmu masih nunggu kamu balik!",
+			"{{ .FirstName }}, sayang banget kalau sampai kehabisan!",
+		}),
+		LeftoverCartURL: env("MAKOTO_LEFTOVER_CART_URL", "https://kyou.id/user/cart"),
 	}
 }
 

@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="id" xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=720" />
+        <title>Item di keranjangmu masih menunggu!</title>
+    </head>
+    <body style="margin:0;padding:0;background:#ffffff;font-family:Nunito,Arial,Helvetica,sans-serif;color:#111827;-webkit-text-size-adjust:none;text-size-adjust:none;">
+        <table role="presentation" width="720" cellspacing="0" cellpadding="0" align="center"
+               style="width:720px;min-width:720px;margin:0 auto;border-collapse:collapse;table-layout:fixed;background:#f0fdfa url('https://kyoucdn.id/static/assets/EmailBG.png') repeat top center;">
+        <tr><td style="padding:28px 0;">
+
+            <!-- ── LOGO ── -->
+            <div style="text-align:center;padding:0 0 20px;">
+                <a href="https://kyou.id/" style="display:inline-block;border:0;text-decoration:none;">
+                    <img src="https://kyoucdn.id/static/assets/brand_logo.png" alt="Kyou.id" width="72"
+                         style="display:block;width:72px;height:auto;border:0;" />
+                </a>
+            </div>
+
+            <!-- ── HERO ── -->
+            <table role="presentation" width="720" cellspacing="0" cellpadding="0" style="width:720px;border-collapse:collapse;">
+            <tr><td style="padding:0 20px;">
+                <table role="presentation" width="680" cellspacing="0" cellpadding="0"
+                       style="width:680px;border-collapse:collapse;border-radius:16px;background:#0d9488;">
+                    <tr>
+                        <td style="padding:0 0 0 6px;">
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;border-radius:0 14px 14px 0;background:#134e4a;">
+                                <tr>
+                                    <td style="padding:32px 32px 30px;">
+                                        <div style="font-size:12px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:#5eead4;margin:0 0 12px;">
+                                            Keranjang belanjamu
+                                        </div>
+                                        <div style="font-size:28px;font-weight:900;color:#ffffff;line-height:1.3;letter-spacing:-0.2px;">
+                                            {{ .Greeting }}
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td></tr>
+            </table>
+
+            <!-- ── CART ITEMS ── -->
+            <table role="presentation" width="720" cellspacing="0" cellpadding="0" style="width:720px;border-collapse:collapse;">
+            <tr><td style="padding:20px 20px 0;">
+                <table role="presentation" width="680" cellspacing="0" cellpadding="0"
+                       style="width:680px;border-collapse:collapse;border-radius:14px;background:#ffffff;border:1px solid #ccfbf1;">
+                    <tr>
+                        <td style="padding:28px 28px 24px;">
+                            <!-- top row: label + urgency badge -->
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;margin:0 0 6px;">
+                            <tr>
+                                <td valign="middle">
+                                    <span style="font-size:13px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#0d9488;">
+                                        Produk di keranjangmu
+                                    </span>
+                                </td>
+                                <td valign="middle" align="right">
+                                    <span style="background:#f0fdfa;color:#0f766e;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:3px 10px;border-radius:20px;border:1px solid #99f6e4;">
+                                        Masih tersedia!
+                                    </span>
+                                </td>
+                            </tr>
+                            </table>
+                            <h2 style="margin:0 0 22px;font-size:19px;font-weight:900;color:#111827;line-height:1.3;border-top:1px solid #e5e7eb;padding-top:16px;">
+                                Sayang banget kalau kehabisan, checkout sekarang yuk!
+                            </h2>
+                            {{ .CartHTML }}
+                            <div style="margin:26px 0 0;text-align:center;">
+                                <a href="{{ .CartURL }}" style="display:inline-block;padding:13px 36px;background:#0d9488;color:#ffffff;font-size:15px;font-weight:900;text-decoration:none;border-radius:10px;letter-spacing:0.4px;">
+                                    Checkout Sekarang
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </td></tr>
+            </table>
+
+            <!-- ── REKOMENDASI ── -->
+            <table role="presentation" width="720" cellspacing="0" cellpadding="0" style="width:720px;border-collapse:collapse;">
+            <tr><td style="padding:16px 20px 0;">
+                <table role="presentation" width="680" cellspacing="0" cellpadding="0"
+                       style="width:680px;border-collapse:collapse;border-radius:14px;background:#ffffff;border:1px solid #e5e7eb;">
+                    <tr>
+                        <td style="padding:28px 28px 24px;">
+                            <p style="margin:0 0 4px;font-size:13px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#6b7280;">
+                                Mungkin kamu juga suka
+                            </p>
+                            <h2 style="margin:0 0 22px;font-size:18px;font-weight:900;color:#111827;padding-top:10px;border-top:1px solid #f3f4f6;">
+                                Lengkapi koleksimu dengan ini!
+                            </h2>
+                            {{ .RecoHTML }}
+                        </td>
+                    </tr>
+                </table>
+            </td></tr>
+            </table>
+
+            <!-- ── CLOSING ── -->
+            <table role="presentation" width="720" cellspacing="0" cellpadding="0" style="width:720px;border-collapse:collapse;">
+            <tr><td style="padding:22px 20px 0;">
+                <table role="presentation" width="680" cellspacing="0" cellpadding="0" style="width:680px;border-collapse:collapse;">
+                    <tr>
+                        <td style="padding:0 12px;text-align:center;">
+                            <p style="margin:0;font-size:15px;font-weight:600;color:#4b5563;line-height:1.7;">
+                                {{ .Closing }}
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td></tr>
+            </table>
+
+            <!-- ── FOOTER ── -->
+            <table role="presentation" width="720" cellspacing="0" cellpadding="0" style="width:720px;border-collapse:collapse;">
+            <tr><td style="padding:28px 20px 0;text-align:center;">
+                <p style="margin:0 0 6px;font-size:12px;color:#9ca3af;">
+                    © 2025 Kyou.id · <a href="https://kyou.id/" style="color:#9ca3af;text-decoration:none;">kyou.id</a>
+                </p>
+                <p style="margin:0;font-size:11px;color:#d1d5db;">
+                    Kamu menerima email ini karena ada item yang masih ada di keranjangmu.
+                </p>
+            </td></tr>
+            </table>
+
+        </td></tr>
+        </table>
+    </body>
+</html>

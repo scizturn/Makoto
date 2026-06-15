@@ -9,8 +9,10 @@ import (
 )
 
 const (
-	FeatureBirthdayVoucher = "birthday_voucher"
-	ProviderKirimEmail     = "kirim.email"
+	FeatureBirthdayVoucher    = "birthday_voucher"
+	FeatureAnniversaryVoucher = "anniversary_voucher"
+	FeatureLeftoverCart       = "leftover_cart"
+	ProviderKirimEmail        = "kirim.email"
 )
 
 type Logger struct {
