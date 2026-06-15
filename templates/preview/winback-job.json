@@ -1,0 +1,82 @@
+{
+  "job_id": "preview-winback-2026-06-15-080000-user-147044",
+  "user_id": "147044",
+  "date": "2026-06-15T08:00:00+07:00",
+  "user": {
+    "id": "147044",
+    "name": "Cheeazy Preview",
+    "email": "cheeazyyy@gmail.com",
+    "is_active": true
+  },
+  "voucher_code": "WBPREVIEW2026",
+  "historical_item": {
+    "name": "[FLASH PO] Nendoroid Rin Shima - Touring Ver.",
+    "image_url": "https://kyoucdn.id/items/64964-nendoroid-rin-shima-touring-ver.jpg.webp",
+    "order_date": "2024-09-01T10:00:00Z",
+    "days_ago": 287
+  },
+  "wishlist_items": [
+    {
+      "id": "103969",
+      "name": "PVC Figure Mihono Bourbon - Uma Musume Pretty Derby (20cm)",
+      "url": "https://kyou.id/items/103969/",
+      "image_url": "https://kyoucdn.id/items/167314-revive-pvc-figure-mihono-bourbon-uma-musume-pretty-derby-20cm-1459445050.jpg.webp",
+      "price": 320000,
+      "status": "ready",
+      "manufacturer": "Bandai Spirits",
+      "series_name": "Uma Musume"
+    },
+    {
+      "id": "165913",
+      "name": "Espresto Figure Fujita Kotone - Charming Pose Ver. Gakuen iDOLM@STER (18cm)",
+      "url": "https://kyou.id/items/165913/",
+      "image_url": "https://kyoucdn.id/items/390842-espresto-figure-fujita-kotone-charming-pose-ver-gakuen-idolm-at-ster-size-tba.jpg.webp",
+      "price": 420000,
+      "status": "ready",
+      "manufacturer": "Bandai Spirits",
+      "series_name": "Gakuen iDOLM@STER"
+    },
+    {
+      "id": "158513",
+      "name": "Kuripan Plushie Awa Subaru - Girls Band Cry (17cm)",
+      "url": "https://kyou.id/items/158513/",
+      "image_url": "https://kyoucdn.id/items/kuripan-plushie-awa-subaru-girls-band-cry-17cm-e664c409.jpg.webp",
+      "price": 850000,
+      "status": "ready",
+      "manufacturer": "Good Smile Company",
+      "series_name": "Girls Band Cry"
+    },
+    {
+      "id": "200151",
+      "name": "Nami Egghead Island Ver. Badge - One Piece",
+      "url": "https://kyou.id/items/200151/",
+      "image_url": "https://kyoucdn.id/items/508115-nami-egghead-island-ver-badge-one-piece.jpg.webp",
+      "price": 80000,
+      "status": "ready",
+      "manufacturer": "BOOM COMIC",
+      "series_name": "One Piece"
+    },
+    {
+      "id": "92977",
+      "name": "PVC Figure Gojo Satoru - Jujutsu Kaisen the Movie Jukon no Kata (18cm)",
+      "url": "https://kyou.id/items/92977/",
+      "image_url": "https://kyoucdn.id/items/92422-revive-pvc-figure-gojo-satoru-jujutsu-kaisen-the-movie-jukon-no-kata-18cm-1768360090.jpg.webp",
+      "price": 320000,
+      "status": "ready",
+      "manufacturer": "Bandai Spirits",
+      "series_name": "Jujutsu Kaisen"
+    },
+    {
+      "id": "173409",
+      "name": "Castorice Chrysos Heirs Series Laser Collectible Card - Honkai: Star Rail (7x12cm)",
+      "url": "https://kyou.id/items/173409/",
+      "image_url": "https://kyoucdn.id/items/371729-castorice-amphoreus-saga-of-heroes-series-laser-collectible-card-honkai-star-rail-7x12cm.jpg.webp",
+      "price": 60000,
+      "status": "ready",
+      "manufacturer": "Mihoyo",
+      "series_name": "Honkai: Star Rail"
+    }
+  ],
+  "popular_items": [],
+  "attempt": 1
+}

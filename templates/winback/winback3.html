@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="id" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=720" />
+    <title>Kita kangen kamu — Kyou.id</title>
+</head>
+<body style="margin:0;padding:0;background:#ffffff;font-family:Nunito,Arial,Helvetica,sans-serif;color:#111827;-webkit-text-size-adjust:none;text-size-adjust:none;">
+<table role="presentation" width="720" cellspacing="0" cellpadding="0" align="center"
+       style="width:720px;min-width:720px;margin:0 auto;border-collapse:collapse;table-layout:fixed;background:#f2fafd url('https://kyoucdn.id/static/assets/EmailBG.png') repeat top center;">
+<tr><td style="padding:28px 0;">
+
+    <!-- LOGO -->
+    <div style="text-align:center;padding:0 0 20px;">
+        <a href="https://kyou.id/" style="display:inline-block;border:0;text-decoration:none;">
+            <img src="https://kyoucdn.id/static/assets/brand_logo.png" alt="Kyou.id" width="72"
+                 style="display:block;width:72px;height:auto;border:0;" />
+        </a>
+    </div>
+
+    <!-- HERO -->
+    <table role="presentation" width="720" cellspacing="0" cellpadding="0"
+           style="width:720px;border-collapse:collapse;">
+    <tr><td style="padding:0 20px;">
+        <table role="presentation" width="680" cellspacing="0" cellpadding="0"
+               style="width:680px;border-collapse:collapse;border-radius:16px;overflow:hidden;
+                      background:linear-gradient(115deg,#065f46,#059669);">
+            <tr>
+                <td align="center" valign="top" style="padding:40px 32px 36px;">
+                    <div style="color:#a7f3d0;font-size:12px;font-weight:800;letter-spacing:3px;text-transform:uppercase;margin:0 0 10px;">
+                        Selamat Datang Kembali
+                    </div>
+                    <div style="color:#ffffff;font-size:36px;font-weight:900;line-height:1.2;letter-spacing:-0.5px;margin:0 0 18px;">
+                        Kita kangen kamu, {{ .FirstName }}!
+                    </div>
+                    <div style="color:#d1fae5;font-size:16px;font-weight:500;line-height:1.6;margin:0 0 28px;">
+                        {{ .Greeting }}
+                    </div>
+                    <a href="{{ .ActionURL }}"
+                       style="display:inline-block;padding:14px 36px;background:#ffffff;color:#065f46;
+                              font-size:15px;font-weight:900;text-decoration:none;border-radius:8px;
+                              letter-spacing:0.5px;">
+                        Klaim Voucher Kamu
+                    </a>
+                </td>
+            </tr>
+        </table>
+    </td></tr>
+    </table>
+
+    <!-- VOUCHER -->
+    <table role="presentation" width="720" cellspacing="0" cellpadding="0"
+           style="width:720px;border-collapse:collapse;margin-top:28px;">
+    <tr><td style="padding:0 20px;">
+        <table role="presentation" width="680" cellspacing="0" cellpadding="0"
+               style="width:680px;border-collapse:collapse;border-radius:14px;overflow:hidden;
+                      background:#ecfdf5;border:2px dashed #10b981;">
+            <tr>
+                <td align="center" style="padding:28px 32px;">
+                    <div style="font-size:12px;font-weight:800;color:#065f46;letter-spacing:3px;text-transform:uppercase;margin:0 0 10px;">
+                        Voucher Spesial Buat Kamu
+                    </div>
+                    <div style="font-size:32px;font-weight:900;color:#064e3b;letter-spacing:6px;margin:0 0 10px;font-family:'Courier New',Courier,monospace;">
+                        {{ .VoucherCode }}
+                    </div>
+                    <div style="font-size:13px;color:#065f46;margin:0 0 18px;">
+                        Berlaku 30 hari &mdash; khusus untuk kamu yang udah lama nggak mampir!
+                    </div>
+                    <a href="{{ .ActionURL }}"
+                       style="display:inline-block;padding:12px 32px;background:#065f46;color:#ffffff;
+                              font-size:14px;font-weight:800;text-decoration:none;border-radius:8px;">
+                        Pakai Sekarang
+                    </a>
+                </td>
+            </tr>
+        </table>
+    </td></tr>
+    </table>
+
+    <!-- HISTORICAL ITEM -->
+    {{ if .HistoricalHTML }}
+    <table role="presentation" width="720" cellspacing="0" cellpadding="0"
+           style="width:720px;border-collapse:collapse;margin-top:28px;">
+    <tr><td style="padding:0 20px;">
+        <table role="presentation" width="680" cellspacing="0" cellpadding="0"
+               style="width:680px;border-collapse:collapse;border-radius:14px;overflow:hidden;
+                      background:#ffffff;border:1px solid #e5e7eb;">
+            <tr>
+                <td style="padding:28px 32px;">
+                    <div style="font-size:12px;font-weight:800;color:#6b7280;letter-spacing:3px;text-transform:uppercase;margin:0 0 16px;">
+                        Masih ingat ini?
+                    </div>
+                    {{ .HistoricalHTML }}
+                </td>
+            </tr>
+        </table>
+    </td></tr>
+    </table>
+    {{ end }}
+
+    <!-- WISHLIST -->
+    {{ if .WishlistHTML }}
+    <table role="presentation" width="720" cellspacing="0" cellpadding="0"
+           style="width:720px;border-collapse:collapse;margin-top:28px;">
+    <tr><td style="padding:0 20px;">
+        <div style="font-size:12px;font-weight:800;color:#6b7280;letter-spacing:3px;text-transform:uppercase;margin:0 0 16px;text-align:center;">
+            Wishlist yang masih nunggu kamu
+        </div>
+        {{ .WishlistHTML }}
+    </td></tr>
+    </table>
+    {{ end }}
+
+    <!-- CLOSING -->
+    <table role="presentation" width="720" cellspacing="0" cellpadding="0"
+           style="width:720px;border-collapse:collapse;margin-top:32px;">
+    <tr><td style="padding:0 20px;">
+        <table role="presentation" width="680" cellspacing="0" cellpadding="0"
+               style="width:680px;border-collapse:collapse;border-radius:14px;overflow:hidden;
+                      background:#ffffff;border:1px solid #e5e7eb;">
+            <tr>
+                <td align="center" style="padding:28px 32px;">
+                    <p style="margin:0 0 8px;font-size:15px;color:#374151;line-height:1.7;">{{ .Closing }}</p>
+                    <p style="margin:0;font-size:13px;color:#9ca3af;">— Tim Kyou.id</p>
+                </td>
+            </tr>
+        </table>
+    </td></tr>
+    </table>
+
+    <!-- FOOTER -->
+    <div style="text-align:center;padding:24px 20px 0;font-size:11px;color:#9ca3af;line-height:1.6;">
+        &copy; 2025 Kyou.id &middot; <a href="https://kyou.id/" style="color:#9ca3af;text-decoration:none;">kyou.id</a>
+    </div>
+
+</td></tr>
+</table>
+</body>
+</html>

@@ -81,6 +81,25 @@ func main() {
 		}
 	}
 
+	// --- Winback ---
+	winbackCampaign := campaign.WinbackCampaign{
+		TemplateIDs: cfg.WinbackTemplateIDs,
+		Subjects:    cfg.WinbackEmailSubjects,
+		Greetings:   cfg.WinbackGreetings,
+		ActionURL:   cfg.WinbackActionURL,
+		Closing:     "Yuk balik lagi — masih banyak koleksi keren yang nunggu kamu di Kyou!",
+	}
+	winbackProcessor := worker.NewWinbackProcessor(sender, validator, winbackCampaign)
+	winbackProcessor.Domain = cfg.KirimEmailDomain
+	winbackProcessor.FromEmail = cfg.FromEmail
+	winbackProcessor.FromName = cfg.FromName
+	if cfg.WinbackEmailTemplateDir != "" {
+		winbackProcessor.Renderer = emailtemplate.FileRenderer{
+			Dir:     cfg.WinbackEmailTemplateDir,
+			Subject: cfg.WinbackEmailSubject,
+		}
+	}
+
 	// --- Leftover Cart ---
 	leftoverCartCampaign := campaign.LeftoverCartCampaign{
 		TemplateIDs: cfg.LeftoverCartTemplateIDs,
@@ -128,6 +147,13 @@ func main() {
 		}
 	}()
 
+	winbackQueue := queue.NewWinbackRedisQueue(cfg.RedisAddr, cfg.RedisPassword, cfg.RedisDB, cfg.WinbackQueueName)
+	defer func() {
+		if err := winbackQueue.Close(); err != nil {
+			log.Printf("winback redis close failed: %v", err)
+		}
+	}()
+
 	// --- Discord + Audit ---
 	discord := notify.DiscordLogger{
 		WebhookURL: cfg.DiscordWebhookURL,
@@ -165,6 +191,12 @@ func main() {
 	discountedWishlistProcessor.BeforeSend = func(ctx context.Context, job domain.DiscountedWishlistJob, result worker.ProcessResult) error {
 		if err := auditLogger.MarkSending(ctx, auditInfoFromDiscountedWishlistJob(job, result)); err != nil {
 			log.Printf("discounted wishlist email audit sending update failed: job_id=%s user_id=%s err=%v", job.ID, job.UserID, err)
+		}
+		return nil
+	}
+	winbackProcessor.BeforeSend = func(ctx context.Context, job domain.WinbackJob, result worker.ProcessResult) error {
+		if err := auditLogger.MarkSending(ctx, auditInfoFromWinbackJob(job, result)); err != nil {
+			log.Printf("winback email audit sending update failed: job_id=%s user_id=%s err=%v", job.ID, job.UserID, err)
 		}
 		return nil
 	}
@@ -221,6 +253,20 @@ func main() {
 		}()
 	} else {
 		log.Print("MAKOTO_DISCOUNTED_WISHLIST_ENABLED is false; skipping discounted wishlist sender")
+	}
+
+	if cfg.WinbackEnabled {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			runWinbackSender(ctx, winbackQueue, winbackProcessor, discord, auditLogger, senderConfig{
+				rateLimitPerMinute: cfg.RateLimitPerMinute,
+				deadLetterQueue:    cfg.WinbackDeadLetterQueue,
+				maxAttempts:        cfg.MaxAttempts,
+			})
+		}()
+	} else {
+		log.Print("MAKOTO_WINBACK_ENABLED is false; skipping winback sender")
 	}
 	wg.Wait()
 }
@@ -655,6 +701,87 @@ func runDiscountedWishlistSender(ctx context.Context, q *queue.DiscountedWishlis
 		}
 		log.Printf("discounted wishlist email sent: job_id=%s user_id=%s", job.ID, job.UserID)
 		_ = discord.Log(ctx, fmt.Sprintf("[Discounted Wishlist Email Sent]\nJob: %s\nUser: %s\nEmail: %s", job.ID, job.UserID, maskEmail(job.User.Email)))
+	}
+}
+
+func auditInfoFromWinbackJob(job domain.WinbackJob, result worker.ProcessResult) audit.MessageInfo {
+	attempt := job.Attempt
+	if attempt <= 0 {
+		attempt = 1
+	}
+	return audit.MessageInfo{
+		JobID:             job.ID,
+		Attempt:           attempt,
+		TemplateID:        result.TemplateID,
+		Subject:           result.Subject,
+		ActionURL:         result.ActionURL,
+		ProviderMessageID: result.SendResult.MessageID,
+		ProviderStatus:    result.SendResult.StatusCode,
+		ProviderResponse:  result.SendResult.Response,
+	}
+}
+
+func runWinbackSender(ctx context.Context, q *queue.WinbackRedisQueue, processor *worker.WinbackProcessor, discord notify.DiscordLogger, auditLogger *audit.Logger, cfg senderConfig) {
+	if cfg.rateLimitPerMinute <= 0 {
+		cfg.rateLimitPerMinute = 100
+	}
+	if cfg.maxAttempts <= 0 {
+		cfg.maxAttempts = 3
+	}
+	if recovered, err := q.RecoverProcessing(ctx); err != nil {
+		log.Printf("winback redis processing recovery failed: %v", err)
+	} else if recovered > 0 {
+		log.Printf("winback redis processing recovery requeued %d job(s)", recovered)
+	}
+	interval := time.Minute / time.Duration(cfg.rateLimitPerMinute)
+	if interval <= 0 {
+		interval = time.Second
+	}
+	ticker := time.NewTicker(interval)
+	defer ticker.Stop()
+
+	for {
+		processingJob, err := q.Dequeue(ctx, 5*time.Second)
+		if errors.Is(err, redis.Nil) {
+			continue
+		}
+		if err != nil {
+			log.Printf("winback redis dequeue failed: %v", err)
+			continue
+		}
+		job := processingJob.Job
+
+		select {
+		case <-ctx.Done():
+			log.Print(ctx.Err())
+			return
+		case <-ticker.C:
+		}
+
+		processResult, err := processor.Process(ctx, job)
+		auditInfo := auditInfoFromWinbackJob(job, processResult)
+		if err != nil {
+			log.Printf("winback email failed: job_id=%s user_id=%s err=%v", job.ID, job.UserID, err)
+			_ = discord.Log(ctx, fmt.Sprintf("[Winback Email Failed]\nJob: %s\nUser: %s\nEmail: %s\nError: %v", job.ID, job.UserID, maskEmail(job.User.Email), err))
+			if ackErr := q.Ack(ctx, processingJob.Payload); ackErr != nil {
+				log.Printf("winback email failed but ack failed: job_id=%s err=%v ack_err=%v", job.ID, err, ackErr)
+			}
+			if err := auditLogger.MarkFailed(ctx, auditInfo); err != nil {
+				log.Printf("winback email audit failed update failed: job_id=%s err=%v", job.ID, err)
+			}
+			continue
+		}
+
+		if err := auditLogger.MarkSent(ctx, auditInfo); err != nil {
+			log.Printf("winback email audit sent update failed: job_id=%s user_id=%s err=%v", job.ID, job.UserID, err)
+		}
+		if err := q.Ack(ctx, processingJob.Payload); err != nil {
+			log.Printf("winback email sent but ack failed: job_id=%s user_id=%s err=%v", job.ID, job.UserID, err)
+			_ = discord.Log(ctx, fmt.Sprintf("[Winback Email Ack Failed]\nJob: %s\nUser: %s\nEmail: %s\nAck error: %v", job.ID, job.UserID, maskEmail(job.User.Email), err))
+			continue
+		}
+		log.Printf("winback email sent: job_id=%s user_id=%s", job.ID, job.UserID)
+		_ = discord.Log(ctx, fmt.Sprintf("[Winback Email Sent]\nJob: %s\nUser: %s\nEmail: %s", job.ID, job.UserID, maskEmail(job.User.Email)))
 	}
 }
 
