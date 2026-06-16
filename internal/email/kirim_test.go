@@ -76,3 +76,40 @@ func TestKirimClientSendsRenderedHTMLWithTransactionalV4(t *testing.T) {
 		t.Fatalf("unexpected body form: %#v", gotForm)
 	}
 }
+
+func TestKirimClientValidatesEmailFromStrictValidationData(t *testing.T) {
+	var gotPath string
+	var gotAuthUser string
+	var gotAuthPass string
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotPath = r.URL.Path
+		gotAuthUser, gotAuthPass, _ = r.BasicAuth()
+		if ct := r.Header.Get("Content-Type"); !strings.HasPrefix(ct, "application/json") {
+			t.Fatalf("expected json content type, got %q", ct)
+		}
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte(`{"success":true,"data":{"email":"ruby@example.com","is_valid":true}}`))
+	}))
+	defer server.Close()
+
+	client := KirimClient{
+		BaseURL:  server.URL,
+		Username: "validation-user",
+		APIToken: "validation-token",
+	}
+
+	valid, err := client.Validate(context.Background(), "ruby@example.com")
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if !valid {
+		t.Fatal("expected email to be valid")
+	}
+	if gotPath != "/api/email/validate/strict" {
+		t.Fatalf("unexpected path %q", gotPath)
+	}
+	if gotAuthUser != "validation-user" || gotAuthPass != "validation-token" {
+		t.Fatalf("unexpected basic auth: %q %q", gotAuthUser, gotAuthPass)
+	}
+}

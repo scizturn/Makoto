@@ -131,7 +131,6 @@ func (c KirimClient) sendTransactionalV4(ctx context.Context, msg domain.EmailMe
 	return domain.SendResult{MessageID: result.MessageID, StatusCode: resp.StatusCode, Response: responseBody}, nil
 }
 
-
 func (c KirimClient) Validate(ctx context.Context, email string) (bool, error) {
 	payload := map[string]string{"email": email}
 	var body bytes.Buffer
@@ -165,12 +164,18 @@ func (c KirimClient) Validate(ctx context.Context, email string) (bool, error) {
 	var result struct {
 		Valid  *bool  `json:"valid"`
 		Status string `json:"status"`
+		Data   struct {
+			IsValid *bool `json:"is_valid"`
+		} `json:"data"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
 		return false, err
 	}
 	if result.Valid != nil {
 		return *result.Valid, nil
+	}
+	if result.Data.IsValid != nil {
+		return *result.Data.IsValid, nil
 	}
 	return strings.EqualFold(result.Status, "valid"), nil
 }
