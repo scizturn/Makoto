@@ -12,7 +12,7 @@ import (
 	"github.com/kyou-id/makoto/internal/emailtemplate"
 )
 
-var templateIDs = []string{"leftover_cart1.html", "leftover_cart2.html", "leftover_cart3.html"}
+var templateIDs = []string{"leftover_cart1.html", "leftover_cart2.html", "leftover_cart3.html", "leftover_cart4.html", "leftover_cart5.html"}
 
 func main() {
 	jobPath := env("MAKOTO_PREVIEW_JOB_PATH", "templates/preview/leftover-cart-job.json")

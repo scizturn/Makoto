@@ -271,6 +271,50 @@ func TestFYPHTMLDoesNotRenderStatusBadges(t *testing.T) {
 	}
 }
 
+func TestRenderCartItemsHTMLIncludesBrowserCartButton(t *testing.T) {
+	got := RenderCartItemsHTMLWithURL([]domain.WishlistItem{
+		{
+			ID:         "item-1",
+			Name:       "Nendoroid Rin <Touring>",
+			URL:        "https://kyou.id/items/1/?x=<bad>",
+			ImageURL:   "https://kyoucdn.id/items/rin.jpg.webp?x=<bad>",
+			Price:      735000,
+			Status:     "PO",
+			SeriesName: "Laid-Back Camp",
+		},
+		{
+			ID:         "item-1",
+			Name:       "Nendoroid Rin <Touring>",
+			Price:      735000,
+			Status:     "ready",
+			SeriesName: "Laid-Back Camp",
+		},
+		{
+			ID:         "item-2",
+			Name:       "Nami Can Badge",
+			Price:      185000,
+			Status:     "FLASH PO",
+			SeriesName: "One Piece",
+		},
+	}, "https://kyou.id/user/cart?utm=<email>")
+
+	if !containsAll(got, []string{
+		`kyou.id/keranjang`,
+		`Keranjang Saya`,
+		`3 item &bull; 2 produk`,
+		`Lanjut ke Keranjang`,
+		`href="https://kyou.id/user/cart?utm=&lt;email&gt;"`,
+		`Nendoroid Rin &lt;Touring&gt;`,
+		`https://kyou.id/items/1/?x=&lt;bad&gt;`,
+		`https://kyoucdn.id/items/rin.jpg.webp?x=&lt;bad&gt;`,
+	}) {
+		t.Fatalf("expected browser cart with button, got %q", got)
+	}
+	if containsAny(got, []string{`Nendoroid Rin <Touring>`, `utm=<email>`, `Ringkasan Belanja`, `Total Harga`, `Subtotal`, `Harga &amp; stok dikunci`}) {
+		t.Fatalf("expected cart html to escape unsafe content, got %q", got)
+	}
+}
+
 func TestBirthdayTemplatesUseFixedEmailWidth(t *testing.T) {
 	for _, path := range []string{
 		"../../templates/birthday/birthday1.html",

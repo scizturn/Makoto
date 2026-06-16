@@ -110,7 +110,7 @@ func Load() Config {
 		LeftoverCartEnabled:          envBool("MAKOTO_LEFTOVER_CART_ENABLED", false),
 		LeftoverCartQueueName:        env("MAKOTO_LEFTOVER_CART_QUEUE_NAME", "leftover_cart_email_jobs"),
 		LeftoverCartDeadLetterQueue:  env("MAKOTO_LEFTOVER_CART_DEAD_LETTER_QUEUE", "leftover_cart_email_jobs_dead"),
-		LeftoverCartTemplateIDs:      envList("MAKOTO_LEFTOVER_CART_TEMPLATE_IDS", []string{"leftover_cart1.html", "leftover_cart2.html", "leftover_cart3.html"}),
+		LeftoverCartTemplateIDs:      envList("MAKOTO_LEFTOVER_CART_TEMPLATE_IDS", []string{"leftover_cart1.html", "leftover_cart2.html", "leftover_cart3.html", "leftover_cart4.html", "leftover_cart5.html"}),
 		LeftoverCartEmailTemplateDir: os.Getenv("MAKOTO_LEFTOVER_CART_EMAIL_TEMPLATE_DIR"),
 		LeftoverCartEmailSubject:     env("MAKOTO_LEFTOVER_CART_EMAIL_SUBJECT", "Eh {{ .FirstName }}, keranjangmu masih nunggu nih!"),
 		LeftoverCartGreetings: envListPipe("MAKOTO_LEFTOVER_CART_GREETINGS", []string{

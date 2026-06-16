@@ -5,108 +5,58 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="viewport" content="width=720" />
         <title>Ada yang ketinggalan di keranjangmu!</title>
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
     </head>
     <body style="margin:0;padding:0;background:#ffffff;font-family:Nunito,Arial,Helvetica,sans-serif;color:#111827;-webkit-text-size-adjust:none;text-size-adjust:none;">
         <table role="presentation" width="720" cellspacing="0" cellpadding="0" align="center"
-               style="width:720px;min-width:720px;margin:0 auto;border-collapse:collapse;table-layout:fixed;background:#fff8f3 url('https://kyoucdn.id/static/assets/EmailBG.png') repeat top center;">
-        <tr><td style="padding:28px 0;">
+               style="width:720px;min-width:720px;margin:0 auto;border-collapse:collapse;table-layout:fixed;background:#f7f7f7;">
+        <tr><td style="padding:0 0 28px;">
 
-            <!-- ── LOGO ── -->
-            <div style="text-align:center;padding:0 0 20px;">
-                <a href="https://kyou.id/" style="display:inline-block;border:0;text-decoration:none;">
-                    <img src="https://kyoucdn.id/static/assets/brand_logo.png" alt="Kyou.id" width="72"
-                         style="display:block;width:72px;height:auto;border:0;" />
-                </a>
-            </div>
-
-            <!-- ── HERO ── -->
-            <table role="presentation" width="720" cellspacing="0" cellpadding="0" style="width:720px;border-collapse:collapse;">
-            <tr><td style="padding:0 20px;">
-                <table role="presentation" width="680" cellspacing="0" cellpadding="0"
-                       style="width:680px;border-collapse:collapse;border-radius:16px;overflow:hidden;background:linear-gradient(110deg,#ff5a0a,#ff8c42);">
-                    <tr>
-                        <td align="center" valign="top" style="padding:36px 28px 32px;">
-                            <div style="color:#fff3e0;font-size:13px;font-weight:800;letter-spacing:3px;text-transform:uppercase;margin:0 0 10px;">
-                                Keranjang Belanjamu
-                            </div>
-                            <div style="color:#ffffff;font-size:30px;font-weight:900;line-height:1.25;letter-spacing:-0.5px;margin:0;">
-                                {{ .Greeting }}
-                            </div>
-                        </td>
-                    </tr>
+            <!-- ── TOP NAV BAR ── -->
+            <table role="presentation" width="720" cellspacing="0" cellpadding="0" style="width:720px;border-collapse:collapse;background:#ff4b0a;">
+            <tr><td style="padding:0 34px;">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;">
+                <tr>
+                    <td valign="middle" style="padding:22px 0 18px;">
+                        <a href="https://kyou.id/" style="display:inline-block;border:0;text-decoration:none;">
+                            <img src="https://kyoucdn.id/static/assets/brand_logo.png" alt="Kyou.id" width="64"
+                                 style="display:block;width:64px;height:auto;border:0;" />
+                        </a>
+                    </td>
+                    <td valign="middle" align="right" style="padding:22px 0 18px;">
+                        <a href="https://kyou.id/user/cart" style="color:#ffffff;font-size:12px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;">KERANJANGMU</a>
+                    </td>
+                </tr>
                 </table>
             </td></tr>
             </table>
 
-            <!-- ── CART ITEMS ── -->
+            <!-- ── HERO TEXT ── -->
             <table role="presentation" width="720" cellspacing="0" cellpadding="0" style="width:720px;border-collapse:collapse;">
-            <tr><td style="padding:28px 20px 0;">
-                <table role="presentation" width="680" cellspacing="0" cellpadding="0"
-                       style="width:680px;border-collapse:collapse;border-radius:14px;background:#ffffff;border:1px solid #ffe0cc;">
-                    <tr>
-                        <td style="padding:28px 32px 24px;">
-                            <p style="margin:0 0 6px;font-size:13px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:#ff5a0a;">
-                                Masih di keranjangmu
-                            </p>
-                            <h2 style="margin:0 0 24px;font-size:20px;font-weight:900;color:#1a1a1a;line-height:1.3;">
-                                Item-item ini masih setia nunggu kamu nih!
-                            </h2>
-                            {{ .CartHTML }}
-                            <div style="margin:28px 0 0;text-align:center;">
-                                <a href="{{ .CartURL }}" style="display:inline-block;padding:14px 36px;background:#ff5a0a;color:#ffffff;font-size:15px;font-weight:900;text-decoration:none;border-radius:10px;letter-spacing:0.5px;">
-                                    Lihat Keranjangku
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                </table>
-            </td></tr>
-            </table>
-
-            <!-- ── REKOMENDASI ── -->
-            <table role="presentation" width="720" cellspacing="0" cellpadding="0" style="width:720px;border-collapse:collapse;">
-            <tr><td style="padding:20px 20px 0;">
-                <table role="presentation" width="680" cellspacing="0" cellpadding="0"
-                       style="width:680px;border-collapse:collapse;border-radius:14px;background:#ffffff;border:1px solid #e5e7eb;">
-                    <tr>
-                        <td style="padding:28px 22px 24px;">
-                            <p style="margin:0 0 6px;font-size:13px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:#6b7280;">
-                                Rekomendasi buat kamu
-                            </p>
-                            <h2 style="margin:0 0 24px;font-size:18px;font-weight:900;color:#1a1a1a;">
-                                Gas buat nemenin koleksimu!
-                            </h2>
-                            {{ .RecoHTML }}
-                        </td>
-                    </tr>
-                </table>
-            </td></tr>
-            </table>
-
-            <!-- ── CLOSING ── -->
-            <table role="presentation" width="720" cellspacing="0" cellpadding="0" style="width:720px;border-collapse:collapse;">
-            <tr><td style="padding:24px 20px 0;">
-                <table role="presentation" width="680" cellspacing="0" cellpadding="0" style="width:680px;border-collapse:collapse;">
-                    <tr>
-                        <td style="padding:0 12px;text-align:center;">
-                            <p style="margin:0;font-size:15px;font-weight:600;color:#4b5563;line-height:1.6;">
-                                {{ .Closing }}
-                            </p>
-                        </td>
-                    </tr>
-                </table>
-            </td></tr>
-            </table>
-
-            <!-- ── FOOTER ── -->
-            <table role="presentation" width="720" cellspacing="0" cellpadding="0" style="width:720px;border-collapse:collapse;">
-            <tr><td style="padding:28px 20px 0;text-align:center;">
-                <p style="margin:0 0 6px;font-size:12px;color:#9ca3af;">
-                    © 2025 Kyou.id · <a href="https://kyou.id/" style="color:#9ca3af;text-decoration:none;">kyou.id</a>
+            <tr><td style="padding:36px 76px 28px;text-align:center;">
+                <div style="display:inline-block;background:#fff3e0;color:#c2410c;font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase;padding:6px 18px;border-radius:24px;border:1px solid #ffc6ad;margin:0 0 18px;">
+                    HALO, {{ .FirstName }}
+                </div>
+                <div style="color:#2b2b2b;font-size:30px;font-weight:900;line-height:1.25;letter-spacing:-0.5px;margin:0 0 14px;">
+                    Rakmu lagi nyimpenin sesuatu
+                </div>
+                <p style="margin:0;font-size:15px;font-weight:700;color:#5f6368;line-height:1.7;">
+                    Beberapa item masih duduk manis di keranjang — kami simpenin dulu buat kamu.
                 </p>
-                <p style="margin:0;font-size:11px;color:#d1d5db;">
-                    Kamu menerima email ini karena ada item yang masih ada di keranjangmu.
-                </p>
+            </td></tr>
+            </table>
+
+            <!-- ── CART PANEL ── -->
+            <table role="presentation" width="720" cellspacing="0" cellpadding="0" style="width:720px;border-collapse:collapse;">
+            <tr><td style="padding:0 28px 36px;">
+                {{ .CartHTML }}
+            </td></tr>
+            </table>
+
+            <!-- ── RECOMMENDATION PANEL ── -->
+            <table role="presentation" width="720" cellspacing="0" cellpadding="0" style="width:720px;border-collapse:collapse;">
+            <tr><td style="padding:0 28px 36px;">
+                {{ .RecoHTML }}
             </td></tr>
             </table>
 
