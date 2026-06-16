@@ -10,46 +10,48 @@ import (
 )
 
 type Config struct {
-	Mode               string
-	Timezone           string
-	RateLimitPerMinute int
-	DatabaseDSN        string
-	RedisAddr          string
-	RedisPassword      string
-	RedisDB            int
-	QueueName          string
-	DeadLetterQueue    string
-	MaxAttempts        int
-	KirimEmailUsername string
-	KirimEmailAPIToken string
-	KirimEmailBaseURL  string
-	KirimEmailDomain   string
-	KirimEmailValidate bool
-	FromEmail          string
-	FromName           string
-	TemplateIDs        []string
-	EmailTemplateDir   string
-	EmailSubject       string
-	ActionURL          string
-	KyouIDAPIBaseURL   string
-	KyouIDAPIToken     string
-	DiscordWebhookURL  string
-	DiscordEnabled     bool
-	AnniversaryEnabled           bool
-	AnniversaryQueueName         string
-	AnniversaryDeadLetterQueue   string
-	AnniversaryTemplateIDs       []string
-	AnniversaryEmailTemplateDir  string
-	AnniversaryEmailSubject      string
-	AnniversaryEmailSubjects     []string
-	LeftoverCartEnabled          bool
-	LeftoverCartQueueName        string
-	LeftoverCartDeadLetterQueue  string
-	LeftoverCartTemplateIDs      []string
-	LeftoverCartEmailTemplateDir string
-	LeftoverCartEmailSubject     string
-	LeftoverCartGreetings        []string
-	LeftoverCartURL              string
+	Mode                               string
+	Timezone                           string
+	RateLimitPerMinute                 int
+	DatabaseDSN                        string
+	RedisAddr                          string
+	RedisPassword                      string
+	RedisDB                            int
+	QueueName                          string
+	DeadLetterQueue                    string
+	MaxAttempts                        int
+	KirimEmailUsername                 string
+	KirimEmailAPIToken                 string
+	KirimEmailValidationUsername       string
+	KirimEmailValidationAPIToken       string
+	KirimEmailBaseURL                  string
+	KirimEmailDomain                   string
+	KirimEmailValidate                 bool
+	FromEmail                          string
+	FromName                           string
+	TemplateIDs                        []string
+	EmailTemplateDir                   string
+	EmailSubject                       string
+	ActionURL                          string
+	KyouIDAPIBaseURL                   string
+	KyouIDAPIToken                     string
+	DiscordWebhookURL                  string
+	DiscordEnabled                     bool
+	AnniversaryEnabled                 bool
+	AnniversaryQueueName               string
+	AnniversaryDeadLetterQueue         string
+	AnniversaryTemplateIDs             []string
+	AnniversaryEmailTemplateDir        string
+	AnniversaryEmailSubject            string
+	AnniversaryEmailSubjects           []string
+	LeftoverCartEnabled                bool
+	LeftoverCartQueueName              string
+	LeftoverCartDeadLetterQueue        string
+	LeftoverCartTemplateIDs            []string
+	LeftoverCartEmailTemplateDir       string
+	LeftoverCartEmailSubject           string
+	LeftoverCartGreetings              []string
+	LeftoverCartURL                    string
 	DiscountedWishlistEnabled          bool
 	DiscountedWishlistQueueName        string
 	DiscountedWishlistDeadLetterQueue  string
@@ -58,50 +60,52 @@ type Config struct {
 	DiscountedWishlistEmailSubject     string
 	DiscountedWishlistGreetings        []string
 	DiscountedWishlistURL              string
-	WinbackEnabled          bool
-	WinbackQueueName        string
-	WinbackDeadLetterQueue  string
-	WinbackTemplateIDs      []string
-	WinbackEmailTemplateDir string
-	WinbackEmailSubject     string
-	WinbackEmailSubjects    []string
-	WinbackGreetings        []string
-	WinbackActionURL        string
+	WinbackEnabled                     bool
+	WinbackQueueName                   string
+	WinbackDeadLetterQueue             string
+	WinbackTemplateIDs                 []string
+	WinbackEmailTemplateDir            string
+	WinbackEmailSubject                string
+	WinbackEmailSubjects               []string
+	WinbackGreetings                   []string
+	WinbackActionURL                   string
 }
 
 func Load() Config {
 	return Config{
-		Mode:               env("MAKOTO_MODE", "run-once"),
-		Timezone:           env("MAKOTO_TIMEZONE", "Asia/Jakarta"),
-		RateLimitPerMinute: envInt("MAKOTO_RATE_LIMIT_PER_MINUTE", 100),
-		DatabaseDSN:        oldDatabaseDSN(),
-		RedisAddr:          env("REDIS_ADDR", "redis:6379"),
-		RedisPassword:      os.Getenv("REDIS_PASSWORD"),
-		RedisDB:            envIntAllowZero("REDIS_DB", 0),
-		QueueName:          env("MAKOTO_QUEUE_NAME", "birthday_email_jobs"),
-		DeadLetterQueue:    env("MAKOTO_DEAD_LETTER_QUEUE", "birthday_email_jobs_dead"),
-		MaxAttempts:        envInt("MAKOTO_MAX_ATTEMPTS", 3),
-		KirimEmailUsername: os.Getenv("KIRIM_EMAIL_USERNAME"),
-		KirimEmailAPIToken: os.Getenv("KIRIM_EMAIL_API_TOKEN"),
-		KirimEmailBaseURL:  env("KIRIM_EMAIL_BASE_URL", "https://smtp-app.kirim.email"),
-		KirimEmailDomain:   env("KIRIM_EMAIL_DOMAIN", "kyou.id"),
-		KirimEmailValidate: envBool("KIRIM_EMAIL_VALIDATE", false),
-		FromEmail:          env("KIRIM_EMAIL_FROM_EMAIL", "nandayo@kyou.id"),
-		FromName:           env("KIRIM_EMAIL_FROM_NAME", "Kyou.id"),
-		TemplateIDs:        envList("MAKOTO_TEMPLATE_IDS", []string{"tpl_001", "tpl_002", "tpl_003"}),
-		EmailTemplateDir:   os.Getenv("MAKOTO_EMAIL_TEMPLATE_DIR"),
-		EmailSubject:       env("MAKOTO_EMAIL_SUBJECT", "Selamat ulang tahun, {{ .Name }}"),
-		ActionURL:          env("MAKOTO_ACTION_URL", "https://kyou.id/user/my-voucher"),
-		KyouIDAPIBaseURL:   env("KYOU_ID_API_BASE_URL", "https://kyou.id"),
-		KyouIDAPIToken:     os.Getenv("KYOU_ID_API_TOKEN"),
-		DiscordWebhookURL:  os.Getenv("DISCORD_WEBHOOK_URL"),
-		DiscordEnabled:     envBool("DISCORD_WEBHOOK_ENABLED", true),
-		AnniversaryEnabled:          envBool("MAKOTO_ANNIVERSARY_ENABLED", false),
-		AnniversaryQueueName:        env("MAKOTO_ANNIVERSARY_QUEUE_NAME", "anniversary_email_jobs"),
-		AnniversaryDeadLetterQueue:  env("MAKOTO_ANNIVERSARY_DEAD_LETTER_QUEUE", "anniversary_email_jobs_dead"),
-		AnniversaryTemplateIDs:      envList("MAKOTO_ANNIVERSARY_TEMPLATE_IDS", []string{"anniversary1.html", "anniversary2.html", "anniversary3.html"}),
-		AnniversaryEmailTemplateDir: os.Getenv("MAKOTO_ANNIVERSARY_EMAIL_TEMPLATE_DIR"),
-		AnniversaryEmailSubject:     env("MAKOTO_ANNIVERSARY_EMAIL_SUBJECT", "Happy Anniversary, {{ .Name }}! 🎉"),
+		Mode:                         env("MAKOTO_MODE", "run-once"),
+		Timezone:                     env("MAKOTO_TIMEZONE", "Asia/Jakarta"),
+		RateLimitPerMinute:           envInt("MAKOTO_RATE_LIMIT_PER_MINUTE", 100),
+		DatabaseDSN:                  oldDatabaseDSN(),
+		RedisAddr:                    env("REDIS_ADDR", "redis:6379"),
+		RedisPassword:                os.Getenv("REDIS_PASSWORD"),
+		RedisDB:                      envIntAllowZero("REDIS_DB", 0),
+		QueueName:                    env("MAKOTO_QUEUE_NAME", "birthday_email_jobs"),
+		DeadLetterQueue:              env("MAKOTO_DEAD_LETTER_QUEUE", "birthday_email_jobs_dead"),
+		MaxAttempts:                  envInt("MAKOTO_MAX_ATTEMPTS", 3),
+		KirimEmailUsername:           os.Getenv("KIRIM_EMAIL_USERNAME"),
+		KirimEmailAPIToken:           os.Getenv("KIRIM_EMAIL_API_TOKEN"),
+		KirimEmailValidationUsername: env("KIRIM_EMAIL_VALIDATION_USERNAME", os.Getenv("KIRIM_EMAIL_USERNAME")),
+		KirimEmailValidationAPIToken: env("KIRIM_EMAIL_VALIDATION_API_TOKEN", os.Getenv("KIRIM_EMAIL_API_TOKEN")),
+		KirimEmailBaseURL:            env("KIRIM_EMAIL_BASE_URL", "https://smtp-app.kirim.email"),
+		KirimEmailDomain:             env("KIRIM_EMAIL_DOMAIN", "kyou.id"),
+		KirimEmailValidate:           envBool("KIRIM_EMAIL_VALIDATE", false),
+		FromEmail:                    env("KIRIM_EMAIL_FROM_EMAIL", "nandayo@kyou.id"),
+		FromName:                     env("KIRIM_EMAIL_FROM_NAME", "Kyou.id"),
+		TemplateIDs:                  envList("MAKOTO_TEMPLATE_IDS", []string{"tpl_001", "tpl_002", "tpl_003"}),
+		EmailTemplateDir:             os.Getenv("MAKOTO_EMAIL_TEMPLATE_DIR"),
+		EmailSubject:                 env("MAKOTO_EMAIL_SUBJECT", "Selamat ulang tahun, {{ .Name }}"),
+		ActionURL:                    env("MAKOTO_ACTION_URL", "https://kyou.id/user/my-voucher"),
+		KyouIDAPIBaseURL:             env("KYOU_ID_API_BASE_URL", "https://kyou.id"),
+		KyouIDAPIToken:               os.Getenv("KYOU_ID_API_TOKEN"),
+		DiscordWebhookURL:            os.Getenv("DISCORD_WEBHOOK_URL"),
+		DiscordEnabled:               envBool("DISCORD_WEBHOOK_ENABLED", true),
+		AnniversaryEnabled:           envBool("MAKOTO_ANNIVERSARY_ENABLED", false),
+		AnniversaryQueueName:         env("MAKOTO_ANNIVERSARY_QUEUE_NAME", "anniversary_email_jobs"),
+		AnniversaryDeadLetterQueue:   env("MAKOTO_ANNIVERSARY_DEAD_LETTER_QUEUE", "anniversary_email_jobs_dead"),
+		AnniversaryTemplateIDs:       envList("MAKOTO_ANNIVERSARY_TEMPLATE_IDS", []string{"anniversary1.html", "anniversary2.html", "anniversary3.html"}),
+		AnniversaryEmailTemplateDir:  os.Getenv("MAKOTO_ANNIVERSARY_EMAIL_TEMPLATE_DIR"),
+		AnniversaryEmailSubject:      env("MAKOTO_ANNIVERSARY_EMAIL_SUBJECT", "Happy Anniversary, {{ .Name }}! 🎉"),
 		AnniversaryEmailSubjects: envListPipe("MAKOTO_ANNIVERSARY_EMAIL_SUBJECTS", []string{
 			"Cieee anniversary! Cek hadiah dari Kyou buat nambahin khilafanmu!",
 			"Ada kado spesial buat anniversary ke-{{ .Years }}, {{ .FirstName }}!",
@@ -120,7 +124,7 @@ func Load() Config {
 			"Psst {{ .FirstName }}, keranjangmu masih nunggu kamu balik!",
 			"{{ .FirstName }}, sayang banget kalau sampai kehabisan!",
 		}),
-		LeftoverCartURL: env("MAKOTO_LEFTOVER_CART_URL", "https://kyou.id/user/cart"),
+		LeftoverCartURL:                    env("MAKOTO_LEFTOVER_CART_URL", "https://kyou.id/user/cart"),
 		DiscountedWishlistEnabled:          envBool("MAKOTO_DISCOUNTED_WISHLIST_ENABLED", false),
 		DiscountedWishlistQueueName:        env("MAKOTO_DISCOUNTED_WISHLIST_QUEUE_NAME", "discounted_wishlist_email_jobs"),
 		DiscountedWishlistDeadLetterQueue:  env("MAKOTO_DISCOUNTED_WISHLIST_DEAD_LETTER_QUEUE", "discounted_wishlist_email_jobs_dead"),
@@ -134,13 +138,13 @@ func Load() Config {
 			"Woi {{ .FirstName }}, item wishlist favoritmu lagi ada promo!",
 			"{{ .FirstName }}, jangan sampai nyesel — wishlistmu lagi diskon sekarang!",
 		}),
-		DiscountedWishlistURL: env("MAKOTO_DISCOUNTED_WISHLIST_URL", "https://kyou.id/user/wishlist"),
+		DiscountedWishlistURL:   env("MAKOTO_DISCOUNTED_WISHLIST_URL", "https://kyou.id/user/wishlist"),
 		WinbackEnabled:          envBool("MAKOTO_WINBACK_ENABLED", false),
 		WinbackQueueName:        env("MAKOTO_WINBACK_QUEUE_NAME", "winback_email_jobs"),
 		WinbackDeadLetterQueue:  env("MAKOTO_WINBACK_DEAD_LETTER_QUEUE", "winback_email_jobs_dead"),
 		WinbackTemplateIDs:      envList("MAKOTO_WINBACK_TEMPLATE_IDS", []string{"winback1.html", "winback2.html", "winback3.html"}),
 		WinbackEmailTemplateDir: os.Getenv("MAKOTO_WINBACK_EMAIL_TEMPLATE_DIR"),
-		WinbackEmailSubject: env("MAKOTO_WINBACK_EMAIL_SUBJECT", "{{ .FirstName }}, kita kangen kamu nih!"),
+		WinbackEmailSubject:     env("MAKOTO_WINBACK_EMAIL_SUBJECT", "{{ .FirstName }}, kita kangen kamu nih!"),
 		WinbackEmailSubjects: envListPipe("MAKOTO_WINBACK_EMAIL_SUBJECTS", []string{
 			"{{ .FirstName }}, kita kangen kamu nih!",
 			"Ada voucher spesial buat kamu, {{ .FirstName }}!",

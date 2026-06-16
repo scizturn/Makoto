@@ -315,7 +315,21 @@ func buildEmail(cfg config.Config) (email.Sender, email.Validator) {
 		log.Print("KIRIM_EMAIL_VALIDATE is false; skipping strict email validation")
 		return client, email.AllowAllValidator{}
 	}
-	return client, client
+	if cfg.KirimEmailValidationUsername == "" || cfg.KirimEmailValidationAPIToken == "" {
+		log.Print("Kirim.email validation credentials are empty; using send credentials for strict email validation")
+		return client, client
+	}
+	log.Printf("Kirim.email validation config: username=%s token_len=%d token_sha256=%s",
+		redactForLog(cfg.KirimEmailValidationUsername),
+		len(cfg.KirimEmailValidationAPIToken),
+		shortSHA256(cfg.KirimEmailValidationAPIToken),
+	)
+	validatorClient := email.KirimClient{
+		BaseURL:  cfg.KirimEmailBaseURL,
+		Username: cfg.KirimEmailValidationUsername,
+		APIToken: cfg.KirimEmailValidationAPIToken,
+	}
+	return client, validatorClient
 }
 
 func redactForLog(value string) string {
