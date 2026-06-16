@@ -2,6 +2,7 @@ package email
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -112,4 +113,26 @@ func TestKirimClientValidatesEmailFromStrictValidationData(t *testing.T) {
 	if gotAuthUser != "validation-user" || gotAuthPass != "validation-token" {
 		t.Fatalf("unexpected basic auth: %q %q", gotAuthUser, gotAuthPass)
 	}
+}
+
+func TestFailOpenValidatorAllowsProviderErrors(t *testing.T) {
+	validator := FailOpenValidator{
+		Validator: errorValidator{err: errors.New("provider 500")},
+	}
+
+	valid, err := validator.Validate(context.Background(), "ruby@example.com")
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if !valid {
+		t.Fatal("expected fail-open validation to allow email")
+	}
+}
+
+type errorValidator struct {
+	err error
+}
+
+func (v errorValidator) Validate(context.Context, string) (bool, error) {
+	return false, v.err
 }

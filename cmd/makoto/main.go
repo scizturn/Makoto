@@ -324,12 +324,16 @@ func buildEmail(cfg config.Config) (email.Sender, email.Validator) {
 		len(cfg.KirimEmailValidationAPIToken),
 		shortSHA256(cfg.KirimEmailValidationAPIToken),
 	)
-	validatorClient := email.KirimClient{
+	var validator email.Validator = email.KirimClient{
 		BaseURL:  cfg.KirimEmailBaseURL,
 		Username: cfg.KirimEmailValidationUsername,
 		APIToken: cfg.KirimEmailValidationAPIToken,
 	}
-	return client, validatorClient
+	if cfg.KirimEmailValidationFailOpen {
+		log.Print("KIRIM_EMAIL_VALIDATION_FAIL_OPEN is true; validation provider errors will not block sending")
+		validator = email.FailOpenValidator{Validator: validator}
+	}
+	return client, validator
 }
 
 func redactForLog(value string) string {

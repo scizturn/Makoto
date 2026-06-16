@@ -24,6 +24,7 @@ type Config struct {
 	KirimEmailAPIToken                 string
 	KirimEmailValidationUsername       string
 	KirimEmailValidationAPIToken       string
+	KirimEmailValidationFailOpen       bool
 	KirimEmailBaseURL                  string
 	KirimEmailDomain                   string
 	KirimEmailValidate                 bool
@@ -87,6 +88,7 @@ func Load() Config {
 		KirimEmailAPIToken:           os.Getenv("KIRIM_EMAIL_API_TOKEN"),
 		KirimEmailValidationUsername: env("KIRIM_EMAIL_VALIDATION_USERNAME", os.Getenv("KIRIM_EMAIL_USERNAME")),
 		KirimEmailValidationAPIToken: env("KIRIM_EMAIL_VALIDATION_API_TOKEN", os.Getenv("KIRIM_EMAIL_API_TOKEN")),
+		KirimEmailValidationFailOpen: envBool("KIRIM_EMAIL_VALIDATION_FAIL_OPEN", false),
 		KirimEmailBaseURL:            env("KIRIM_EMAIL_BASE_URL", "https://smtp-app.kirim.email"),
 		KirimEmailDomain:             env("KIRIM_EMAIL_DOMAIN", "kyou.id"),
 		KirimEmailValidate:           envBool("KIRIM_EMAIL_VALIDATE", false),

@@ -27,3 +27,16 @@ type AllowAllValidator struct{}
 func (AllowAllValidator) Validate(context.Context, string) (bool, error) {
 	return true, nil
 }
+
+type FailOpenValidator struct {
+	Validator Validator
+}
+
+func (v FailOpenValidator) Validate(ctx context.Context, address string) (bool, error) {
+	valid, err := v.Validator.Validate(ctx, address)
+	if err != nil {
+		log.Printf("email validation failed open: email=%s err=%v", address, err)
+		return true, nil
+	}
+	return valid, nil
+}
