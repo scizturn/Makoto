@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"crypto/sha256"
 	"errors"
 	"fmt"
 	"log"
@@ -296,6 +297,14 @@ func buildEmail(cfg config.Config) (email.Sender, email.Validator) {
 		log.Print("Kirim.email credentials are empty; using local logging sender and allow-all validator")
 		return email.LoggingSender{}, email.AllowAllValidator{}
 	}
+	log.Printf("Kirim.email config: base_url=%s domain=%s validate=%t username=%s token_len=%d token_sha256=%s",
+		cfg.KirimEmailBaseURL,
+		cfg.KirimEmailDomain,
+		cfg.KirimEmailValidate,
+		redactForLog(cfg.KirimEmailUsername),
+		len(cfg.KirimEmailAPIToken),
+		shortSHA256(cfg.KirimEmailAPIToken),
+	)
 
 	client := email.KirimClient{
 		BaseURL:  cfg.KirimEmailBaseURL,
@@ -307,6 +316,24 @@ func buildEmail(cfg config.Config) (email.Sender, email.Validator) {
 		return client, email.AllowAllValidator{}
 	}
 	return client, client
+}
+
+func redactForLog(value string) string {
+	if value == "" {
+		return "<empty>"
+	}
+	if len(value) <= 8 {
+		return fmt.Sprintf("<redacted len=%d>", len(value))
+	}
+	return fmt.Sprintf("%s...%s(len=%d)", value[:4], value[len(value)-4:], len(value))
+}
+
+func shortSHA256(value string) string {
+	if value == "" {
+		return "<empty>"
+	}
+	sum := sha256.Sum256([]byte(value))
+	return fmt.Sprintf("%x", sum[:4])
 }
 
 type senderConfig struct {
