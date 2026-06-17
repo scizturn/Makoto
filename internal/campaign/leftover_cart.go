@@ -72,47 +72,118 @@ func (c LeftoverCartCampaign) BuildMergeData(user domain.User, cartItems []domai
 		"cart_items": cartItems,
 		"reco_items": recoItems,
 		"cart_html":  RenderCartItemsHTMLWithURL(cartItems, c.CartURL),
-		"reco_html":  RenderLeftoverRecoHTML(recoItems),
+		"reco_html":  RenderLeftoverRecoHTML(recoItems, firstName),
 		"cart_url":   c.CartURL,
 		"closing":    c.Closing,
 	}
 }
 
-func RenderLeftoverRecoHTML(items []domain.FYPItem) string {
+func RenderLeftoverRecoHTML(items []domain.FYPItem, firstName string) string {
 	if len(items) == 0 {
 		return ""
+	}
+	firstName = strings.TrimSpace(firstName)
+	if firstName == "" {
+		firstName = "Teman Kyou"
 	}
 
 	theme := strings.TrimSpace(items[0].SeriesName)
 	if theme == "" {
 		theme = "koleksimu"
-	} else {
-		theme = theme + "-mu"
 	}
+	safeFirstName := html.EscapeString(firstName)
+	safeTheme := html.EscapeString(theme)
 
 	var builder strings.Builder
 	builder.WriteString(fmt.Sprintf(`
-<table role="presentation" width="100%%" cellspacing="0" cellpadding="0" style="width:100%%;border-collapse:collapse;">
+<table role="presentation" width="100%%" cellspacing="0" cellpadding="0" style="width:100%%;border-collapse:separate;background:#f4f4f5;border:1px solid #d6d6d6;border-radius:16px;overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,0.10);">
   <tr>
-    <td align="center" style="padding:0 0 20px;">
-      <p style="margin:0 0 8px;color:#ff4b0a;font-size:13px;font-weight:900;letter-spacing:3px;text-transform:uppercase;">Pilihan Buat Nemenin</p>
-      <h2 style="margin:0;color:#2b2b2b;font-size:28px;font-weight:900;line-height:1.25;">Tiga ini paling pas di rak %s</h2>
-      <div style="display:inline-block;margin:20px 0 0;padding:8px 20px;background:#ffffff;border:1px solid #e5e7eb;border-radius:24px;box-shadow:0 4px 12px rgba(0,0,0,0.10);color:#3f3f46;font-size:14px;font-weight:900;">buat nemenin koleksimu</div>
+    <td style="padding:18px 22px;background:#0ea5d8;">
+      <table role="presentation" width="100%%" cellspacing="0" cellpadding="0" style="width:100%%;border-collapse:collapse;">
+        <tr>
+          <td width="58" valign="middle" style="width:58px;">
+            <div style="width:46px;height:46px;border-radius:50%%;background:#fff3e0;border:3px solid #ffffff;text-align:center;line-height:46px;overflow:hidden;">
+              <img src="https://kyoucdn.id/static/assets/brand_logo.png" alt="Kyou Care" width="36" style="display:inline-block;width:36px;height:auto;border:0;vertical-align:middle;">
+            </div>
+          </td>
+          <td valign="middle">
+            <p style="margin:0 0 3px;color:#ffffff;font-size:18px;font-weight:900;line-height:1.1;">Kyou Care <span style="display:inline-block;margin-left:8px;padding:4px 10px;border-radius:14px;background:#7dd3fc;color:#ffffff;font-size:12px;font-weight:900;vertical-align:middle;">KOUKA</span></p>
+            <p style="margin:0;color:#ffffff;font-size:13px;font-weight:900;">● Online · biasanya balas &lt; 5 menit</p>
+          </td>
+          <td width="24" align="right" valign="top" style="width:24px;color:#ffffff;font-size:28px;font-weight:900;line-height:24px;">−</td>
+        </tr>
+      </table>
     </td>
   </tr>
-</table>`, html.EscapeString(theme)))
+  <tr>
+    <td style="padding:22px 22px 0;">
+      <div style="margin:0 auto 14px;width:72px;border-radius:14px;background:#e5e5e5;color:#7a7a7a;font-size:12px;font-weight:900;line-height:26px;text-align:center;">Hari ini</div>
+      <table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;margin:0 0 12px 58px;">
+        <tr><td style="padding:13px 16px;background:#ffffff;border-radius:18px;box-shadow:0 1px 3px rgba(0,0,0,0.08);color:#2b2b2b;font-size:15px;font-weight:700;line-height:1.45;">Hai <strong>%s</strong>! Aku Kouka dari Kyou Care.</td></tr>
+      </table>
+      <table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;margin:0 0 12px 58px;">
+        <tr><td style="padding:13px 16px;background:#ffffff;border-radius:18px;box-shadow:0 1px 3px rgba(0,0,0,0.08);color:#2b2b2b;font-size:15px;font-weight:700;line-height:1.6;">Aku barusan lihat item incaranmu udah mendarat di rak kamu — selamat, ya! <span style="display:inline-block;margin-left:6px;padding:7px 12px;border-radius:12px;background:#f1f1f1;border:1px solid #e2e2e2;color:#3f3f46;font-size:13px;font-weight:900;">%s</span></td></tr>
+      </table>
+      <table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;margin:0 0 12px 58px;">
+        <tr><td style="padding:13px 16px;background:#ffffff;border-radius:18px;box-shadow:0 1px 3px rgba(0,0,0,0.08);color:#2b2b2b;font-size:15px;font-weight:700;line-height:1.55;">Biar dia nggak sendirian, aku siapin beberapa temen dari seri &amp; kategori yang mirip. Cek pelan-pelan aja ya:</td></tr>
+      </table>
+    </td>
+  </tr>
+`, safeFirstName, safeTheme))
 
 	for index, item := range items {
 		if index >= 3 {
 			break
 		}
-		builder.WriteString(renderLeftoverRecoCard(item, index))
+		builder.WriteString(renderLeftoverChatRecoItem(item, index))
 	}
 
+	builder.WriteString(`
+  <tr>
+    <td style="padding:0 22px 20px;">
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse;">
+        <tr>
+          <td width="58" valign="middle" style="width:58px;">
+            <div style="width:42px;height:42px;border-radius:50%;background:#fff3e0;border:3px solid #ff4b0a;text-align:center;line-height:42px;overflow:hidden;">
+              <img src="https://kyoucdn.id/static/assets/brand_logo.png" alt="Kouka" width="32" style="display:inline-block;width:32px;height:auto;border:0;vertical-align:middle;">
+            </div>
+          </td>
+          <td valign="middle">
+            <div style="display:inline-block;padding:10px 18px;border-radius:20px;background:#ffffff;box-shadow:0 1px 3px rgba(0,0,0,0.08);">
+              <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#cfcfcf;margin-right:5px;"></span>
+              <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#cfcfcf;margin-right:5px;"></span>
+              <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#cfcfcf;"></span>
+            </div>
+          </td>
+        </tr>
+      </table>
+      <table role="presentation" cellspacing="0" cellpadding="0" align="center" style="border-collapse:collapse;margin:16px auto 0;">
+        <tr>
+          <td style="padding:0 6px;"><a href="https://kyou.id/" style="display:inline-block;padding:0 18px;border:1px solid #ff4b0a;border-radius:20px;color:#ff4b0a;font-size:13px;font-weight:900;line-height:36px;text-decoration:none;">Lihat semua rekomendasi</a></td>
+          <td style="padding:0 6px;"><a href="https://kyou.id/" style="display:inline-block;padding:0 18px;border:1px solid #ff4b0a;border-radius:20px;color:#ff4b0a;font-size:13px;font-weight:900;line-height:36px;text-decoration:none;">Seri favoritmu</a></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  <tr>
+    <td style="padding:14px 18px;background:#ffffff;border-top:1px solid #e5e5e5;">
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse;">
+        <tr>
+          <td valign="middle" style="padding-right:12px;">
+            <div style="height:46px;border-radius:24px;background:#f4f4f5;border:1px solid #dddddd;color:#b0b0b0;font-size:14px;font-weight:700;line-height:46px;padding-left:20px;">Ketik pesan ke Kyou Care...</div>
+          </td>
+          <td width="50" valign="middle" align="right" style="width:50px;">
+            <div style="width:46px;height:46px;border-radius:50%;background:#ff4b0a;color:#ffffff;font-size:22px;font-weight:900;line-height:46px;text-align:center;">›</div>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>`)
 	return builder.String()
 }
 
-func renderLeftoverRecoCard(item domain.FYPItem, index int) string {
+func renderLeftoverChatRecoItem(item domain.FYPItem, index int) string {
 	name, version := cartItemDisplayName(item.Name, item.SeriesName)
 	if version != "" {
 		name = strings.TrimSpace(name + " " + version)
@@ -121,69 +192,41 @@ func renderLeftoverRecoCard(item domain.FYPItem, index int) string {
 	safeSeries := html.EscapeString(displayManufacturerOrFallback(item.SeriesName, "Kyou Pick"))
 	safeImageURL := html.EscapeString(item.ImageURL)
 	safeURL := html.EscapeString(itemURL(item.ID))
+	priceFormatted := formatPrice(item.Price)
 
 	statusLabel := "Pre-Order"
+	statusBg := "#64748b"
 	status := strings.ToUpper(strings.TrimSpace(item.Status))
 	if status == "READY" || status == "READY STOCK" {
 		statusLabel = "Ready Stock"
+		statusBg = "#22c55e"
 	}
 
-	cardBorder := "#e5e7eb"
-	cardBg := "#ffffff"
-	align := "left"
-	imageFirst := true
-	if index%2 == 1 {
-		cardBorder = "#ffc9b5"
-		cardBg = "#fff7f3"
-		align = "right"
-		imageFirst = false
-	}
-
-	imageHTML := fmt.Sprintf(`
-<td width="150" valign="middle" style="width:150px;padding:%s;">
-  <div style="position:relative;width:132px;height:132px;border-radius:10px;overflow:hidden;background:#f3f4f6;">
-    <img src="%s" alt="%s" width="132" height="132" style="display:block;width:132px;height:132px;object-fit:cover;border:0;">
-  </div>
-  <div style="margin:-124px 0 94px 10px;width:78px;background:#64748b;color:#ffffff;font-size:12px;font-weight:900;line-height:24px;text-align:center;border-radius:4px;">%s</div>
-</td>`, recoImagePadding(imageFirst), safeImageURL, safeName, html.EscapeString(statusLabel))
+	imageHTML := fmt.Sprintf(`<img src="%s" alt="%s" width="72" height="72" style="display:block;width:72px;height:72px;object-fit:cover;border:0;border-radius:6px;">`, safeImageURL, safeName)
 	if safeImageURL == "" {
-		imageHTML = fmt.Sprintf(`
-<td width="150" valign="middle" style="width:150px;padding:%s;">
-  <div style="width:132px;height:132px;border-radius:10px;background:#f3f4f6;"></div>
-</td>`, recoImagePadding(imageFirst))
-	}
-
-	textHTML := fmt.Sprintf(`
-<td valign="middle" align="%s" style="padding:%s;">
-  <p style="margin:0 0 5px;color:#a3a3a3;font-size:13px;font-weight:900;letter-spacing:1px;text-transform:uppercase;">%s</p>
-  <h3 style="margin:0 0 8px;color:#2b2b2b;font-size:20px;font-weight:900;line-height:1.25;">%s<span style="color:#ff4b0a;">®</span></h3>
-  <p style="margin:0 0 16px;color:#4b5563;font-size:15px;font-weight:700;line-height:1.55;">%s</p>
-  <a href="%s" style="display:inline-block;background:#ff4b0a;border-bottom:4px solid #c93a00;border-radius:22px;color:#ffffff;font-size:14px;font-weight:900;letter-spacing:1px;line-height:42px;padding:0 28px;text-decoration:none;text-transform:uppercase;">Belanja Sekarang</a>
-</td>`, align, recoTextPadding(imageFirst), safeSeries, safeName, leftoverRecoDescription(index), safeURL)
-
-	firstCell, secondCell := imageHTML, textHTML
-	if !imageFirst {
-		firstCell, secondCell = textHTML, imageHTML
+		imageHTML = `<div style="width:72px;height:72px;border-radius:6px;background:#f3f4f6;"></div>`
 	}
 
 	return fmt.Sprintf(`
-<table role="presentation" width="100%%" cellspacing="0" cellpadding="0" style="width:100%%;border-collapse:separate;margin:0 0 16px;background:%s;border:1px solid %s;border-radius:14px;box-shadow:0 3px 12px rgba(0,0,0,0.08);overflow:hidden;">
-  <tr>%s%s</tr>
-</table>`, cardBg, cardBorder, firstCell, secondCell)
-}
-
-func recoImagePadding(imageFirst bool) string {
-	if imageFirst {
-		return "16px 0 16px 18px"
-	}
-	return "16px 18px 16px 0"
-}
-
-func recoTextPadding(imageFirst bool) string {
-	if imageFirst {
-		return "18px 22px 18px 20px"
-	}
-	return "18px 20px 18px 22px"
+  <tr>
+    <td style="padding:0 22px 10px;">
+      <table role="presentation" width="540" cellspacing="0" cellpadding="0" align="right" style="width:540px;border-collapse:separate;background:#ffffff;border:1px solid #d8d8d8;border-radius:10px;box-shadow:0 2px 5px rgba(0,0,0,0.08);">
+        <tr>
+          <td width="86" valign="middle" style="width:86px;padding:12px 0 12px 12px;">%s</td>
+          <td valign="middle" style="padding:12px 10px;">
+            <p style="margin:0 0 4px;color:#a3a3a3;font-size:12px;font-weight:900;text-transform:uppercase;">%s</p>
+            <p style="margin:0 0 7px;color:#2b2b2b;font-size:16px;font-weight:900;line-height:1.25;">%s</p>
+            <span style="display:inline-block;margin-right:10px;padding:4px 10px;background:%s;color:#ffffff;border-radius:6px;font-size:12px;font-weight:900;">%s</span>
+            <span style="color:#2b2b2b;font-size:14px;font-weight:900;">IDR %s</span>
+          </td>
+          <td width="34" valign="middle" align="center" style="width:34px;"><a href="%s" style="display:block;color:#ff4b0a;font-size:32px;font-weight:900;text-decoration:none;">›</a></td>
+        </tr>
+      </table>
+      <table role="presentation" width="540" cellspacing="0" cellpadding="0" align="right" style="width:540px;border-collapse:collapse;">
+        <tr><td style="padding:8px 0 0;color:#3f3f46;font-size:13px;font-weight:700;line-height:1.45;"><strong style="color:#ff4b0a;">Kouka:</strong> %s</td></tr>
+      </table>
+    </td>
+  </tr>`, imageHTML, safeSeries, safeName, statusBg, html.EscapeString(statusLabel), priceFormatted, safeURL, leftoverRecoDescription(index))
 }
 
 func leftoverRecoDescription(index int) string {
