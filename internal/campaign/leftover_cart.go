@@ -321,14 +321,52 @@ func leftoverHistoricalCharacterName(itemName string, seriesName string) string 
 	if version != "" {
 		name = strings.TrimSpace(name + " " + version)
 	}
+	name = stripLeftoverCharacterPrefix(name)
 	words := strings.Fields(name)
 	for index, word := range words {
 		normalized := strings.Trim(strings.ToLower(word), ":-_/")
 		if leftoverProductTypeWords[normalized] && index+1 < len(words) {
-			return strings.Join(words[index+1:], " ")
+			before := strings.Join(words[:index], " ")
+			after := strings.Join(words[index+1:], " ")
+			if strings.TrimSpace(before) == "" || leftoverGenericProductPrefix(before) {
+				return after
+			}
+			return before
+		}
+		if leftoverProductTypeWords[normalized] && index > 0 {
+			return strings.Join(words[:index], " ")
 		}
 	}
 	return strings.TrimSpace(name)
+}
+
+func stripLeftoverCharacterPrefix(name string) string {
+	prefixes := []string{
+		"hololive English ",
+		"hololive Indonesia ",
+		"hololive Japan ",
+		"hololive ",
+	}
+	for _, prefix := range prefixes {
+		if strings.HasPrefix(strings.ToLower(name), strings.ToLower(prefix)) {
+			return strings.TrimSpace(name[len(prefix):])
+		}
+	}
+	return name
+}
+
+func leftoverGenericProductPrefix(text string) bool {
+	words := strings.Fields(strings.ToLower(text))
+	if len(words) == 0 {
+		return true
+	}
+	for _, word := range words {
+		word = strings.Trim(word, ":-_/")
+		if !leftoverGenericProductWords[word] {
+			return false
+		}
+	}
+	return true
 }
 
 var leftoverProductTypeWords = map[string]bool{
@@ -344,6 +382,15 @@ var leftoverProductTypeWords = map[string]bool{
 	"stand":      true,
 	"tapestry":   true,
 	"wallscroll": true,
+}
+
+var leftoverGenericProductWords = map[string]bool{
+	"big":     true,
+	"chibi":   true,
+	"cute":    true,
+	"desktop": true,
+	"kuripan": true,
+	"premium": true,
 }
 
 func koukaAvatarHTML() string {

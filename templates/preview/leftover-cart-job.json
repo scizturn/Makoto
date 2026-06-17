@@ -1,67 +1,73 @@
 {
-  "job_id": "preview-leftover-cart-2026-06-17-101654-user-31877",
-  "user_id": "31877",
-  "date": "2026-06-17T10:16:54.774269+07:00",
+  "job_id": "preview-leftover-cart-2026-06-17-212524-user-630",
+  "user_id": "630",
+  "date": "2026-06-17T21:25:24.018736+07:00",
   "user": {
-    "id": "31877",
-    "name": "Abimanyu Nugroho",
-    "email": "manyu555abi@gmail.com",
-    "birthday": "2001-08-06T00:00:00Z",
+    "id": "630",
+    "name": "erico chiavas",
+    "email": "kyoukeiyasake@gmail.com",
+    "birthday": "1997-12-02T00:00:00Z",
     "is_active": true
   },
   "historical_item": {
-    "name": "Kuripan Plushie Awa Subaru - Girls Band Cry (17cm)",
-    "image_url": "https://kyoucdn.id/items/kuripan-plushie-awa-subaru-girls-band-cry-17cm-e664c409.jpg.webp",
-    "order_date": "2026-06-15T21:18:36Z",
+    "name": "hololive English Ninomae Ina'nis Plushie Keychain - Longue Costume Ver.",
+    "image_url": "https://kyoucdn.id/items/hololive-english-ninomae-inanis-plushie-keychain-longue-costume-ver-4d877fab.jpg.webp",
+    "order_date": "2026-06-10T23:38:03Z",
     "days_ago": 0
   },
   "cart_items": [
     {
-      "id": "221228",
-      "name": "[Exclusive Sale] Nendoroid Shorekeeper - Wuthering Waves",
-      "url": "https://kyou.id/items/221228/",
-      "image_url": "https://kyoucdn.id/items/nendoroid-shorekeeper-wuthering-waves-bb2bf021.jpg.webp",
-      "price": 860000,
+      "id": "225394",
+      "name": "hololive Japan Shirakami Fubuki 8th Anniversary SKNB Factory Delivery Bag",
+      "url": "https://kyou.id/items/225394/",
+      "image_url": "https://kyoucdn.id/items/hololive-japan-shirakami-fubuki-8th-anniversary-sknb-factory-delivery-bag-6d143fbb.jpg.webp",
+      "price": 1250000,
       "status": "PO",
-      "manufacturer": "Good Smile Company",
-      "series_name": "Wuthering Waves",
-      "po_deadline": "2026-06-23T00:00:00Z",
-      "po_release_at": "2026-10-01T00:00:00Z"
+      "manufacturer": "Cover",
+      "series_name": "hololive production",
+      "po_deadline": "2026-07-06T00:00:00Z",
+      "po_release_at": "2027-01-01T00:00:00Z"
     }
   ],
   "reco_items": [
     {
-      "id": "212863",
-      "name": "Ebizuka Tomo Chibi / Q Version Keychain - Girls Band Cry",
+      "id": "225408",
+      "name": "hololive Japan Takane Lui Birthday 2026 Pouch",
       "kind": "character",
-      "series_id": "6014",
-      "image_url": "https://kyoucdn.id/items/ebizuka-tomo-chibi-q-version-keychain-girls-band-cry-c81e8c6003e82079e6a9e4fa545ea605f705b95b91abaa8eba790d9a58ebd168.jpg.webp",
-      "price": 100000,
-      "status": "ready",
-      "manufacturer": "Dimension Poptown",
-      "series_name": "Girls Band Cry"
+      "series_id": "4413",
+      "image_url": "https://kyoucdn.id/items/hololive-japan-takane-lui-birthday-2026-pouch-ff37c528.jpg.webp",
+      "price": 820000,
+      "status": "PO",
+      "manufacturer": "Cover",
+      "series_name": "hololive production",
+      "po_deadline": "2026-07-06T00:00:00Z",
+      "po_release_at": "2027-02-01T00:00:00Z"
     },
     {
-      "id": "212862",
-      "name": "Awa Subaru Chibi / Q Version Keychain - Girls Band Cry",
+      "id": "225407",
+      "name": "hololive Japan Takane Lui Birthday 2026 2 Pin badge Set",
       "kind": "character",
-      "series_id": "6014",
-      "image_url": "https://kyoucdn.id/items/awa-subaru-chibi-q-version-keychain-girls-band-cry-1912c070ff160461efcef03e94e812bbe983a12a7a64c707a941ea5fb1c0d0df.jpg.webp",
-      "price": 100000,
-      "status": "ready",
-      "manufacturer": "Dimension Poptown",
-      "series_name": "Girls Band Cry"
+      "series_id": "4413",
+      "image_url": "https://kyoucdn.id/items/hololive-japan-takane-lui-birthday-2026-2-pin-badge-set-74e10bfb.jpg.webp",
+      "price": 600000,
+      "status": "PO",
+      "manufacturer": "Cover",
+      "series_name": "hololive production",
+      "po_deadline": "2026-07-06T00:00:00Z",
+      "po_release_at": "2027-02-01T00:00:00Z"
     },
     {
-      "id": "212861",
-      "name": "Kawaragi Momoka Chibi / Q Version Keychain - Girls Band Cry",
+      "id": "225406",
+      "name": "hololive Japan Takane Lui Birthday 2026 Acrylic Diorama Stand",
       "kind": "character",
-      "series_id": "6014",
-      "image_url": "https://kyoucdn.id/items/kawaragi-momoka-chibi-q-version-keychain-girls-band-cry-f78a362544f4cf6d049d2256fb65fb4036ac190061825eb860b0882286ef3198.jpg.webp",
-      "price": 100000,
-      "status": "ready",
-      "manufacturer": "Dimension Poptown",
-      "series_name": "Girls Band Cry"
+      "series_id": "4413",
+      "image_url": "https://kyoucdn.id/items/hololive-japan-takane-lui-birthday-2026-acrylic-diorama-stand-1eb23988.jpg.webp",
+      "price": 720000,
+      "status": "PO",
+      "manufacturer": "Cover",
+      "series_name": "hololive production",
+      "po_deadline": "2026-07-06T00:00:00Z",
+      "po_release_at": "2027-02-01T00:00:00Z"
     }
   ],
   "attempt": 1
