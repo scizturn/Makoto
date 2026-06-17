@@ -233,7 +233,7 @@ func RenderLeftoverRecoHTML(items []domain.FYPItem, firstName string, historical
           </td>
           <td valign="middle">
             <p style="margin:0 0 3px;color:#ffffff;font-size:18px;font-weight:900;line-height:1.1;">Kyou.id <span style="display:inline-block;margin-left:8px;padding:4px 10px;border-radius:14px;background:#7dd3fc;color:#ffffff;font-size:12px;font-weight:900;vertical-align:middle;">KOUKA</span></p>
-            <p style="margin:0;color:#ffffff;font-size:13px;font-weight:900;">● Online · biasanya balas &lt; 5 menit</p>
+            <p style="margin:0;color:#ffffff;font-size:13px;font-weight:900;">● Online</p>
           </td>
           <td width="24" align="right" valign="top" style="width:24px;color:#ffffff;font-size:28px;font-weight:900;line-height:24px;">−</td>
         </tr>
