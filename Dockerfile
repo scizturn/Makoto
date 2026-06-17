@@ -6,7 +6,7 @@ COPY go.mod go.sum* ./
 RUN go mod download
 
 COPY . .
-RUN go build -o /out/makoto ./cmd/makoto
+RUN CGO_ENABLED=0 go build -o /out/makoto ./cmd/makoto
 
 FROM alpine:3.20
 
