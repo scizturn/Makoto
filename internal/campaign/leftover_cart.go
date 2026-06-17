@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"html"
 	"math/rand"
+	"net/url"
 	"strconv"
 	"strings"
 	texttemplate "text/template"
@@ -218,6 +219,7 @@ func RenderLeftoverRecoHTML(items []domain.FYPItem, firstName string, historical
 	}
 	safeFirstName := html.EscapeString(firstName)
 	safeTheme := html.EscapeString(theme)
+	safeSeriesSearchURL := html.EscapeString(leftoverSeriesSearchURL(theme))
 
 	var builder strings.Builder
 	builder.WriteString(fmt.Sprintf(`
@@ -233,7 +235,7 @@ func RenderLeftoverRecoHTML(items []domain.FYPItem, firstName string, historical
           </td>
           <td valign="middle">
             <p style="margin:0 0 3px;color:#ffffff;font-size:18px;font-weight:900;line-height:1.1;">Kyou.id <span style="display:inline-block;margin-left:8px;padding:4px 10px;border-radius:14px;background:#7dd3fc;color:#ffffff;font-size:12px;font-weight:900;vertical-align:middle;">KOUKA</span></p>
-            <p style="margin:0;color:#ffffff;font-size:13px;font-weight:900;">● Online</p>
+            <p style="margin:0;color:#ffffff;font-size:13px;font-weight:900;"><span style="color:#22c55e;">●</span> Online</p>
           </td>
           <td width="24" align="right" valign="top" style="width:24px;color:#ffffff;font-size:28px;font-weight:900;line-height:24px;">−</td>
         </tr>
@@ -244,26 +246,32 @@ func RenderLeftoverRecoHTML(items []domain.FYPItem, firstName string, historical
     <td style="padding:18px 16px 20px;background-image:url('https://images2.imgbox.com/11/6f/MewvOpFD_o.png');background-size:cover;background-position:center top;background-repeat:no-repeat;background-color:rgba(255,255,255,0.5);background-blend-mode:lighten;">
       <div style="margin:0 auto 14px;width:72px;border-radius:14px;background:#e5e5e5;color:#7a7a7a;font-size:12px;font-weight:900;line-height:26px;text-align:center;">Hari ini</div>
       <table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;margin:0 0 12px 58px;">
-        <tr><td style="padding:13px 16px;background:#ffffff;border-radius:18px;box-shadow:0 1px 3px rgba(0,0,0,0.08);color:#2b2b2b;font-size:15px;font-weight:700;line-height:1.45;">Hai <strong>%s</strong>! Aku Kouka dari Kyou.id.</td></tr>
+        <tr><td style="padding:13px 16px;background:#ffffff;border-radius:18px;box-shadow:0 1px 3px rgba(0,0,0,0.08);color:#2b2b2b;font-size:15px;font-weight:700;line-height:1.45;">Hai, <strong>%s</strong>! Kouka di sini.</td></tr>
       </table>
       <table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;margin:0 0 12px 58px;">
-        <tr><td style="padding:13px 16px;background:#ffffff;border-radius:18px;box-shadow:0 1px 3px rgba(0,0,0,0.08);color:#2b2b2b;font-size:15px;font-weight:700;line-height:1.6;">Aku inget kamu pernah bawa pulang</td></tr>
+        <tr><td style="padding:13px 16px;background:#ffffff;border-radius:18px;box-shadow:0 1px 3px rgba(0,0,0,0.08);color:#2b2b2b;font-size:15px;font-weight:700;line-height:1.6;">Masih inget sama koleksimu yang ini?</td></tr>
       </table>
 `, safeFirstName))
 	builder.WriteString(renderLeftoverHistoricalCard(historicalItem))
 	builder.WriteString(`
       <table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;margin:0 0 12px 58px;">
-        <tr><td style="padding:13px 16px;background:#ffffff;border-radius:18px;box-shadow:0 1px 3px rgba(0,0,0,0.08);color:#2b2b2b;font-size:15px;font-weight:700;line-height:1.55;">Biar koleksimu makin nyambung, aku siapin beberapa temen dari seri atau kategori yang mirip. Cek pelan-pelan aja ya:</td></tr>
+        <tr><td style="padding:13px 16px;background:#ffffff;border-radius:18px;box-shadow:0 1px 3px rgba(0,0,0,0.08);color:#2b2b2b;font-size:15px;font-weight:700;line-height:1.55;">Pilihan kamu keren banget!</td></tr>
+      </table>
+      <table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;margin:0 0 12px 58px;">
+        <tr><td style="padding:13px 16px;background:#ffffff;border-radius:18px;box-shadow:0 1px 3px rgba(0,0,0,0.08);color:#2b2b2b;font-size:15px;font-weight:700;line-height:1.55;">Kouka udah intip-intip koleksimu, dan ini beberapa rekomendasi item yang cocok buat menemaninya:</td></tr>
       </table>`)
 
 	for index, item := range items {
 		if index >= 3 {
 			break
 		}
-		builder.WriteString(renderLeftoverChatRecoItem(item, index))
+		builder.WriteString(renderLeftoverChatRecoItem(item))
 	}
 
 	builder.WriteString(`
+      <table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;margin:4px 0 12px 58px;">
+        <tr><td style="padding:13px 16px;background:#ffffff;border-radius:18px;box-shadow:0 1px 3px rgba(0,0,0,0.08);color:#2b2b2b;font-size:15px;font-weight:700;line-height:1.55;">Kouka tunggu kabar baiknya ya, semoga makin happy sama koleksinya!</td></tr>
+      </table>
       <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse;margin:2px 0 12px;">
         <tr>
           <td width="58" valign="middle" style="width:58px;">` + koukaAvatarHTML() + `</td>
@@ -278,14 +286,22 @@ func RenderLeftoverRecoHTML(items []domain.FYPItem, firstName string, historical
       </table>
       <table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;margin:0 0 0 58px;">
         <tr>
-          <td style="padding:0 6px;"><a href="https://kyou.id/" style="display:inline-block;padding:0 18px;border:1px solid #ff4b0a;border-radius:20px;color:#ff4b0a;font-size:13px;font-weight:900;line-height:36px;background:white;text-decoration:none;">Lihat semua rekomendasi</a></td>
-          <td style="padding:0 6px;"><a href="https://kyou.id/" style="display:inline-block;padding:0 18px;border:1px solid #ff4b0a;border-radius:20px;color:#ff4b0a;font-size:13px;font-weight:900;line-height:36px;background:white;text-decoration:none;">Seri ` + safeTheme + `</a></td>
+          <td style="padding:0 6px;"><a href="https://kyou.id/search?page=1%2C40&amp;sort=kyou_search_score&amp;sold=false" style="display:inline-block;padding:0 18px;border:1px solid #ff4b0a;border-radius:20px;color:#ff4b0a;font-size:13px;font-weight:900;line-height:36px;background:white;text-decoration:none;">Rekomendasi lainnya</a></td>
+          <td style="padding:0 6px;"><a href="` + safeSeriesSearchURL + `" style="display:inline-block;padding:0 18px;border:1px solid #ff4b0a;border-radius:20px;color:#ff4b0a;font-size:13px;font-weight:900;line-height:36px;background:white;text-decoration:none;">` + safeTheme + `</a></td>
         </tr>
       </table>
     </td>
   </tr>
 </table>`)
 	return builder.String()
+}
+
+func leftoverSeriesSearchURL(seriesName string) string {
+	seriesName = strings.TrimSpace(seriesName)
+	if seriesName == "" {
+		return "https://kyou.id/search?page=1%2C40&sort=kyou_search_score&sold=false"
+	}
+	return "https://kyou.id/search?page=1%2C40&series=" + url.QueryEscape(seriesName) + "&sort=kyou_search_score&sold=false"
 }
 
 func koukaAvatarHTML() string {
@@ -325,7 +341,7 @@ func renderLeftoverHistoricalCard(item domain.HistoricalItem) string {
       </table>`, imageHTML, safeName)
 }
 
-func renderLeftoverChatRecoItem(item domain.FYPItem, index int) string {
+func renderLeftoverChatRecoItem(item domain.FYPItem) string {
 	name, version := cartItemDisplayName(item.Name, item.SeriesName)
 	if version != "" {
 		name = strings.TrimSpace(name + " " + version)
@@ -364,27 +380,7 @@ func renderLeftoverChatRecoItem(item domain.FYPItem, index int) string {
         </tr>
         <tr><td colspan="3" align="center" style="padding:10px 0;border-top:1px solid #e5e5e5;"><a href="%s" style="color:#ff4b0a;font-size:13px;font-weight:900;text-decoration:none;">Lihat produk ›</a></td></tr>
       </table>
-      <table role="presentation" width="100%%" cellspacing="0" cellpadding="0" style="width:100%%;border-collapse:collapse;margin:0 0 12px;">
-        <tr>
-          <td width="58" valign="middle" style="width:58px;">%s</td>
-          <td valign="middle">
-            <div style="display:inline-block;max-width:500px;padding:12px 16px;border-radius:18px;background:#ffffff;box-shadow:0 1px 3px rgba(0,0,0,0.08);color:#3f3f46;font-size:14px;font-weight:700;line-height:1.45;"><strong style="color:#ff4b0a;">Kouka:</strong> %s</div>
-          </td>
-        </tr>
-      </table>
-`, imageHTML, safeSeries, safeName, statusBg, html.EscapeString(statusLabel), priceFormatted, safeURL, safeURL, koukaAvatarHTML(), leftoverRecoDescription(index))
-}
-
-func leftoverRecoDescription(index int) string {
-	descriptions := []string{
-		"Sama-sama figure karakter, biar rak koleksimu makin rame.",
-		"Satu kategori pilihan yang pas disandingin sama item incaranmu.",
-		"Ready stock, langsung bisa dikirim nemenin koleksimu.",
-	}
-	if index < len(descriptions) {
-		return descriptions[index]
-	}
-	return descriptions[0]
+`, imageHTML, safeSeries, safeName, statusBg, html.EscapeString(statusLabel), priceFormatted, safeURL, safeURL)
 }
 
 func RenderCartItemsHTML(items []domain.WishlistItem) string {
