@@ -66,10 +66,11 @@ type viewData struct {
 	ActionURL          string
 	Closing            string
 	// Leftover Cart fields
-	Greeting string
-	CartHTML template.HTML
-	RecoHTML template.HTML
-	CartURL  string
+	Greeting   string
+	CartHTML   template.HTML
+	RecoHTML   template.HTML
+	FooterHTML template.HTML
+	CartURL    string
 	// Discounted Wishlist fields
 	FillHTML    template.HTML
 	WishlistURL string
@@ -91,6 +92,7 @@ func viewDataFromMergeData(data map[string]any) viewData {
 		Greeting:           stringValue(data["greeting"]),
 		CartHTML:           template.HTML(stringValue(data["cart_html"])),
 		RecoHTML:           template.HTML(stringValue(data["reco_html"])),
+		FooterHTML:         template.HTML(stringValue(data["footer_html"])),
 		CartURL:            stringValue(data["cart_url"]),
 		FillHTML:           template.HTML(stringValue(data["fill_html"])),
 		WishlistURL:        stringValue(data["wishlist_url"]),

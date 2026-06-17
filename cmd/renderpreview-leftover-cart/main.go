@@ -19,7 +19,7 @@ func main() {
 	outputPath := env("MAKOTO_PREVIEW_HTML_PATH", "templates/preview/leftover-cart-preview.html")
 	templateDir := env("MAKOTO_LEFTOVER_CART_EMAIL_TEMPLATE_DIR", "templates/leftover_cart")
 	subject := env("MAKOTO_LEFTOVER_CART_EMAIL_SUBJECT", "Eh {{ .FirstName }}, keranjangmu masih nunggu nih!")
-	cartURL := env("MAKOTO_LEFTOVER_CART_URL", "https://kyou.id/user/cart")
+	cartURL := env("MAKOTO_LEFTOVER_CART_URL", "https://kyou.id/user/history")
 
 	payload, err := os.ReadFile(jobPath)
 	if err != nil {
@@ -38,7 +38,7 @@ func main() {
 
 	greetingTpl := "Hei {{ .FirstName }}, kamu lagi sibuk ya?"
 	greeting := lc.RenderGreeting(greetingTpl, job.User)
-	mergeData := lc.BuildMergeData(job.User, job.CartItems, job.RecoItems, greeting)
+	mergeData := lc.BuildMergeData(job.User, job.CartItems, job.RecoItems, job.HistoricalItem, greeting)
 
 	renderer := emailtemplate.FileRenderer{Dir: templateDir, Subject: subject}
 

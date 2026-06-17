@@ -59,26 +59,151 @@ func (c LeftoverCartCampaign) RenderGreeting(tpl string, user domain.User) strin
 	return buf.String()
 }
 
-func (c LeftoverCartCampaign) BuildMergeData(user domain.User, cartItems []domain.WishlistItem, recoItems []domain.FYPItem, greeting string) map[string]any {
+func (c LeftoverCartCampaign) BuildMergeData(user domain.User, cartItems []domain.WishlistItem, recoItems []domain.FYPItem, historicalItem domain.HistoricalItem, greeting string) map[string]any {
 	firstName := user.Name
 	if i := strings.Index(user.Name, " "); i > 0 {
 		firstName = user.Name[:i]
 	}
 
 	return map[string]any{
-		"name":       user.Name,
-		"first_name": firstName,
-		"greeting":   greeting,
-		"cart_items": cartItems,
-		"reco_items": recoItems,
-		"cart_html":  RenderCartItemsHTMLWithURL(cartItems, c.CartURL),
-		"reco_html":  RenderLeftoverRecoHTML(recoItems, firstName),
-		"cart_url":   c.CartURL,
-		"closing":    c.Closing,
+		"name":            user.Name,
+		"first_name":      firstName,
+		"greeting":        greeting,
+		"cart_items":      cartItems,
+		"historical_item": historicalItem,
+		"reco_items":      recoItems,
+		"cart_html":       RenderCartItemsHTMLWithURL(cartItems, c.CartURL),
+		"reco_html":       RenderLeftoverRecoHTML(recoItems, firstName, historicalItem),
+		"footer_html":     RenderMemberversaryFooterHTML(c.Closing),
+		"cart_url":        c.CartURL,
+		"closing":         c.Closing,
 	}
 }
 
-func RenderLeftoverRecoHTML(items []domain.FYPItem, firstName string) string {
+func RenderMemberversaryFooterHTML(closing string) string {
+	closing = strings.TrimSpace(closing)
+	if closing == "" {
+		closing = "Sampai ketemu lagi di Kyou!"
+	}
+	return strings.Replace(memberversaryFooterHTML, "{{closing}}", html.EscapeString(closing), 1)
+}
+
+const memberversaryFooterHTML = `
+            <!-- ── ABOUT KYOU IMAGE ── -->
+            <table role="presentation" width="720" cellspacing="0" cellpadding="0"
+                   style="width:720px;border-collapse:collapse;background:#2c2422;border-radius:20px 20px 0 0;overflow:hidden;">
+            <tr><td style="padding:40px 52px 2px 52px;line-height:0;font-size:0;">
+                <img src="https://kyoucdn.id/static/assets/about_kyou.jpg" alt="About Kyou" width="616"
+                     style="display:block;width:616px;height:auto;border:0;border-radius:10px;" />
+            </td></tr>
+            </table>
+
+            <!-- ── 2 CTA BUTTONS ── -->
+            <table role="presentation" width="720" cellspacing="0" cellpadding="0"
+                   style="width:720px;border-collapse:collapse;background:#2c2422;">
+            <tr><td style="padding:32px 37px 32px;">
+                <table role="presentation" width="646" cellspacing="0" cellpadding="0"
+                       style="width:646px;border-collapse:collapse;">
+                <tr>
+                    <td width="50%" style="padding:0 4px 0 0;">
+                        <a href="https://kyou.id/user/wishlist"
+                           style="display:block;padding:20px 18px 18px;border:4px solid #5a351d;border-radius:999px;background:#ff5a0a;box-shadow:0 7px 0 #5a351d;color:#ffffff;font-size:16px;font-weight:900;letter-spacing:1px;line-height:1;text-align:center;text-decoration:none;">
+                            <img src="https://kyoucdn.id/static/assets/k-mail.png" alt="" width="24" height="24"
+                                 style="display:inline-block;width:24px;height:24px;margin:0 8px 0 0;border:0;vertical-align:middle;" />
+                            <span style="display:inline-block;vertical-align:middle;">Cek wishlist kamu lainnya!</span>
+                        </a>
+                    </td>
+                    <td width="50%" style="padding:0 0 0 4px;">
+                        <a href="https://chat.whatsapp.com/E3kCtsnUfN70QYuMCtPgpM"
+                           style="display:block;padding:20px 18px 18px;border:4px solid #5a351d;border-radius:999px;background:#2bd166;box-shadow:0 7px 0 #5a351d;color:#ffffff;font-size:16px;font-weight:900;letter-spacing:1px;line-height:1;text-align:center;text-decoration:none;">
+                            <img src="https://kyoucdn.id/static/assets/wa-email.png" alt="" width="24" height="24"
+                                 style="display:inline-block;width:24px;height:24px;margin:0 8px 0 0;border:0;vertical-align:middle;" />
+                            <span style="display:inline-block;vertical-align:middle;">Join WA Kamar Wibu!</span>
+                        </a>
+                    </td>
+                </tr>
+                </table>
+            </td></tr>
+            </table>
+
+            <!-- ── TOKO FISIK ── -->
+            <table role="presentation" width="720" cellspacing="0" cellpadding="0"
+                   style="width:720px;border-collapse:collapse;">
+            <tr><td style="padding:36px;background:#2c2422;border-top:1px dashed #7a3b14;border-bottom:1px dashed #7a3b14;text-align:center;">
+                <h2 style="margin:0 0 24px;color:#ffffff;font-size:34px;font-weight:900;line-height:1.15;">
+                    Mampir ke Toko Fisik Kyou!
+                </h2>
+                <table role="presentation" width="648" cellspacing="0" cellpadding="0"
+                       style="width:648px;border-collapse:collapse;">
+                <tr>
+                    <td width="25%" valign="top" style="width:25%;padding:0 7px 12px;">
+                        <a href="https://kyou.id/stores/alpha" style="display:block;text-decoration:none;">
+                            <img src="https://kyoucdn.id/static/assets/alpha.png" alt="Alpha Store" width="145"
+                                 style="display:block;width:145px;height:auto;border:0;border-radius:10px;" />
+                        </a>
+                    </td>
+                    <td width="25%" valign="top" style="width:25%;padding:0 7px 12px;">
+                        <a href="https://kyou.id/stores/beta" style="display:block;text-decoration:none;">
+                            <img src="https://kyoucdn.id/static/assets/beta.png" alt="Beta Store" width="145"
+                                 style="display:block;width:145px;height:auto;border:0;border-radius:10px;" />
+                        </a>
+                    </td>
+                    <td width="25%" valign="top" style="width:25%;padding:0 7px 12px;">
+                        <a href="https://kyou.id/stores/gamma" style="display:block;text-decoration:none;">
+                            <img src="https://kyoucdn.id/static/assets/gamma.png" alt="Gamma Store" width="145"
+                                 style="display:block;width:145px;height:auto;border:0;border-radius:10px;" />
+                        </a>
+                    </td>
+                    <td width="25%" valign="top" style="width:25%;padding:0 7px 12px;">
+                        <a href="https://maps.app.goo.gl/kwAtN6H3Kf7cVSA49" style="display:block;text-decoration:none;">
+                            <img src="https://kyoucdn.id/static/assets/delta.png" alt="Delta Store" width="145"
+                                 style="display:block;width:145px;height:auto;border:0;border-radius:10px;" />
+                        </a>
+                    </td>
+                </tr>
+                </table>
+            </td></tr>
+            </table>
+
+            <!-- ── SOCIAL MEDIA ── -->
+            <table role="presentation" width="720" cellspacing="0" cellpadding="0"
+                   style="width:720px;border-collapse:collapse;">
+            <tr><td style="padding:18px 36px 46px;background:#2c2422;border-top:1px dashed #7a3b14;border-bottom:1px dashed #7a3b14;text-align:center;">
+                <h2 style="margin:0 0 32px;color:#ffffff;font-size:40px;font-weight:900;line-height:1.15;">
+                    Interact with Kyou!
+                </h2>
+                <table role="presentation" cellspacing="0" cellpadding="0" align="center"
+                       style="margin:0 auto;border-collapse:collapse;">
+                <tr>
+                    <td style="padding:0 8px;"><a href="https://api.whatsapp.com/send/?phone=6281770092014&amp;text=Halo+Kyou"><img src="https://kyoucdn.id/static/assets/whatsapp.jpg" alt="WhatsApp" width="58" height="58" style="display:block;width:58px;height:58px;border:0;border-radius:999px;" /></a></td>
+                    <td style="padding:0 8px;"><a href="https://www.facebook.com/kyouhobbyshop"><img src="https://kyoucdn.id/static/assets/facebook.jpg" alt="Facebook" width="58" height="58" style="display:block;width:58px;height:58px;border:0;border-radius:999px;" /></a></td>
+                    <td style="padding:0 8px;"><a href="https://www.messenger.com/t/1466845816917156/"><img src="https://kyoucdn.id/static/assets/messenger.jpg" alt="Messenger" width="58" height="58" style="display:block;width:58px;height:58px;border:0;border-radius:999px;" /></a></td>
+                    <td style="padding:0 8px;"><a href="https://www.youtube.com/@ChannelWibunyaKyou"><img src="https://kyoucdn.id/static/assets/youtube.jpg" alt="YouTube" width="58" height="58" style="display:block;width:58px;height:58px;border:0;border-radius:999px;" /></a></td>
+                    <td style="padding:0 8px;"><a href="https://www.tiktok.com/@kyou.id?lang=en"><img src="https://kyoucdn.id/static/assets/tiktok.jpg" alt="TikTok" width="58" height="58" style="display:block;width:58px;height:58px;border:0;border-radius:999px;" /></a></td>
+                    <td style="padding:0 8px;"><a href="https://kyou.id"><img src="https://kyoucdn.id/static/assets/kyou.jpg" alt="Kyou" width="58" height="58" style="display:block;width:58px;height:58px;border:0;border-radius:999px;" /></a></td>
+                </tr>
+                </table>
+            </td></tr>
+            </table>
+
+            <!-- ── DARK CLOSING ── -->
+            <table role="presentation" width="720" cellspacing="0" cellpadding="0"
+                   style="width:720px;border-collapse:collapse;background:#2c2422;">
+            <tr><td style="padding:36px;border-top:1px dashed #7a3b14;border-bottom:1px dashed #7a3b14;text-align:center;">
+                <img src="https://kyoucdn.id/static/assets/brand_logo.png" alt="Kyou.id" width="132"
+                     style="display:block;width:132px;height:auto;margin:0 auto 28px;border:0;" />
+                <p style="margin:0 0 8px;color:#ffffff;font-size:20px;font-weight:900;line-height:1.2;">{{closing}}</p>
+                <p style="margin:0 0 0;color:rgba(255,255,255,0.5);font-size:14px;font-weight:500;line-height:1.4;">
+                    ©2014–2026 Kyou Hobby Shop
+                </p>
+                <p style="margin:0;color:rgba(255,255,255,0.4);font-size:14px;font-weight:500;line-height:1.55;">
+                    Kamu menerima email ini karena terdaftar sebagai Teman Kyou.
+                </p>
+            </td></tr>
+            </table>
+`
+
+func RenderLeftoverRecoHTML(items []domain.FYPItem, firstName string, historicalItem domain.HistoricalItem) string {
 	if len(items) == 0 {
 		return ""
 	}
@@ -96,7 +221,7 @@ func RenderLeftoverRecoHTML(items []domain.FYPItem, firstName string) string {
 
 	var builder strings.Builder
 	builder.WriteString(fmt.Sprintf(`
-<table role="presentation" width="100%%" cellspacing="0" cellpadding="0" style="width:100%%;border-collapse:separate;background:#f4f4f5;border:1px solid #d6d6d6;border-radius:16px;overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,0.10);">
+<table role="presentation" width="100%%" cellspacing="0" cellpadding="0" style="width:100%%;border-collapse:collapse;background:#f4f4f5;border:1px solid #d6d6d6;border-radius:16px;overflow:hidden;">
   <tr>
     <td style="padding:18px 22px;background:#0ea5d8;">
       <table role="presentation" width="100%%" cellspacing="0" cellpadding="0" style="width:100%%;border-collapse:collapse;">
@@ -116,20 +241,20 @@ func RenderLeftoverRecoHTML(items []domain.FYPItem, firstName string) string {
     </td>
   </tr>
   <tr>
-    <td style="padding:22px 22px 0;">
+    <td style="padding:18px 16px 20px;">
       <div style="margin:0 auto 14px;width:72px;border-radius:14px;background:#e5e5e5;color:#7a7a7a;font-size:12px;font-weight:900;line-height:26px;text-align:center;">Hari ini</div>
       <table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;margin:0 0 12px 58px;">
         <tr><td style="padding:13px 16px;background:#ffffff;border-radius:18px;box-shadow:0 1px 3px rgba(0,0,0,0.08);color:#2b2b2b;font-size:15px;font-weight:700;line-height:1.45;">Hai <strong>%s</strong>! Aku Kouka dari Kyou Care.</td></tr>
       </table>
       <table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;margin:0 0 12px 58px;">
-        <tr><td style="padding:13px 16px;background:#ffffff;border-radius:18px;box-shadow:0 1px 3px rgba(0,0,0,0.08);color:#2b2b2b;font-size:15px;font-weight:700;line-height:1.6;">Aku barusan lihat item incaranmu udah mendarat di rak kamu — selamat, ya! <span style="display:inline-block;margin-left:6px;padding:7px 12px;border-radius:12px;background:#f1f1f1;border:1px solid #e2e2e2;color:#3f3f46;font-size:13px;font-weight:900;">%s</span></td></tr>
+        <tr><td style="padding:13px 16px;background:#ffffff;border-radius:18px;box-shadow:0 1px 3px rgba(0,0,0,0.08);color:#2b2b2b;font-size:15px;font-weight:700;line-height:1.6;">Aku inget kamu pernah bawa pulang</td></tr>
       </table>
+`, safeFirstName))
+	builder.WriteString(renderLeftoverHistoricalCard(historicalItem))
+	builder.WriteString(`
       <table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;margin:0 0 12px 58px;">
-        <tr><td style="padding:13px 16px;background:#ffffff;border-radius:18px;box-shadow:0 1px 3px rgba(0,0,0,0.08);color:#2b2b2b;font-size:15px;font-weight:700;line-height:1.55;">Biar dia nggak sendirian, aku siapin beberapa temen dari seri &amp; kategori yang mirip. Cek pelan-pelan aja ya:</td></tr>
-      </table>
-    </td>
-  </tr>
-`, safeFirstName, safeTheme))
+        <tr><td style="padding:13px 16px;background:#ffffff;border-radius:18px;box-shadow:0 1px 3px rgba(0,0,0,0.08);color:#2b2b2b;font-size:15px;font-weight:700;line-height:1.55;">Biar koleksimu makin nyambung, aku siapin beberapa temen dari seri atau kategori yang mirip. Cek pelan-pelan aja ya:</td></tr>
+      </table>`)
 
 	for index, item := range items {
 		if index >= 3 {
@@ -139,17 +264,11 @@ func RenderLeftoverRecoHTML(items []domain.FYPItem, firstName string) string {
 	}
 
 	builder.WriteString(`
-  <tr>
-    <td style="padding:0 22px 20px;">
-      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse;">
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse;margin:2px 0 12px;">
         <tr>
-          <td width="58" valign="middle" style="width:58px;">
-            <div style="width:42px;height:42px;border-radius:50%;background:#fff3e0;border:3px solid #ff4b0a;text-align:center;line-height:42px;overflow:hidden;">
-              <img src="https://kyoucdn.id/static/assets/brand_logo.png" alt="Kouka" width="32" style="display:inline-block;width:32px;height:auto;border:0;vertical-align:middle;">
-            </div>
-          </td>
+          <td width="58" valign="middle" style="width:58px;">` + koukaAvatarHTML() + `</td>
           <td valign="middle">
-            <div style="display:inline-block;padding:10px 18px;border-radius:20px;background:#ffffff;box-shadow:0 1px 3px rgba(0,0,0,0.08);">
+            <div style="display:inline-block;padding:8px 16px;border-radius:18px;background:#ffffff;box-shadow:0 1px 3px rgba(0,0,0,0.08);">
               <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#cfcfcf;margin-right:5px;"></span>
               <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#cfcfcf;margin-right:5px;"></span>
               <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#cfcfcf;"></span>
@@ -157,30 +276,53 @@ func RenderLeftoverRecoHTML(items []domain.FYPItem, firstName string) string {
           </td>
         </tr>
       </table>
-      <table role="presentation" cellspacing="0" cellpadding="0" align="center" style="border-collapse:collapse;margin:16px auto 0;">
+      <table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;margin:0 0 0 58px;">
         <tr>
           <td style="padding:0 6px;"><a href="https://kyou.id/" style="display:inline-block;padding:0 18px;border:1px solid #ff4b0a;border-radius:20px;color:#ff4b0a;font-size:13px;font-weight:900;line-height:36px;text-decoration:none;">Lihat semua rekomendasi</a></td>
-          <td style="padding:0 6px;"><a href="https://kyou.id/" style="display:inline-block;padding:0 18px;border:1px solid #ff4b0a;border-radius:20px;color:#ff4b0a;font-size:13px;font-weight:900;line-height:36px;text-decoration:none;">Seri favoritmu</a></td>
-        </tr>
-      </table>
-    </td>
-  </tr>
-  <tr>
-    <td style="padding:14px 18px;background:#ffffff;border-top:1px solid #e5e5e5;">
-      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse;">
-        <tr>
-          <td valign="middle" style="padding-right:12px;">
-            <div style="height:46px;border-radius:24px;background:#f4f4f5;border:1px solid #dddddd;color:#b0b0b0;font-size:14px;font-weight:700;line-height:46px;padding-left:20px;">Ketik pesan ke Kyou Care...</div>
-          </td>
-          <td width="50" valign="middle" align="right" style="width:50px;">
-            <div style="width:46px;height:46px;border-radius:50%;background:#ff4b0a;color:#ffffff;font-size:22px;font-weight:900;line-height:46px;text-align:center;">›</div>
-          </td>
+          <td style="padding:0 6px;"><a href="https://kyou.id/" style="display:inline-block;padding:0 18px;border:1px solid #ff4b0a;border-radius:20px;color:#ff4b0a;font-size:13px;font-weight:900;line-height:36px;text-decoration:none;">Seri ` + safeTheme + `</a></td>
         </tr>
       </table>
     </td>
   </tr>
 </table>`)
 	return builder.String()
+}
+
+func koukaAvatarHTML() string {
+	return `<div style="width:42px;height:42px;border-radius:50%;background:#fff3e0;border:3px solid #ff4b0a;text-align:center;line-height:42px;overflow:hidden;">
+  <img src="https://kyoucdn.id/static/assets/brand_logo.png" alt="Kouka" width="32" style="display:inline-block;width:32px;height:auto;border:0;vertical-align:middle;">
+</div>`
+}
+
+func renderLeftoverHistoricalCard(item domain.HistoricalItem) string {
+	name := strings.TrimSpace(item.Name)
+	if name == "" {
+		return ""
+	}
+	displayName, version := cartItemDisplayName(name, "")
+	if version != "" {
+		displayName = strings.TrimSpace(displayName + " " + version)
+	}
+	safeName := html.EscapeString(displayName)
+	safeImageURL := html.EscapeString(item.ImageURL)
+	imageHTML := fmt.Sprintf(`<img src="%s" alt="%s" width="72" height="72" style="display:block;width:72px;height:72px;object-fit:cover;border:0;border-radius:6px;">`, safeImageURL, safeName)
+	if safeImageURL == "" {
+		imageHTML = `<div style="width:72px;height:72px;border-radius:6px;background:#f3f4f6;"></div>`
+	}
+
+	return fmt.Sprintf(`
+      <table role="presentation" width="540" cellspacing="0" cellpadding="0" style="width:540px;border-collapse:separate;margin:0 0 12px 58px;background:#ffffff;border:1px solid #b7e4c7;border-radius:14px;box-shadow:0 2px 5px rgba(0,0,0,0.08);overflow:hidden;">
+        <tr><td colspan="2" style="padding:8px 14px;background:#e8f8ef;border-bottom:1px solid #b7e4c7;color:#22a65a;font-size:12px;font-weight:900;letter-spacing:.6px;text-transform:uppercase;">◇ Koleksi Kamu</td></tr>
+        <tr>
+          <td width="86" valign="middle" style="width:86px;padding:12px 0 12px 12px;">%s</td>
+          <td valign="middle" style="padding:12px 14px;">
+            <p style="margin:0 0 3px;color:#a3a3a3;font-size:12px;font-weight:900;">Koleksi sebelumnya</p>
+            <p style="margin:0 0 7px;color:#2b2b2b;font-size:16px;font-weight:900;line-height:1.25;">%s</p>
+            <span style="display:inline-block;padding:4px 10px;background:#22c55e;color:#ffffff;border-radius:7px;font-size:12px;font-weight:900;">Koleksi kamu</span>
+            <span style="margin-left:8px;color:#3f3f46;font-size:13px;font-weight:900;">Udah di rakmu</span>
+          </td>
+        </tr>
+      </table>`, imageHTML, safeName)
 }
 
 func renderLeftoverChatRecoItem(item domain.FYPItem, index int) string {
@@ -208,9 +350,8 @@ func renderLeftoverChatRecoItem(item domain.FYPItem, index int) string {
 	}
 
 	return fmt.Sprintf(`
-  <tr>
-    <td style="padding:0 22px 10px;">
-      <table role="presentation" width="540" cellspacing="0" cellpadding="0" align="right" style="width:540px;border-collapse:separate;background:#ffffff;border:1px solid #d8d8d8;border-radius:10px;box-shadow:0 2px 5px rgba(0,0,0,0.08);">
+      <table role="presentation" width="540" cellspacing="0" cellpadding="0" style="width:540px;border-collapse:separate;margin:0 0 8px 58px;background:#ffffff;border:1px solid #f1c9bb;border-radius:14px;box-shadow:0 2px 5px rgba(0,0,0,0.08);overflow:hidden;">
+        <tr><td colspan="3" style="padding:8px 14px;background:#fff1ec;border-bottom:1px solid #f1c9bb;color:#ff4b0a;font-size:12px;font-weight:900;letter-spacing:.6px;text-transform:uppercase;">◇ Produk - Kyou Hobby Shop</td></tr>
         <tr>
           <td width="86" valign="middle" style="width:86px;padding:12px 0 12px 12px;">%s</td>
           <td valign="middle" style="padding:12px 10px;">
@@ -221,12 +362,17 @@ func renderLeftoverChatRecoItem(item domain.FYPItem, index int) string {
           </td>
           <td width="34" valign="middle" align="center" style="width:34px;"><a href="%s" style="display:block;color:#ff4b0a;font-size:32px;font-weight:900;text-decoration:none;">›</a></td>
         </tr>
+        <tr><td colspan="3" align="center" style="padding:10px 0;border-top:1px solid #e5e5e5;"><a href="%s" style="color:#ff4b0a;font-size:13px;font-weight:900;text-decoration:none;">Lihat produk ›</a></td></tr>
       </table>
-      <table role="presentation" width="540" cellspacing="0" cellpadding="0" align="right" style="width:540px;border-collapse:collapse;">
-        <tr><td style="padding:8px 0 0;color:#3f3f46;font-size:13px;font-weight:700;line-height:1.45;"><strong style="color:#ff4b0a;">Kouka:</strong> %s</td></tr>
+      <table role="presentation" width="100%%" cellspacing="0" cellpadding="0" style="width:100%%;border-collapse:collapse;margin:0 0 12px;">
+        <tr>
+          <td width="58" valign="middle" style="width:58px;">%s</td>
+          <td valign="middle">
+            <div style="display:inline-block;max-width:500px;padding:12px 16px;border-radius:18px;background:#ffffff;box-shadow:0 1px 3px rgba(0,0,0,0.08);color:#3f3f46;font-size:14px;font-weight:700;line-height:1.45;"><strong style="color:#ff4b0a;">Kouka:</strong> %s</div>
+          </td>
+        </tr>
       </table>
-    </td>
-  </tr>`, imageHTML, safeSeries, safeName, statusBg, html.EscapeString(statusLabel), priceFormatted, safeURL, leftoverRecoDescription(index))
+`, imageHTML, safeSeries, safeName, statusBg, html.EscapeString(statusLabel), priceFormatted, safeURL, safeURL, koukaAvatarHTML(), leftoverRecoDescription(index))
 }
 
 func leftoverRecoDescription(index int) string {
@@ -242,7 +388,7 @@ func leftoverRecoDescription(index int) string {
 }
 
 func RenderCartItemsHTML(items []domain.WishlistItem) string {
-	return RenderCartItemsHTMLWithURL(items, "https://kyou.id/user/cart")
+	return RenderCartItemsHTMLWithURL(items, "https://kyou.id/user/history")
 }
 
 func RenderCartItemsHTMLWithURL(items []domain.WishlistItem, cartURL string) string {
@@ -250,7 +396,7 @@ func RenderCartItemsHTMLWithURL(items []domain.WishlistItem, cartURL string) str
 		return `<p style="margin:0;color:#6b7280;">Keranjangmu lagi nunggu kamu balik nih!</p>`
 	}
 	if strings.TrimSpace(cartURL) == "" {
-		cartURL = "https://kyou.id/user/cart"
+		cartURL = "https://kyou.id/user/history"
 	}
 
 	totalItems := len(items)
@@ -274,7 +420,7 @@ func RenderCartItemsHTMLWithURL(items []domain.WishlistItem, cartURL string) str
         </td>
         <td valign="middle" style="padding:0;">
           <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:18px;padding:12px 18px;display:block;width:518px;">
-            <span style="font-size:14px;font-weight:900;color:#334155;">kyou.id/keranjang</span>
+            <span style="font-size:14px;font-weight:900;color:#334155;">https://kyou.id/user/history</span>
           </div>
         </td>
       </tr>

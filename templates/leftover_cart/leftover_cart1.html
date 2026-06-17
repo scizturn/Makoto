@@ -9,11 +9,11 @@
     </head>
     <body style="margin:0;padding:0;background:#ffffff;font-family:Nunito,Arial,Helvetica,sans-serif;color:#111827;-webkit-text-size-adjust:none;text-size-adjust:none;">
         <table role="presentation" width="720" cellspacing="0" cellpadding="0" align="center"
-               style="width:720px;min-width:720px;margin:0 auto;border-collapse:collapse;table-layout:fixed;background:#f7f7f7;">
+               style="width:720px;min-width:720px;margin:0 auto;border-collapse:collapse;table-layout:fixed;background:#fdfdfd;">
         <tr><td style="padding:0 0 28px;">
 
             <!-- ── TOP NAV BAR ── -->
-            <table role="presentation" width="720" cellspacing="0" cellpadding="0" style="width:720px;border-collapse:collapse;background:#ff4b0a;">
+            <table role="presentation" width="720" cellspacing="0" cellpadding="0" style="width:720px;border-collapse:collapse;background:#ff4b0a;border-radius:0 0 24px 24px;">
             <tr><td style="padding:0 34px;">
                 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;">
                 <tr>
@@ -24,7 +24,7 @@
                         </a>
                     </td>
                     <td valign="middle" align="right" style="padding:22px 0 18px;">
-                        <a href="https://kyou.id/user/cart" style="color:#ffffff;font-size:12px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;">KERANJANGMU</a>
+                        <a href="https://kyou.id/user/history" style="color:#ffffff;font-size:12px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;">KERANJANGMU</a>
                     </td>
                 </tr>
                 </table>
@@ -53,12 +53,16 @@
             </td></tr>
             </table>
 
+            {{ if .RecoHTML }}
             <!-- ── RECOMMENDATION PANEL ── -->
             <table role="presentation" width="720" cellspacing="0" cellpadding="0" style="width:720px;border-collapse:collapse;">
             <tr><td style="padding:0 28px 36px;">
                 {{ .RecoHTML }}
             </td></tr>
             </table>
+            {{ end }}
+
+            {{ .FooterHTML }}
 
         </td></tr>
         </table>

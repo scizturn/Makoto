@@ -126,7 +126,7 @@ func Load() Config {
 			"Psst {{ .FirstName }}, keranjangmu masih nunggu kamu balik!",
 			"{{ .FirstName }}, sayang banget kalau sampai kehabisan!",
 		}),
-		LeftoverCartURL:                    env("MAKOTO_LEFTOVER_CART_URL", "https://kyou.id/user/cart"),
+		LeftoverCartURL:                    env("MAKOTO_LEFTOVER_CART_URL", "https://kyou.id/user/history"),
 		DiscountedWishlistEnabled:          envBool("MAKOTO_DISCOUNTED_WISHLIST_ENABLED", false),
 		DiscountedWishlistQueueName:        env("MAKOTO_DISCOUNTED_WISHLIST_QUEUE_NAME", "discounted_wishlist_email_jobs"),
 		DiscountedWishlistDeadLetterQueue:  env("MAKOTO_DISCOUNTED_WISHLIST_DEAD_LETTER_QUEUE", "discounted_wishlist_email_jobs_dead"),

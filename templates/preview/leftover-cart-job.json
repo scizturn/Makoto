@@ -1,98 +1,67 @@
 {
-  "job_id": "preview-leftover-cart-2026-06-16-121036-user-147044",
-  "user_id": "147044",
-  "date": "2026-06-16T12:10:36.713893+07:00",
+  "job_id": "preview-leftover-cart-2026-06-17-101654-user-31877",
+  "user_id": "31877",
+  "date": "2026-06-17T10:16:54.774269+07:00",
   "user": {
-    "id": "147044",
-    "name": "Tegar",
-    "email": "tegaramir327@gmail.com",
-    "birthday": "2003-01-07T00:00:00Z",
+    "id": "31877",
+    "name": "Abimanyu Nugroho",
+    "email": "manyu555abi@gmail.com",
+    "birthday": "2001-08-06T00:00:00Z",
     "is_active": true
+  },
+  "historical_item": {
+    "name": "Kuripan Plushie Awa Subaru - Girls Band Cry (17cm)",
+    "image_url": "https://kyoucdn.id/items/kuripan-plushie-awa-subaru-girls-band-cry-17cm-e664c409.jpg.webp",
+    "order_date": "2026-06-15T21:18:36Z",
+    "days_ago": 0
   },
   "cart_items": [
     {
-      "id": "224275",
-      "name": "[Type A] Uma Musume Pretty Derby Bath Towel Vol.3 Written as \"Friend,\" but pronounced \"Rival\" (60x120cm)",
-      "url": "https://kyou.id/items/224275/",
-      "image_url": "https://kyoucdn.id/items/type-a-uma-musume-pretty-derby-bath-towel-vol3-written-as-friend-but-pronounced-rival-60x120cm-41e1e5a0.jpg.webp",
-      "price": 250000,
-      "status": "ready",
-      "manufacturer": "FuRyu",
-      "series_name": "Uma Musume"
-    },
-    {
-      "id": "181536",
-      "name": "Yumemirize Figure Frieren - Hitonemuri Ver. Sousou no Frieren (6cm)",
-      "url": "https://kyou.id/items/181536/",
-      "image_url": "https://kyoucdn.id/items/403380-yumemirize-figure-frieren-hitonemuri-ver-sousou-no-frieren-size-tba-309909832.jpg.webp",
-      "price": 480000,
-      "status": "ready",
-      "manufacturer": "SEGA",
-      "series_name": "Sousou no Frieren",
-      "po_release_at": "2026-05-26T00:00:00Z"
-    },
-    {
-      "id": "180349",
-      "name": "[REVIVE] PVC Figure 1/6 Succubus Iinchou-san / Succubus Monitor Miona - Illustration by Ban",
-      "url": "https://kyou.id/items/180349/",
-      "image_url": "https://kyoucdn.id/items/397192-pvc-figure-16-succubus-iinchou-san-succubus-monitor-miona-illustration-by-ban.jpg.webp",
-      "price": 1050000,
+      "id": "221228",
+      "name": "[Exclusive Sale] Nendoroid Shorekeeper - Wuthering Waves",
+      "url": "https://kyou.id/items/221228/",
+      "image_url": "https://kyoucdn.id/items/nendoroid-shorekeeper-wuthering-waves-bb2bf021.jpg.webp",
+      "price": 860000,
       "status": "PO",
-      "manufacturer": "AniMester",
-      "series_name": "Original Character",
-      "po_release_at": "2026-04-14T00:00:00Z"
-    },
-    {
-      "id": "206536",
-      "name": "TENITOL TALL Figure Reze - Chainsaw Man The Movie : Reze Arc (30cm)",
-      "url": "https://kyou.id/items/206536/",
-      "image_url": "https://kyoucdn.id/items/tenitol-tall-figure-reze-chainsaw-man-the-movie-reze-arc-f21f0fe3de8bebb63263f89938622b7e1dae4b2ed6aa7e5d4978e60c303c5d16.jpg.webp",
-      "price": 1650000,
-      "status": "PO",
-      "manufacturer": "FuRyu",
-      "series_name": "Chainsaw Man",
-      "po_release_at": "2026-11-01T00:00:00Z"
+      "manufacturer": "Good Smile Company",
+      "series_name": "Wuthering Waves",
+      "po_deadline": "2026-06-23T00:00:00Z",
+      "po_release_at": "2026-10-01T00:00:00Z"
     }
   ],
   "reco_items": [
     {
-      "id": "225297",
-      "name": "Blade Boys' Dormitory Series Plush - Honkai: Star Rail (27cm)",
+      "id": "212863",
+      "name": "Ebizuka Tomo Chibi / Q Version Keychain - Girls Band Cry",
       "kind": "character",
-      "series_id": "5548",
-      "image_url": "https://kyoucdn.id/items/blade-boys-dormitory-series-plush-honkai-star-rail-27cm-d4436e9b.jpg.webp",
-      "price": 650000,
-      "status": "PO",
-      "manufacturer": "Mihoyo",
-      "series_name": "Honkai: Star Rail",
-      "po_deadline": "2026-06-26T00:00:00Z",
-      "po_release_at": "2026-11-01T00:00:00Z"
+      "series_id": "6014",
+      "image_url": "https://kyoucdn.id/items/ebizuka-tomo-chibi-q-version-keychain-girls-band-cry-c81e8c6003e82079e6a9e4fa545ea605f705b95b91abaa8eba790d9a58ebd168.jpg.webp",
+      "price": 100000,
+      "status": "ready",
+      "manufacturer": "Dimension Poptown",
+      "series_name": "Girls Band Cry"
     },
     {
-      "id": "225299",
-      "name": "Argenti Boy's Dormitory Series Blanket - Honkai: Star Rail (115x85cm)",
+      "id": "212862",
+      "name": "Awa Subaru Chibi / Q Version Keychain - Girls Band Cry",
       "kind": "character",
-      "series_id": "5548",
-      "image_url": "https://kyoucdn.id/items/argenti-boys-dormitory-series-blanket-honkai-star-rail-115x85cm-35d6d601.jpg.webp",
-      "price": 430000,
-      "status": "PO",
-      "manufacturer": "Mihoyo",
-      "series_name": "Honkai: Star Rail",
-      "po_deadline": "2026-06-26T00:00:00Z",
-      "po_release_at": "2026-11-01T00:00:00Z"
+      "series_id": "6014",
+      "image_url": "https://kyoucdn.id/items/awa-subaru-chibi-q-version-keychain-girls-band-cry-1912c070ff160461efcef03e94e812bbe983a12a7a64c707a941ea5fb1c0d0df.jpg.webp",
+      "price": 100000,
+      "status": "ready",
+      "manufacturer": "Dimension Poptown",
+      "series_name": "Girls Band Cry"
     },
     {
-      "id": "225298",
-      "name": "Sunday Boys' Dormitory Series Plush - Honkai: Star Rail (27cm)",
+      "id": "212861",
+      "name": "Kawaragi Momoka Chibi / Q Version Keychain - Girls Band Cry",
       "kind": "character",
-      "series_id": "5548",
-      "image_url": "https://kyoucdn.id/items/sunday-boys-dormitory-series-plush-honkai-star-rail-27cm-debe6dcc.jpg.webp",
-      "price": 650000,
-      "status": "PO",
-      "manufacturer": "Mihoyo",
-      "series_name": "Honkai: Star Rail",
-      "po_deadline": "2026-06-26T00:00:00Z",
-      "po_release_at": "2026-11-01T00:00:00Z"
+      "series_id": "6014",
+      "image_url": "https://kyoucdn.id/items/kawaragi-momoka-chibi-q-version-keychain-girls-band-cry-f78a362544f4cf6d049d2256fb65fb4036ac190061825eb860b0882286ef3198.jpg.webp",
+      "price": 100000,
+      "status": "ready",
+      "manufacturer": "Dimension Poptown",
+      "series_name": "Girls Band Cry"
     }
   ],
   "attempt": 1
