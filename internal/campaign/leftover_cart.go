@@ -220,6 +220,9 @@ func RenderLeftoverRecoHTML(items []domain.FYPItem, firstName string, historical
 	safeFirstName := html.EscapeString(firstName)
 	safeTheme := html.EscapeString(theme)
 	safeSeriesSearchURL := html.EscapeString(leftoverSeriesSearchURL(theme))
+	characterName := leftoverHistoricalCharacterName(historicalItem.Name, theme)
+	safeCharacterName := html.EscapeString(characterName)
+	safeCharacterSearchURL := html.EscapeString(leftoverCharacterSearchURL(characterName))
 
 	var builder strings.Builder
 	builder.WriteString(fmt.Sprintf(`
@@ -286,8 +289,9 @@ func RenderLeftoverRecoHTML(items []domain.FYPItem, firstName string, historical
       </table>
       <table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;margin:0 0 0 58px;">
         <tr>
-          <td style="padding:0 6px;"><a href="https://kyou.id/search?page=1%2C40&amp;sort=kyou_search_score&amp;sold=false" style="display:inline-block;padding:0 18px;border:1px solid #ff4b0a;border-radius:20px;color:#ff4b0a;font-size:13px;font-weight:900;line-height:36px;background:white;text-decoration:none;">Rekomendasi lainnya</a></td>
-          <td style="padding:0 6px;"><a href="` + safeSeriesSearchURL + `" style="display:inline-block;padding:0 18px;border:1px solid #ff4b0a;border-radius:20px;color:#ff4b0a;font-size:13px;font-weight:900;line-height:36px;background:white;text-decoration:none;">` + safeTheme + `</a></td>
+          <td style="padding:0 4px;"><a href="https://kyou.id/search?page=1%2C40&amp;sort=kyou_search_score&amp;sold=false" style="display:inline-block;padding:0 14px;border:1px solid #ff4b0a;border-radius:20px;color:#ff4b0a;font-size:13px;font-weight:900;line-height:36px;background:white;text-decoration:none;">Rekomendasi lainnya</a></td>
+          <td style="padding:0 4px;"><a href="` + safeSeriesSearchURL + `" style="display:inline-block;padding:0 14px;border:1px solid #ff4b0a;border-radius:20px;color:#ff4b0a;font-size:13px;font-weight:900;line-height:36px;background:white;text-decoration:none;">` + safeTheme + `</a></td>
+          <td style="padding:0 4px;"><a href="` + safeCharacterSearchURL + `" style="display:inline-block;padding:0 14px;border:1px solid #ff4b0a;border-radius:20px;color:#ff4b0a;font-size:13px;font-weight:900;line-height:36px;background:white;text-decoration:none;">` + safeCharacterName + `</a></td>
         </tr>
       </table>
     </td>
@@ -302,6 +306,44 @@ func leftoverSeriesSearchURL(seriesName string) string {
 		return "https://kyou.id/search?page=1%2C40&sort=kyou_search_score&sold=false"
 	}
 	return "https://kyou.id/search?page=1%2C40&series=" + url.QueryEscape(seriesName) + "&sort=kyou_search_score&sold=false"
+}
+
+func leftoverCharacterSearchURL(characterName string) string {
+	characterName = strings.TrimSpace(characterName)
+	if characterName == "" {
+		return "https://kyou.id/search?page=1%2C40&sort=kyou_search_score&sold=false"
+	}
+	return "https://kyou.id/search?q=" + strings.ToLower(url.QueryEscape(characterName)) + "&page=1%2C40&sort=kyou_search_score&sold=false"
+}
+
+func leftoverHistoricalCharacterName(itemName string, seriesName string) string {
+	name, version := cartItemDisplayName(itemName, seriesName)
+	if version != "" {
+		name = strings.TrimSpace(name + " " + version)
+	}
+	words := strings.Fields(name)
+	for index, word := range words {
+		normalized := strings.Trim(strings.ToLower(word), ":-_/")
+		if leftoverProductTypeWords[normalized] && index+1 < len(words) {
+			return strings.Join(words[index+1:], " ")
+		}
+	}
+	return strings.TrimSpace(name)
+}
+
+var leftoverProductTypeWords = map[string]bool{
+	"acrylic":    true,
+	"badge":      true,
+	"charm":      true,
+	"figure":     true,
+	"keychain":   true,
+	"nendoroid":  true,
+	"plush":      true,
+	"plushie":    true,
+	"pouch":      true,
+	"stand":      true,
+	"tapestry":   true,
+	"wallscroll": true,
 }
 
 func koukaAvatarHTML() string {
