@@ -282,14 +282,14 @@ func TestRenderCartItemsHTMLIncludesBrowserCartButton(t *testing.T) {
 			Status:     "FLASH PO",
 			SeriesName: "One Piece",
 		},
-	}, "https://kyou.id/user/history?utm=<email>")
+	}, "https://kyou.id/user/cart?utm=<email>")
 
 	if !containsAll(got, []string{
-		`https://kyou.id/user/history`,
-		`Keranjang Saya`,
+		`https://kyou.id/user/cart`,
+		`Shopping Cart`,
 		`3 item &bull; 2 produk`,
 		`Lanjut ke Keranjang`,
-		`href="https://kyou.id/user/history?utm=&lt;email&gt;"`,
+		`href="https://kyou.id/user/cart?utm=&lt;email&gt;"`,
 		`Nendoroid Rin &lt;Touring&gt;`,
 		`https://kyou.id/items/1/?x=&lt;bad&gt;`,
 		`https://kyoucdn.id/items/rin.jpg.webp?x=&lt;bad&gt;`,

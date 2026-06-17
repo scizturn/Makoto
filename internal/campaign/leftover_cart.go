@@ -228,11 +228,11 @@ func RenderLeftoverRecoHTML(items []domain.FYPItem, firstName string, historical
         <tr>
           <td width="58" valign="middle" style="width:58px;">
             <div style="width:46px;height:46px;border-radius:50%%;background:#fff3e0;border:3px solid #ffffff;text-align:center;line-height:46px;overflow:hidden;">
-              <img src="https://kyoucdn.id/static/assets/brand_logo.png" alt="Kyou Care" width="36" style="display:inline-block;width:36px;height:auto;border:0;vertical-align:middle;">
+              <img src="https://kyou.id/static/img/icon/kouka_chibi.png.webp" alt="Kyou.id" width="46" style="display:block;width:46px;height:46px;object-fit:cover;border:0;">
             </div>
           </td>
           <td valign="middle">
-            <p style="margin:0 0 3px;color:#ffffff;font-size:18px;font-weight:900;line-height:1.1;">Kyou Care <span style="display:inline-block;margin-left:8px;padding:4px 10px;border-radius:14px;background:#7dd3fc;color:#ffffff;font-size:12px;font-weight:900;vertical-align:middle;">KOUKA</span></p>
+            <p style="margin:0 0 3px;color:#ffffff;font-size:18px;font-weight:900;line-height:1.1;">Kyou.id <span style="display:inline-block;margin-left:8px;padding:4px 10px;border-radius:14px;background:#7dd3fc;color:#ffffff;font-size:12px;font-weight:900;vertical-align:middle;">KOUKA</span></p>
             <p style="margin:0;color:#ffffff;font-size:13px;font-weight:900;">● Online · biasanya balas &lt; 5 menit</p>
           </td>
           <td width="24" align="right" valign="top" style="width:24px;color:#ffffff;font-size:28px;font-weight:900;line-height:24px;">−</td>
@@ -241,10 +241,10 @@ func RenderLeftoverRecoHTML(items []domain.FYPItem, firstName string, historical
     </td>
   </tr>
   <tr>
-    <td style="padding:18px 16px 20px;">
+    <td style="padding:18px 16px 20px;background-image:url('https://images2.imgbox.com/11/6f/MewvOpFD_o.png');background-size:cover;background-position:center top;background-repeat:no-repeat;background-color:rgba(255,255,255,0.5);background-blend-mode:lighten;">
       <div style="margin:0 auto 14px;width:72px;border-radius:14px;background:#e5e5e5;color:#7a7a7a;font-size:12px;font-weight:900;line-height:26px;text-align:center;">Hari ini</div>
       <table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;margin:0 0 12px 58px;">
-        <tr><td style="padding:13px 16px;background:#ffffff;border-radius:18px;box-shadow:0 1px 3px rgba(0,0,0,0.08);color:#2b2b2b;font-size:15px;font-weight:700;line-height:1.45;">Hai <strong>%s</strong>! Aku Kouka dari Kyou Care.</td></tr>
+        <tr><td style="padding:13px 16px;background:#ffffff;border-radius:18px;box-shadow:0 1px 3px rgba(0,0,0,0.08);color:#2b2b2b;font-size:15px;font-weight:700;line-height:1.45;">Hai <strong>%s</strong>! Aku Kouka dari Kyou.id.</td></tr>
       </table>
       <table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;margin:0 0 12px 58px;">
         <tr><td style="padding:13px 16px;background:#ffffff;border-radius:18px;box-shadow:0 1px 3px rgba(0,0,0,0.08);color:#2b2b2b;font-size:15px;font-weight:700;line-height:1.6;">Aku inget kamu pernah bawa pulang</td></tr>
@@ -278,8 +278,8 @@ func RenderLeftoverRecoHTML(items []domain.FYPItem, firstName string, historical
       </table>
       <table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;margin:0 0 0 58px;">
         <tr>
-          <td style="padding:0 6px;"><a href="https://kyou.id/" style="display:inline-block;padding:0 18px;border:1px solid #ff4b0a;border-radius:20px;color:#ff4b0a;font-size:13px;font-weight:900;line-height:36px;text-decoration:none;">Lihat semua rekomendasi</a></td>
-          <td style="padding:0 6px;"><a href="https://kyou.id/" style="display:inline-block;padding:0 18px;border:1px solid #ff4b0a;border-radius:20px;color:#ff4b0a;font-size:13px;font-weight:900;line-height:36px;text-decoration:none;">Seri ` + safeTheme + `</a></td>
+          <td style="padding:0 6px;"><a href="https://kyou.id/" style="display:inline-block;padding:0 18px;border:1px solid #ff4b0a;border-radius:20px;color:#ff4b0a;font-size:13px;font-weight:900;line-height:36px;background:white;text-decoration:none;">Lihat semua rekomendasi</a></td>
+          <td style="padding:0 6px;"><a href="https://kyou.id/" style="display:inline-block;padding:0 18px;border:1px solid #ff4b0a;border-radius:20px;color:#ff4b0a;font-size:13px;font-weight:900;line-height:36px;background:white;text-decoration:none;">Seri ` + safeTheme + `</a></td>
         </tr>
       </table>
     </td>
@@ -290,7 +290,7 @@ func RenderLeftoverRecoHTML(items []domain.FYPItem, firstName string, historical
 
 func koukaAvatarHTML() string {
 	return `<div style="width:42px;height:42px;border-radius:50%;background:#fff3e0;border:3px solid #ff4b0a;text-align:center;line-height:42px;overflow:hidden;">
-  <img src="https://kyoucdn.id/static/assets/brand_logo.png" alt="Kouka" width="32" style="display:inline-block;width:32px;height:auto;border:0;vertical-align:middle;">
+  <img src="https://kyou.id/static/img/icon/kouka_chibi.png.webp" alt="Kouka" width="42" style="display:block;width:42px;height:42px;object-fit:cover;border:0;">
 </div>`
 }
 
@@ -388,7 +388,7 @@ func leftoverRecoDescription(index int) string {
 }
 
 func RenderCartItemsHTML(items []domain.WishlistItem) string {
-	return RenderCartItemsHTMLWithURL(items, "https://kyou.id/user/history")
+	return RenderCartItemsHTMLWithURL(items, "https://kyou.id/user/cart")
 }
 
 func RenderCartItemsHTMLWithURL(items []domain.WishlistItem, cartURL string) string {
@@ -396,7 +396,7 @@ func RenderCartItemsHTMLWithURL(items []domain.WishlistItem, cartURL string) str
 		return `<p style="margin:0;color:#6b7280;">Keranjangmu lagi nunggu kamu balik nih!</p>`
 	}
 	if strings.TrimSpace(cartURL) == "" {
-		cartURL = "https://kyou.id/user/history"
+		cartURL = "https://kyou.id/user/cart"
 	}
 
 	totalItems := len(items)
@@ -420,7 +420,7 @@ func RenderCartItemsHTMLWithURL(items []domain.WishlistItem, cartURL string) str
         </td>
         <td valign="middle" style="padding:0;">
           <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:18px;padding:12px 18px;display:block;width:518px;">
-            <span style="font-size:14px;font-weight:900;color:#334155;">https://kyou.id/user/history</span>
+            <span style="font-size:14px;font-weight:900;color:#334155;"><a href="https://kyou.id/user/cart" style="text-decoration:none;color:#334155;">https://kyou.id/user/cart</a></span>
           </div>
         </td>
       </tr>
@@ -428,24 +428,26 @@ func RenderCartItemsHTMLWithURL(items []domain.WishlistItem, cartURL string) str
   </td>
 </tr>`)
 
-	// Keranjang Saya header row
+	// Shopping Cart header row + white card wrapped in a single link
+	safeCartURLSection := html.EscapeString(cartURL)
 	builder.WriteString(fmt.Sprintf(`
 <tr>
   <td style="padding:20px 20px 0;">
     <table role="presentation" width="100%%" cellspacing="0" cellpadding="0" style="width:100%%;border-collapse:collapse;margin-bottom:12px;">
       <tr>
-        <td align="left" style="font-size:20px;font-weight:900;color:#1f2937;">Keranjang Saya</td>
+        <td align="left" style="font-size:20px;font-weight:900;color:#1f2937;">Shopping Cart</td>
         <td align="right" style="font-size:13px;font-weight:800;color:#7b7b7b;">%d item &bull; %d produk</td>
       </tr>
     </table>
   </td>
 </tr>`, totalItems, productCount))
 
-	// White card with items
-	builder.WriteString(`
+	// White card with items — entire card is wrapped in a link
+	builder.WriteString(fmt.Sprintf(`
 <tr>
   <td style="padding:0 20px 20px;">
-    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="width:100%;border-collapse:separate;background-color:#ffffff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;">`)
+    <a href="%s" style="display:block;text-decoration:none;color:inherit;">
+    <table role="presentation" width="100%%" cellspacing="0" cellpadding="0" style="width:100%%;border-collapse:separate;background-color:#ffffff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;">`, safeCartURLSection))
 
 	// Pilih semua row
 	builder.WriteString(`
@@ -475,7 +477,7 @@ func RenderCartItemsHTMLWithURL(items []domain.WishlistItem, cartURL string) str
 		builder.WriteString(`</td></tr>`)
 	}
 
-	builder.WriteString(`</table></td></tr>`)
+	builder.WriteString(`</table></a></td></tr>`)
 	builder.WriteString(renderCartButton(cartURL))
 	builder.WriteString(`</table>`)
 

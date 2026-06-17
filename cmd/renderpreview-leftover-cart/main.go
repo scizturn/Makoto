@@ -19,7 +19,7 @@ func main() {
 	outputPath := env("MAKOTO_PREVIEW_HTML_PATH", "templates/preview/leftover-cart-preview.html")
 	templateDir := env("MAKOTO_LEFTOVER_CART_EMAIL_TEMPLATE_DIR", "templates/leftover_cart")
 	subject := env("MAKOTO_LEFTOVER_CART_EMAIL_SUBJECT", "Eh {{ .FirstName }}, keranjangmu masih nunggu nih!")
-	cartURL := env("MAKOTO_LEFTOVER_CART_URL", "https://kyou.id/user/history")
+	cartURL := env("MAKOTO_LEFTOVER_CART_URL", "https://kyou.id/user/cart")
 
 	payload, err := os.ReadFile(jobPath)
 	if err != nil {
