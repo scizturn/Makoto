@@ -240,11 +240,11 @@ func renderDiscountedFeaturedCard(item domain.DiscountedWishlistItem) string {
 	}
 	seriesText := ""
 	if safeSeries != "" {
-		seriesText = fmt.Sprintf(` dari %s`, safeSeries)
+		seriesText = fmt.Sprintf(`&nbsp;dari %s`, safeSeries)
 	}
 	discountText := ""
 	if pct := discountPercent(item); pct > 0 {
-		discountText = fmt.Sprintf(` turun %d%%,`, pct)
+		discountText = fmt.Sprintf(`&nbsp;turun %d%%,`, pct)
 	}
 	priceText := formatIDR(effectiveDiscountedPrice(item))
 	originalPriceText := formatIDR(item.OriginalPrice)
@@ -254,7 +254,7 @@ func renderDiscountedFeaturedCard(item domain.DiscountedWishlistItem) string {
 
 	originalPriceHTML := ""
 	if originalPriceText != "" && item.DiscountPrice > 0 && item.OriginalPrice != item.DiscountPrice {
-		originalPriceHTML = fmt.Sprintf(` dari <span style="color:#8f8f8f;text-decoration:line-through;">%s</span>`, originalPriceText)
+		originalPriceHTML = fmt.Sprintf(`&nbsp;dari <span style="color:#8f8f8f;text-decoration:line-through;">%s</span>`, originalPriceText)
 	}
 
 	safeDiscountName := html.EscapeString(strings.Trim(item.DiscountName, "[]"))
@@ -263,7 +263,7 @@ func renderDiscountedFeaturedCard(item domain.DiscountedWishlistItem) string {
 	}
 
 	return fmt.Sprintf(
-		`<div style="position:relative;width:660px;margin:0 auto;padding-top:12px;"><table role="presentation" width="660" cellspacing="0" cellpadding="0" style="width:660px;border-collapse:separate;border-spacing:0;border:2px solid #fc4c02;border-radius:12px;background:#ffffff;overflow:hidden;"><tr><td width="224" valign="top" style="width:224px;padding:17px 0 17px 17px;">%s</td><td width="436" valign="middle" style="width:436px;padding:20px 24px 20px 14px;"><h2 style="margin:0 0 8px;color:#2d2d2d;font-size:18px;font-weight:900;line-height:1.2;">Inget nggak? Kamu pernah nyimpen ini.</h2><p style="margin:0 0 16px;color:#565252;font-size:14px;font-weight:600;line-height:1.5;"><strong style="color:#2d2d2d;">%s%s</strong>%s pas %s%s jadi <strong style="color:#fc4c02;">%s</strong>%s.</p><a href="%s" style="display:inline-block;padding:12px 24px;border-radius:8px;background:#fc4c02;color:#ffffff;font-size:14px;font-weight:900;line-height:1;text-decoration:none;">Ambil Sekarang</a></td></tr></table><div style="position:absolute;left:24px;top:0;display:inline-block;padding:6px 14px;border-radius:999px;background:#fc4c02;color:#ffffff;font-size:11px;font-weight:900;line-height:1.2;letter-spacing:1px;text-transform:uppercase;">&hearts; DARI WISHLIST KAMU</div></div>`,
+		`<div style="width:660px;margin:0 auto;"><table role="presentation" width="660" cellspacing="0" cellpadding="0" style="width:660px;border-collapse:separate;border-spacing:0;border:2px solid #fc4c02;border-radius:12px;background:#ffffff;overflow:hidden;"><tr><td width="224" valign="top" style="width:224px;padding:17px 0 17px 17px;">%s</td><td width="436" valign="middle" style="width:436px;padding:20px 24px 20px 14px;"><div style="margin-bottom:12px;"><span style="display:inline-block;padding:6px 14px;border-radius:999px;background:#fc4c02;color:#ffffff;font-size:11px;font-weight:900;line-height:1.2;letter-spacing:1px;text-transform:uppercase;">&hearts; DARI WISHLIST KAMU</span></div><h2 style="margin:0 0 8px;color:#2d2d2d;font-size:18px;font-weight:900;line-height:1.2;">Inget nggak? Kamu pernah nyimpen ini.</h2><p style="margin:0 0 16px;color:#565252;font-size:14px;font-weight:600;line-height:1.5;"><strong style="color:#2d2d2d;">%s%s</strong>%s pas %s%s jadi&nbsp;<strong style="color:#fc4c02;">%s</strong>%s.</p><a href="%s" style="display:inline-block;padding:12px 24px;border-radius:8px;background:#fc4c02;color:#ffffff;font-size:14px;font-weight:900;line-height:1;text-decoration:none;">Ambil Sekarang</a></td></tr></table></div>`,
 		imgHTML,
 		safeFullName, versionText,
 		seriesText, safeDiscountName, discountText, priceText, originalPriceHTML,
@@ -322,7 +322,7 @@ func renderDiscountedPromoCard(item domain.DiscountedWishlistItem, index int) st
 	rotations := []string{"-1.4deg", "1.1deg", "-0.7deg", "1.3deg", "-1deg", "0.8deg"}
 	rotation := rotations[index%len(rotations)]
 	inner := fmt.Sprintf(
-		`<div style="position:relative;width:190px;margin:0 auto;padding-top:9px;transform:rotate(%s);"><div style="position:absolute;z-index:2;left:0;width:100%%;top:1px;text-align:center;"><span style="display:inline-block;width:58px;height:15px;background:#ffb38f;background:repeating-linear-gradient(90deg,rgba(255,130,80,.48) 0,rgba(255,130,80,.48) 7px,rgba(255,196,157,.62) 7px,rgba(255,196,157,.62) 11px);opacity:.82;transform:rotate(-1deg);"></span></div><div style="box-sizing:border-box;width:184px;margin:0 auto;padding:7px 7px 10px;border:%s;background:#ffffff;box-shadow:0 5px 10px rgba(67,50,32,.16);"><div style="width:166px;height:166px;background:#f3f4f6;">%s</div><div style="min-height:94px;padding:8px 1px 0;text-align:left;background:#ffffff;"><div style="margin-bottom:6px;"><span style="display:inline-block;padding:3px 7px;border-radius:999px;background:%s;color:%s;font-size:8px;font-weight:900;line-height:1;letter-spacing:.5px;">%s</span></div><p style="margin:0 0 4px;color:#a2a2a2;font-size:8px;font-weight:800;line-height:1.2;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">%s</p><p style="margin:0;color:#2d2d2d;font-size:12px;font-weight:800;line-height:1.22;letter-spacing:0;">%s</p>%s%s</div></div></div>`,
+		`<div style="position:relative;width:190px;margin:0 auto;padding-top:9px;transform:rotate(%s);"><div style="position:absolute;z-index:2;left:0;width:100%%;top:4px;text-align:center;"><span style="display:inline-block;width:58px;height:15px;background:#ffb38f;background:repeating-linear-gradient(90deg,rgba(255,130,80,.48) 0,rgba(255,130,80,.48) 7px,rgba(255,196,157,.62) 7px,rgba(255,196,157,.62) 11px);opacity:.82;transform:rotate(-1deg);"></span></div><div style="box-sizing:border-box;width:184px;margin:0 auto;padding:7px 7px 10px;border:%s;background:#ffffff;box-shadow:0 5px 10px rgba(67,50,32,.16);"><div style="width:166px;height:166px;background:#f3f4f6;">%s</div><div style="min-height:94px;padding:8px 1px 0;text-align:left;background:#ffffff;"><div style="margin-bottom:6px;"><span style="display:inline-block;padding:3px 7px;border-radius:999px;background:%s;color:%s;font-size:8px;font-weight:900;line-height:1;letter-spacing:.5px;">%s</span></div><p style="margin:0 0 4px;color:#a2a2a2;font-size:8px;font-weight:800;line-height:1.2;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">%s</p><p style="margin:0;color:#2d2d2d;font-size:12px;font-weight:800;line-height:1.22;letter-spacing:0;">%s</p>%s%s</div></div></div>`,
 		rotation, border, imgHTML, labelBackground, labelColor, label, safeSeries, safeName, versionP, priceHTML,
 	)
 
