@@ -81,6 +81,7 @@ type viewData struct {
 	PromoCount           string
 	DisplayWishlistCount string
 	DisplayFillCount     string
+	DiscountName         string
 	BackInItemHTML       template.HTML
 	CompanionHTML        template.HTML
 	CompanionName        string
@@ -115,6 +116,7 @@ func viewDataFromMergeData(data map[string]any) viewData {
 		PromoCount:           stringValue(data["promo_count"]),
 		DisplayWishlistCount: stringValue(data["display_wishlist_count"]),
 		DisplayFillCount:     stringValue(data["display_fill_count"]),
+		DiscountName:         stringValue(data["discount_name"]),
 		BackInItemHTML:       template.HTML(stringValue(data["back_in_item_html"])),
 		CompanionHTML:        template.HTML(stringValue(data["companion_html"])),
 		CompanionName:        stringValue(data["companion_name"]),

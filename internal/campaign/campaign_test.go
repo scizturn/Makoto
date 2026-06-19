@@ -175,6 +175,37 @@ func TestRenderWishlistHTMLUsesImageCardsWhenImageURLExists(t *testing.T) {
 	}
 }
 
+func TestAbbreviateCardTitleKeepsCharacterBeforeQSeries(t *testing.T) {
+	name, version := abbreviateCardTitle(
+		"Vivian Banshee Mockingbird Q Series Acrylic Keychain - Zenless Zone Zero (7,4cm)",
+		"Zenless Zone Zero",
+	)
+	if name != "Vivian Banshee Mockingbird" || version != "" {
+		t.Fatalf("unexpected Q Series title: name=%q version=%q", name, version)
+	}
+}
+
+func TestDiscountedWishlistDisplayNamePrefersCharacterName(t *testing.T) {
+	name, version := discountedWishlistDisplayName(domain.DiscountedWishlistItem{
+		Name:          "Vivian Banshee Mockingbird Q Series Acrylic Keychain - Zenless Zone Zero",
+		CharacterName: "Vivian Banshee Mockingbird",
+		SeriesName:    "Zenless Zone Zero",
+	})
+	if name != "Vivian Banshee Mockingbird" || version != "" {
+		t.Fatalf("unexpected discounted wishlist display name: name=%q version=%q", name, version)
+	}
+}
+
+func TestDiscountedPromoGridRendersTapedWishlistCards(t *testing.T) {
+	got := RenderDiscountedPromoGridHTML([]domain.DiscountedWishlistItem{{
+		ID: "1", CharacterName: "Mihono Bourbon", URL: "https://kyou.id/items/1/",
+		ImageURL: "https://kyoucdn.id/items/1.webp", SeriesName: "Uma Musume", OriginalPrice: 400000, DiscountPrice: 300000, IsWishlisted: true,
+	}}, nil)
+	if !containsAll(got, []string{"repeating-linear-gradient", "transform:rotate(-1.4deg)", "&hearts; WISHLIST", "2px solid #ff5a24", "Uma Musume", "Mihono Bourbon", "font-size:12px", "IDR 400.000", "text-decoration:line-through", "font-size:13px", "IDR 300.000", "-25%"}) {
+		t.Fatalf("expected taped wishlist promo card, got %q", got)
+	}
+}
+
 func TestRenderFYPHTMLUsesImageCardsWhenImageURLExists(t *testing.T) {
 	got := RenderFYPHTML([]domain.FYPItem{
 		{

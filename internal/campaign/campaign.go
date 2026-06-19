@@ -144,16 +144,16 @@ func RenderWishlistGridHTML(items []domain.WishlistItem) string {
 
 func FYPToWishlistItem(p domain.FYPItem) domain.WishlistItem {
 	return domain.WishlistItem{
-		ID:          p.ID,
-		Name:        p.Name,
-		URL:         "https://kyou.id/items/" + p.ID + "/",
-		ImageURL:    p.ImageURL,
-		Price:       p.Price,
-		Status:      p.Status,
+		ID:           p.ID,
+		Name:         p.Name,
+		URL:          "https://kyou.id/items/" + p.ID + "/",
+		ImageURL:     p.ImageURL,
+		Price:        p.Price,
+		Status:       p.Status,
 		Manufacturer: p.Manufacturer,
-		SeriesName:  p.SeriesName,
-		PODeadline:  p.PODeadline,
-		POReleaseAt: p.POReleaseAt,
+		SeriesName:   p.SeriesName,
+		PODeadline:   p.PODeadline,
+		POReleaseAt:  p.POReleaseAt,
 	}
 }
 
@@ -260,6 +260,9 @@ func abbreviateCardTitle(name, seriesName string) (string, string) {
 		if suf := name[i:]; strings.HasSuffix(suf, ")") && strings.Contains(suf, "cm") {
 			name = strings.TrimSpace(name[:i])
 		}
+	}
+	if marker := strings.Index(strings.ToLower(name), " q series "); marker > 0 {
+		return strings.TrimSpace(name[:marker]), ""
 	}
 	name = stripItemNoise(name, seriesName)
 
