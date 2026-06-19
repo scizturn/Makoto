@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"html"
 	"math/rand"
+	"net/url"
 	"strconv"
 	"strings"
 	texttemplate "text/template"
@@ -19,6 +20,8 @@ type DiscountedWishlistCampaign struct {
 	Closing     string
 	RandomIntn  func(n int) int
 }
+
+const discountedWishlistPromoLimit = 12
 
 func (c DiscountedWishlistCampaign) SelectTemplate(now time.Time, key string) string {
 	if len(c.TemplateIDs) == 0 {
@@ -72,16 +75,53 @@ func (c DiscountedWishlistCampaign) BuildMergeData(user domain.User, items []dom
 			fill = append(fill, item)
 		}
 	}
+	displayWishlist, displayFill := capDiscountedWishlistPromoItems(wishlisted, fill, discountedWishlistPromoLimit)
+	featuredHTML := ""
+	if featured, ok := firstDiscountedWishlistItem(displayWishlist, displayFill); ok {
+		featuredHTML = renderDiscountedFeaturedCard(featured)
+	}
 
 	return map[string]any{
-		"name":         user.Name,
-		"first_name":   firstName,
-		"greeting":     greeting,
-		"wishlist_html": RenderDiscountedItemsHTML(wishlisted),
-		"fill_html":    RenderDiscountedItemsHTML(fill),
-		"wishlist_url": c.WishlistURL,
-		"closing":      c.Closing,
+		"name":                   user.Name,
+		"first_name":             firstName,
+		"greeting":               greeting,
+		"wishlist_html":          RenderDiscountedItemsHTML(wishlisted),
+		"fill_html":              RenderDiscountedItemsHTML(fill),
+		"featured_html":          featuredHTML,
+		"promo_html":             RenderDiscountedPromoGridHTML(displayWishlist, displayFill),
+		"wishlist_count":         len(wishlisted),
+		"fill_count":             len(fill),
+		"promo_count":            len(displayWishlist) + len(displayFill),
+		"display_wishlist_count": len(displayWishlist),
+		"display_fill_count":     len(displayFill),
+		"wishlist_url":           c.WishlistURL,
+		"closing":                c.Closing,
 	}
+}
+
+func capDiscountedWishlistPromoItems(wishlisted, fill []domain.DiscountedWishlistItem, limit int) ([]domain.DiscountedWishlistItem, []domain.DiscountedWishlistItem) {
+	if limit <= 0 {
+		return nil, nil
+	}
+	displayWishlist := wishlisted
+	if len(displayWishlist) > limit {
+		displayWishlist = displayWishlist[:limit]
+	}
+	remaining := limit - len(displayWishlist)
+	displayFill := fill
+	if remaining < len(displayFill) {
+		displayFill = displayFill[:remaining]
+	}
+	return displayWishlist, displayFill
+}
+
+func firstDiscountedWishlistItem(groups ...[]domain.DiscountedWishlistItem) (domain.DiscountedWishlistItem, bool) {
+	for _, group := range groups {
+		if len(group) > 0 {
+			return group[0], true
+		}
+	}
+	return domain.DiscountedWishlistItem{}, false
 }
 
 func RenderDiscountedItemsHTML(items []domain.DiscountedWishlistItem) string {
@@ -106,15 +146,158 @@ func RenderDiscountedItemsHTML(items []domain.DiscountedWishlistItem) string {
 		}
 		builder.WriteString(`<tr>`)
 		for i := start; i < end; i++ {
-			builder.WriteString(`<td width="212" valign="top" align="center" style="width:212px;padding:0;text-align:center;">`)
+			builder.WriteString(`<td width="212" valign="top" align="center" style="width:212px;padding:0 7px;text-align:center;">`)
 			builder.WriteString(renderDiscountedItemCard(items[i]))
 			builder.WriteString(`</td>`)
+		}
+		for i := end; i < start+3; i++ {
+			builder.WriteString(`<td width="212" valign="top" align="center" style="width:212px;padding:0 7px;text-align:center;">&nbsp;</td>`)
 		}
 		builder.WriteString(`</tr>`)
 	}
 
 	builder.WriteString(`</table>`)
 	return builder.String()
+}
+
+func RenderDiscountedPromoGridHTML(wishlisted, fill []domain.DiscountedWishlistItem) string {
+	items := append([]domain.DiscountedWishlistItem{}, wishlisted...)
+	items = append(items, fill...)
+	if len(items) == 0 {
+		return `<p style="margin:0;color:#6b7280;">Nantikan promo menarik berikutnya!</p>`
+	}
+
+	var builder strings.Builder
+	builder.WriteString(`<table role="presentation" width="636" cellspacing="0" cellpadding="0" align="center" style="width:636px;border-collapse:collapse;margin:0 auto;">`)
+	for rowStart := 0; rowStart < len(items); rowStart += 3 {
+		rowEnd := rowStart + 3
+		if rowEnd > len(items) {
+			rowEnd = len(items)
+		}
+		if rowStart > 0 {
+			builder.WriteString(`<tr><td colspan="3" style="height:14px;line-height:14px;font-size:14px;">&nbsp;</td></tr>`)
+		}
+		builder.WriteString(`<tr>`)
+		for i := rowStart; i < rowEnd; i++ {
+			builder.WriteString(`<td width="212" valign="top" align="center" style="width:212px;padding:0 7px;text-align:center;">`)
+			builder.WriteString(renderDiscountedPromoCard(items[i]))
+			builder.WriteString(`</td>`)
+		}
+		for i := rowEnd; i < rowStart+3; i++ {
+			builder.WriteString(`<td width="212" valign="top" align="center" style="width:212px;padding:0 7px;text-align:center;">&nbsp;</td>`)
+		}
+		builder.WriteString(`</tr>`)
+	}
+	builder.WriteString(`</table>`)
+	return builder.String()
+}
+
+func renderDiscountedFeaturedCard(item domain.DiscountedWishlistItem) string {
+	mainName, version := abbreviateCardTitle(item.Name, item.SeriesName)
+	safeName := html.EscapeString(mainName)
+	safeVersion := html.EscapeString(version)
+	safeFullName := html.EscapeString(item.Name)
+	safeSeries := html.EscapeString(displayManufacturerOrFallback(item.SeriesName, "Koleksi"))
+	safeURL := html.EscapeString(itemURLOrFallback(item.URL, "https://kyou.id/user/wishlist"))
+	safeImageURL := html.EscapeString(item.ImageURL)
+
+	imgHTML := fmt.Sprintf(
+		`<img src="%s" alt="%s" width="190" height="190" style="display:block;width:190px;height:190px;object-fit:cover;background:#f3f4f6;border:0;border-radius:10px;">`,
+		safeImageURL, safeName,
+	)
+	if safeImageURL == "" {
+		imgHTML = `<div style="width:190px;height:190px;background:#f3f4f6;border-radius:10px;"></div>`
+	}
+
+	versionText := ""
+	if safeVersion != "" {
+		versionText = " " + safeVersion
+	}
+	seriesText := ""
+	if safeSeries != "" {
+		seriesText = fmt.Sprintf(` dari %s`, safeSeries)
+	}
+	discountText := ""
+	if pct := discountPercent(item); pct > 0 {
+		discountText = fmt.Sprintf(` turun %d%%,`, pct)
+	}
+	priceText := formatIDR(effectiveDiscountedPrice(item))
+	originalPriceText := formatIDR(item.OriginalPrice)
+	if priceText == "" {
+		priceText = "harga promo"
+	}
+
+	originalPriceHTML := ""
+	if originalPriceText != "" && item.DiscountPrice > 0 && item.OriginalPrice != item.DiscountPrice {
+		originalPriceHTML = fmt.Sprintf(` dari <span style="color:#8f8f8f;text-decoration:line-through;">%s</span>`, originalPriceText)
+	}
+
+	badgeHTML := ""
+	if pct := discountPercent(item); pct > 0 {
+		badgeHTML = fmt.Sprintf(`<span style="display:inline-block;margin-top:10px;padding:7px 10px;border-radius:999px;background:#fc4c02;color:#ffffff;font-size:12px;font-weight:900;line-height:1;">-%d%%</span>`, pct)
+	}
+
+	return fmt.Sprintf(
+		`<table role="presentation" width="660" cellspacing="0" cellpadding="0" style="width:660px;border-collapse:collapse;border:1px solid #ffd6c2;border-radius:12px;background:#fff8f3;box-shadow:0 8px 20px rgba(45,45,45,0.08);"><tr><td width="224" valign="top" style="width:224px;padding:17px 0 17px 17px;">%s</td><td width="436" valign="middle" style="width:436px;padding:20px 24px 20px 14px;"><p style="display:inline-block;margin:0 0 12px;padding:7px 10px;border-radius:999px;background:#fff3ee;color:#fc4c02;font-size:11px;font-weight:900;line-height:1;letter-spacing:.3px;text-transform:uppercase;">Dari wishlist kamu</p><h2 style="margin:0 0 8px;color:#2d2d2d;font-size:24px;font-weight:900;line-height:1.18;letter-spacing:0;">Inget nggak? Kamu pernah nyimpen ini.</h2><p style="margin:0 0 18px;color:#565252;font-size:14px;font-weight:600;line-height:1.55;"><strong style="color:#2d2d2d;">%s%s</strong>%s pas Khilaf Fest%s jadi <strong style="color:#fc4c02;">%s</strong>%s.</p><a href="%s" style="display:inline-block;padding:13px 20px;border-radius:8px;background:#fc4c02;color:#ffffff;font-size:14px;font-weight:900;line-height:1;text-decoration:none;">Ambil Sekarang</a>%s</td></tr></table>`,
+		imgHTML,
+		safeFullName, versionText,
+		seriesText, discountText, priceText, originalPriceHTML,
+		safeURL, badgeHTML,
+	)
+}
+
+func renderDiscountedPromoCard(item domain.DiscountedWishlistItem) string {
+	mainName, version := abbreviateCardTitle(item.Name, item.SeriesName)
+	safeName := html.EscapeString(mainName)
+	safeVersion := html.EscapeString(version)
+	safeSeries := html.EscapeString(displayManufacturerOrFallback(item.SeriesName, "Koleksi"))
+	safeURL := html.EscapeString(item.URL)
+	safeImageURL := html.EscapeString(item.ImageURL)
+
+	imgHTML := fmt.Sprintf(
+		`<img src="%s" alt="%s" width="184" height="184" style="display:block;width:184px;height:184px;object-fit:cover;background:#f3f4f6;border:0;border-radius:13px 13px 0 0;">`,
+		safeImageURL, safeName,
+	)
+	if safeImageURL == "" {
+		imgHTML = `<div style="width:184px;height:184px;background:#f3f4f6;border-radius:13px 13px 0 0;"></div>`
+	}
+
+	label := "BUAT KAMU"
+	labelBackground := "#565252"
+	borderColor := "#e8e8e8"
+	if item.IsWishlisted {
+		label = "♥ WISHLIST"
+		labelBackground = "#fc4c02"
+		borderColor = "#fc4c02"
+	}
+
+	versionP := ""
+	if safeVersion != "" {
+		versionP = fmt.Sprintf(`<p style="margin:0;color:#2d2d2d;font-size:13px;font-weight:900;line-height:1.25;letter-spacing:0;">%s</p>`, safeVersion)
+	}
+	originalPriceHTML := ""
+	if item.OriginalPrice > 0 && item.DiscountPrice > 0 && item.OriginalPrice != item.DiscountPrice {
+		originalPriceHTML = fmt.Sprintf(`<p style="margin:14px 0 2px;color:#9a9a9a;font-size:10px;font-weight:800;line-height:1.2;text-decoration:line-through;">%s</p>`, formatIDR(item.OriginalPrice))
+	}
+	pctBadge := ""
+	if pct := discountPercent(item); pct > 0 {
+		pctBadge = fmt.Sprintf(`<span style="display:inline-block;margin-left:5px;padding:2px 4px;border-radius:2px;background:#fc4c02;color:#ffffff;font-size:9px;font-weight:900;line-height:1;">-%d%%</span>`, pct)
+	}
+	priceHTML := ""
+	if price := effectiveDiscountedPrice(item); price > 0 {
+		priceHTML = fmt.Sprintf(`%s<p style="margin:0;color:#fc4c02;font-size:13px;font-weight:900;line-height:1.18;letter-spacing:0;">%s%s</p>`, originalPriceHTML, formatIDR(price), pctBadge)
+	}
+
+	inner := fmt.Sprintf(
+		`<div style="overflow:hidden;width:188px;border:2px solid %s;border-radius:9px;background:#ffffff;box-shadow:none;"><div style="position:relative;width:188px;height:184px;background:#ffffff;">%s<span style="position:absolute;right:0;top:0;display:inline-block;padding:6px 9px 6px 11px;border-radius:0 7px 0 9px;background:%s;color:#ffffff;font-size:9px;font-weight:900;line-height:1;letter-spacing:.6px;">%s</span></div><div style="min-height:114px;padding:12px 14px 14px;text-align:left;background:#ffffff;"><p style="margin:0 0 7px;color:#a2a2a2;font-size:9px;font-weight:800;line-height:1.2;letter-spacing:.6px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">%s</p><p style="margin:0;color:#2d2d2d;font-size:13px;font-weight:900;line-height:1.22;letter-spacing:0;">%s</p>%s%s</div></div>`,
+		borderColor, imgHTML, labelBackground, label,
+		safeSeries, safeName, versionP, priceHTML,
+	)
+
+	if safeURL == "" {
+		return inner
+	}
+	return fmt.Sprintf(`<a href="%s" style="display:block;width:188px;margin:auto;color:inherit;text-decoration:none;">%s</a>`, safeURL, inner)
 }
 
 func renderDiscountedItemCard(item domain.DiscountedWishlistItem) string {
@@ -124,20 +307,19 @@ func renderDiscountedItemCard(item domain.DiscountedWishlistItem) string {
 	safeSeries := html.EscapeString(displayManufacturerOrFallback(item.SeriesName, "Koleksi"))
 	safeURL := html.EscapeString(item.URL)
 	safeImageURL := html.EscapeString(item.ImageURL)
-	safeDiscountName := html.EscapeString(item.DiscountName)
 
 	imgHTML := fmt.Sprintf(
-		`<img src="%s" alt="%s" width="180" height="180" style="display:block;width:180px;height:180px;object-fit:cover;background:#f3f4f6;border:0;">`,
+		`<img src="%s" alt="%s" width="188" height="188" style="display:block;width:188px;height:188px;object-fit:cover;background:#f3f4f6;border:0;border-radius:8px 8px 0 0;">`,
 		safeImageURL, safeName,
 	)
 	if safeImageURL == "" {
-		imgHTML = `<div style="width:180px;height:180px;background:#f3f4f6;"></div>`
+		imgHTML = `<div style="width:188px;height:188px;background:#f3f4f6;border-radius:8px 8px 0 0;"></div>`
 	}
 
 	versionP := ""
 	if safeVersion != "" {
 		versionP = fmt.Sprintf(
-			`<p style="margin:0 0 1px;color:#374151;font-size:10px;font-weight:600;line-height:1.3;">%s</p>`,
+			`<p style="margin:0;color:#2d2d2d;font-size:12px;font-weight:800;line-height:1.25;">%s</p>`,
 			safeVersion,
 		)
 	}
@@ -145,7 +327,7 @@ func renderDiscountedItemCard(item domain.DiscountedWishlistItem) string {
 	originalPriceHTML := ""
 	if item.OriginalPrice > 0 && item.OriginalPrice != item.DiscountPrice {
 		originalPriceHTML = fmt.Sprintf(
-			`<p style="margin:0 0 1px;color:#9ca3af;font-size:9px;font-weight:500;text-decoration:line-through;">%s</p>`,
+			`<p style="margin:8px 0 2px;color:#8b8b8b;font-size:11px;font-weight:700;line-height:1.2;text-decoration:line-through;">%s</p>`,
 			formatIDR(item.OriginalPrice),
 		)
 	}
@@ -154,7 +336,7 @@ func renderDiscountedItemCard(item domain.DiscountedWishlistItem) string {
 	if item.OriginalPrice > 0 && item.DiscountPrice > 0 && item.OriginalPrice > item.DiscountPrice {
 		pct := (item.OriginalPrice - item.DiscountPrice) * 100 / item.OriginalPrice
 		pctBadge = fmt.Sprintf(
-			`<span style="display:inline-block;margin-left:4px;padding:1px 4px;background:#dc2626;border-radius:3px;color:#ffffff;font-size:9px;font-weight:800;">-%d%%</span>`,
+			`<span style="display:inline-block;margin-left:6px;padding:4px 7px;background:#fc4c02;border-radius:5px;color:#ffffff;font-size:10px;font-weight:900;line-height:1;">-%d%%</span>`,
 			pct,
 		)
 	}
@@ -162,40 +344,50 @@ func renderDiscountedItemCard(item domain.DiscountedWishlistItem) string {
 	discountPriceHTML := ""
 	if item.DiscountPrice > 0 {
 		discountPriceHTML = fmt.Sprintf(
-			`<p style="margin:0 0 2px;color:#dc2626;font-size:11px;font-weight:900;line-height:1.3;">%s%s</p>`,
+			`<p style="margin:0;color:#fc4c02;font-size:18px;font-weight:900;line-height:1.2;letter-spacing:0;">%s%s</p>`,
 			formatIDR(item.DiscountPrice), pctBadge,
 		)
 	}
 
-	discountBadge := ""
-	if safeDiscountName != "" {
-		discountBadge = fmt.Sprintf(
-			`<span style="display:inline-block;padding:1px 5px;background:#7c3aed;border-radius:3px;color:#ffffff;font-size:9px;font-weight:800;">%s</span>`,
-			safeDiscountName,
-		)
-	}
-
-	borderStyle := "1px solid #9ca3af"
-	wishlistBadge := ""
-	if item.IsWishlisted {
-		borderStyle = "2px solid #f59e0b"
-		wishlistBadge = `<div style="margin:4px 0 0;text-align:center;"><span style="display:inline-block;padding:2px 8px;background:#fef3c7;border:1px solid #f59e0b;border-radius:3px;color:#92400e;font-size:9px;font-weight:800;">★ Wishlist Kamu</span></div>`
-	}
-
 	inner := fmt.Sprintf(
-		`<div style="overflow:hidden;width:180px;border:%s;border-radius:8px;background:url('https://kyoucdn.id/static/assets/item%%20bg1.jpg') center/cover no-repeat;">%s<div style="padding:8px 10px 10px;text-align:left;"><p style="margin:0 0 2px;color:#2f2b28;font-size:10px;font-weight:400;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">%s</p><p style="margin:0 0 2px;color:#0f172a;font-size:12px;font-weight:900;line-height:1.3;white-space:normal;word-break:break-word;">%s</p>%s%s%s%s%s</div></div>`,
-		borderStyle, imgHTML,
+		`<div style="overflow:hidden;width:188px;border-radius:8px;background:#fff4ec;box-shadow:0 8px 18px rgba(45,45,45,0.16);">%s<div style="min-height:106px;padding:12px 14px 14px;text-align:left;background:linear-gradient(180deg,#fff7f1 0%%,#ffe9dc 100%%);"><p style="margin:0 0 5px;color:#8b8b8b;font-size:10px;font-weight:900;line-height:1.2;letter-spacing:0.8px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">%s</p><p style="margin:0;color:#2d2d2d;font-size:13px;font-weight:900;line-height:1.25;">%s</p>%s%s%s</div></div>`,
+		imgHTML,
 		safeSeries, safeName, versionP,
-		originalPriceHTML, discountPriceHTML, discountBadge, wishlistBadge,
+		originalPriceHTML, discountPriceHTML,
 	)
 
 	if safeURL == "" {
 		return inner
 	}
 	return fmt.Sprintf(
-		`<a href="%s" style="display:block;width:180px;margin:auto;color:inherit;text-decoration:none;">%s</a>`,
+		`<a href="%s" style="display:block;width:188px;margin:auto;color:inherit;text-decoration:none;">%s</a>`,
 		safeURL, inner,
 	)
+}
+
+func discountPercent(item domain.DiscountedWishlistItem) int {
+	if item.OriginalPrice <= 0 || item.DiscountPrice <= 0 || item.OriginalPrice <= item.DiscountPrice {
+		return 0
+	}
+	return (item.OriginalPrice - item.DiscountPrice) * 100 / item.OriginalPrice
+}
+
+func effectiveDiscountedPrice(item domain.DiscountedWishlistItem) int {
+	if item.DiscountPrice > 0 {
+		return item.DiscountPrice
+	}
+	return item.OriginalPrice
+}
+
+func itemURLOrFallback(rawURL, fallback string) string {
+	rawURL = strings.TrimSpace(rawURL)
+	if rawURL == "" {
+		return fallback
+	}
+	if _, err := url.ParseRequestURI(rawURL); err != nil {
+		return fallback
+	}
+	return rawURL
 }
 
 func formatIDR(price int) string {
@@ -209,5 +401,5 @@ func formatIDR(price int) string {
 		s = s[:len(s)-3]
 	}
 	parts = append([]string{s}, parts...)
-	return "Rp " + strings.Join(parts, ".")
+	return "IDR " + strings.Join(parts, ".")
 }

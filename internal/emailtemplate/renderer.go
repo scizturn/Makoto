@@ -72,30 +72,44 @@ type viewData struct {
 	FooterHTML template.HTML
 	CartURL    string
 	// Discounted Wishlist fields
-	FillHTML    template.HTML
-	WishlistURL string
+	FillHTML             template.HTML
+	FeaturedHTML         template.HTML
+	PromoHTML            template.HTML
+	WishlistURL          string
+	WishlistCount        string
+	FillCount            string
+	PromoCount           string
+	DisplayWishlistCount string
+	DisplayFillCount     string
 }
 
 func viewDataFromMergeData(data map[string]any) viewData {
 	return viewData{
-		Name:               stringValue(data["name"]),
-		FirstName:          stringValue(data["first_name"]),
-		VoucherCode:        stringValue(data["voucher_code"]),
-		WishlistHTML:       template.HTML(stringValue(data["wishlist_html"])),
-		FYPHTML:            template.HTML(stringValue(data["fyp_html"])),
-		HistoricalHTML:     template.HTML(stringValue(data["historical_html"])),
-		Years:              stringValue(data["years"]),
-		JoinDate:           stringValue(data["join_date"]),
-		AnniversaryEdition: stringValue(data["anniversary_edition"]),
-		ActionURL:          stringValue(data["action_url"]),
-		Closing:            stringValue(data["closing"]),
-		Greeting:           stringValue(data["greeting"]),
-		CartHTML:           template.HTML(stringValue(data["cart_html"])),
-		RecoHTML:           template.HTML(stringValue(data["reco_html"])),
-		FooterHTML:         template.HTML(stringValue(data["footer_html"])),
-		CartURL:            stringValue(data["cart_url"]),
-		FillHTML:           template.HTML(stringValue(data["fill_html"])),
-		WishlistURL:        stringValue(data["wishlist_url"]),
+		Name:                 stringValue(data["name"]),
+		FirstName:            stringValue(data["first_name"]),
+		VoucherCode:          stringValue(data["voucher_code"]),
+		WishlistHTML:         template.HTML(stringValue(data["wishlist_html"])),
+		FYPHTML:              template.HTML(stringValue(data["fyp_html"])),
+		HistoricalHTML:       template.HTML(stringValue(data["historical_html"])),
+		Years:                stringValue(data["years"]),
+		JoinDate:             stringValue(data["join_date"]),
+		AnniversaryEdition:   stringValue(data["anniversary_edition"]),
+		ActionURL:            stringValue(data["action_url"]),
+		Closing:              stringValue(data["closing"]),
+		Greeting:             stringValue(data["greeting"]),
+		CartHTML:             template.HTML(stringValue(data["cart_html"])),
+		RecoHTML:             template.HTML(stringValue(data["reco_html"])),
+		FooterHTML:           template.HTML(stringValue(data["footer_html"])),
+		CartURL:              stringValue(data["cart_url"]),
+		FillHTML:             template.HTML(stringValue(data["fill_html"])),
+		FeaturedHTML:         template.HTML(stringValue(data["featured_html"])),
+		PromoHTML:            template.HTML(stringValue(data["promo_html"])),
+		WishlistURL:          stringValue(data["wishlist_url"]),
+		WishlistCount:        stringValue(data["wishlist_count"]),
+		FillCount:            stringValue(data["fill_count"]),
+		PromoCount:           stringValue(data["promo_count"]),
+		DisplayWishlistCount: stringValue(data["display_wishlist_count"]),
+		DisplayFillCount:     stringValue(data["display_fill_count"]),
 	}
 }
 

@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/kyou-id/makoto/internal/campaign"
 	"github.com/kyou-id/makoto/internal/domain"
@@ -74,7 +75,7 @@ func main() {
 		}
 	}
 
-	index := buildIndexHTML(rendered)
+	index := buildIndexHTML(rendered, time.Now().Unix())
 	if err := os.WriteFile(outputPath, []byte(index), 0o600); err != nil {
 		log.Fatal("failed writing index: ", err)
 	}
@@ -82,7 +83,7 @@ func main() {
 		outputPath, job.UserID, wishlisted, fill)
 }
 
-func buildIndexHTML(rendered []string) string {
+func buildIndexHTML(rendered []string, version int64) string {
 	var sections strings.Builder
 	for i, path := range rendered {
 		tmplID := templateIDs[i]
@@ -94,7 +95,7 @@ func buildIndexHTML(rendered []string) string {
   </div>`, i+1, tmplID))
 			continue
 		}
-		src := fmt.Sprintf("discounted-wishlist%d-preview.html", i+1)
+		src := fmt.Sprintf("discounted-wishlist%d-preview.html?v=%d", i+1, version)
 		sections.WriteString(fmt.Sprintf(`
   <div class="section">
     <div class="label">Template %d &mdash; %s</div>

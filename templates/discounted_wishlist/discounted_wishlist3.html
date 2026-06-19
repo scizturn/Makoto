@@ -4,113 +4,93 @@
         <meta charset="utf-8" />
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="viewport" content="width=720" />
-        <title>Wishlist kamu lagi diskon!</title>
+        <title>Khilaf Fest wishlist kamu lagi turun</title>
     </head>
-    <body style="margin:0;padding:0;background:#ffffff;font-family:Nunito,Arial,Helvetica,sans-serif;color:#111827;-webkit-text-size-adjust:none;text-size-adjust:none;">
-        <table role="presentation" width="720" cellspacing="0" cellpadding="0" align="center"
-               style="width:720px;min-width:720px;margin:0 auto;border-collapse:collapse;table-layout:fixed;background:#f0fdfa url('https://kyoucdn.id/static/assets/EmailBG.png') repeat top center;">
-        <tr><td style="padding:28px 0;">
+    <body style="margin:0;padding:0;background:#f2f2f2;font-family:Nunito,Arial,Helvetica,sans-serif;color:#2d2d2d;-webkit-text-size-adjust:none;text-size-adjust:none;">
+        <table role="presentation" width="720" cellspacing="0" cellpadding="0" align="center" style="width:720px;min-width:720px;margin:0 auto;border-collapse:collapse;table-layout:fixed;background:#f7f7f7;">
+            <tr>
+                <td style="padding:0;">
+                    <table role="presentation" width="720" cellspacing="0" cellpadding="0" style="width:720px;border-collapse:collapse;background:#fc4c02;">
+                        <tr>
+                            <td width="170" valign="middle" style="width:170px;padding:20px 0 20px 32px;">
+                                <a href="https://kyou.id/" style="color:#ffffff;font-size:22px;font-weight:900;line-height:1;text-decoration:none;">Kyou.id</a>
+                            </td>
+                            <td width="518" valign="middle" align="right" style="width:518px;padding:20px 32px 20px 0;color:#ffffff;font-size:14px;font-weight:900;line-height:1;letter-spacing:.3px;">Khilaf Fest &middot; 13&ndash;22 Juni</td>
+                        </tr>
+                    </table>
 
-            <!-- ── LOGO ── -->
-            <div style="text-align:center;padding:0 0 20px;">
-                <a href="https://kyou.id/" style="display:inline-block;border:0;text-decoration:none;">
-                    <img src="https://kyoucdn.id/static/assets/brand_logo.png" alt="Kyou.id" width="72"
-                         style="display:block;width:72px;height:auto;border:0;" />
-                </a>
-            </div>
+                    <table role="presentation" width="720" cellspacing="0" cellpadding="0" style="width:720px;border-collapse:collapse;background:#ffffff;">
+                        <tr>
+                            <td style="padding:34px 30px 24px;">
+                                <p style="margin:0 0 14px;color:#fc4c02;font-size:13px;font-weight:900;line-height:1.2;letter-spacing:.4px;text-transform:uppercase;">Halo, {{ .FirstName }}</p>
+                                <h1 style="margin:0 0 12px;color:#2d2d2d;font-size:30px;font-weight:900;line-height:1.18;letter-spacing:0;">Maaf ya baru ngabarin, {{ .FirstName }}</h1>
+                                <p style="margin:0;color:#565252;font-size:16px;font-weight:600;line-height:1.58;">Khilaf Fest udah jalan dari kemarin &mdash; ternyata beberapa barang wishlist-mu ikut turun. Sengaja kami samperin biar nggak kelewat.</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding:0 30px 30px;">
+                                <table role="presentation" width="660" cellspacing="0" cellpadding="0" style="width:660px;border-collapse:collapse;border-radius:12px;background:#fff3ee;">
+                                    <tr>
+                                        <td width="430" valign="middle" style="width:430px;padding:16px 18px;color:#fc4c02;font-size:14px;font-weight:900;line-height:1.25;">Khilaf Fest &middot; 13&ndash;22 Juni</td>
+                                        <td width="230" valign="middle" align="right" style="width:230px;padding:16px 18px;color:#2d2d2d;font-size:14px;font-weight:900;line-height:1.25;">Tinggal 5 hari</td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
 
-            <!-- ── HERO ── -->
-            <table role="presentation" width="720" cellspacing="0" cellpadding="0" style="width:720px;border-collapse:collapse;">
-            <tr><td style="padding:0 20px;">
-                <table role="presentation" width="680" cellspacing="0" cellpadding="0"
-                       style="width:680px;border-collapse:collapse;border-radius:16px;overflow:hidden;background:linear-gradient(110deg,#0f766e,#0d9488,#2dd4bf);">
-                    <tr>
-                        <td align="center" valign="top" style="padding:36px 28px 32px;">
-                            <div style="display:inline-block;padding:4px 14px;background:rgba(255,255,255,0.18);border-radius:20px;color:#ccfbf1;font-size:11px;font-weight:800;letter-spacing:3px;text-transform:uppercase;margin:0 0 14px;">
-                                🎯 Diskon Wishlist
-                            </div>
-                            <div style="color:#ffffff;font-size:28px;font-weight:900;line-height:1.25;letter-spacing:-0.5px;margin:0;">
-                                {{ .Greeting }}
-                            </div>
-                        </td>
-                    </tr>
-                </table>
-            </td></tr>
-            </table>
+                    <table role="presentation" width="720" cellspacing="0" cellpadding="0" style="width:720px;border-collapse:collapse;background:#ffffff;">
+                        <tr>
+                            <td style="padding:0 30px 28px;">
+                                {{ .FeaturedHTML }}
+                            </td>
+                        </tr>
+                    </table>
 
-            <!-- ── WISHLIST ITEMS ON SALE ── -->
-            <table role="presentation" width="720" cellspacing="0" cellpadding="0" style="width:720px;border-collapse:collapse;">
-            <tr><td style="padding:28px 20px 0;">
-                <table role="presentation" width="680" cellspacing="0" cellpadding="0"
-                       style="width:680px;border-collapse:collapse;border-radius:14px;background:#ffffff;border:1px solid #99f6e4;">
-                    <tr>
-                        <td style="padding:28px 22px 24px;">
-                            <p style="margin:0 0 4px;font-size:13px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:#0f766e;">
-                                ★ Wishlist Kamu yang Lagi Diskon
-                            </p>
-                            <h2 style="margin:0 0 24px;font-size:20px;font-weight:900;color:#1a1a1a;line-height:1.3;">
-                                Momen yang tepat buat checkout wishlist impianmu!
-                            </h2>
-                            {{ .WishlistHTML }}
-                            <div style="margin:28px 0 0;text-align:center;">
-                                <a href="{{ .WishlistURL }}" style="display:inline-block;padding:14px 36px;background:#0f766e;color:#ffffff;font-size:15px;font-weight:900;text-decoration:none;border-radius:10px;letter-spacing:0.5px;">
-                                    Lihat Wishlistku
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                </table>
-            </td></tr>
-            </table>
+                    <table role="presentation" width="720" cellspacing="0" cellpadding="0" style="width:720px;border-collapse:collapse;background:#fffaf6;">
+                        <tr>
+                            <td style="padding:30px 30px 18px;">
+                                <h2 style="margin:0 0 8px;color:#2d2d2d;font-size:24px;font-weight:900;line-height:1.2;letter-spacing:0;">Sekarang lagi ada promosi!</h2>
+                                <p style="margin:0;color:#565252;font-size:15px;font-weight:600;line-height:1.55;">{{ .PromoCount }} barang lagi promo di Khilaf Fest &mdash; {{ .DisplayWishlistCount }} dari wishlist kamu + {{ .DisplayFillCount }} pilihan buat kamu.</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding:10px 23px 20px;">
+                                {{ .PromoHTML }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding:0 30px 18px;text-align:center;">
+                                <p style="margin:0;color:#8b8b8b;font-size:12px;font-weight:800;line-height:1.5;">Border oranye = dari wishlist-mu &middot; sisanya pilihan populer yang lagi Ready</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding:0 30px 34px;">
+                                <a href="{{ .WishlistURL }}" style="display:block;width:660px;padding:18px 0;border-radius:8px;background:#fc4c02;color:#ffffff;font-size:16px;font-weight:900;line-height:1;text-align:center;text-decoration:none;">Buka Semua Promo Wishlist-ku</a>
+                            </td>
+                        </tr>
+                    </table>
 
-            <!-- ── FILL ITEMS FROM SAME SERIES ── -->
-            <table role="presentation" width="720" cellspacing="0" cellpadding="0" style="width:720px;border-collapse:collapse;">
-            <tr><td style="padding:20px 20px 0;">
-                <table role="presentation" width="680" cellspacing="0" cellpadding="0"
-                       style="width:680px;border-collapse:collapse;border-radius:14px;background:#ffffff;border:1px solid #e5e7eb;">
-                    <tr>
-                        <td style="padding:28px 22px 24px;">
-                            <p style="margin:0 0 4px;font-size:13px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:#6b7280;">
-                                Dari Seri yang Sama
-                            </p>
-                            <h2 style="margin:0 0 24px;font-size:18px;font-weight:900;color:#1a1a1a;">
-                                Cocok buat nemenin koleksimu!
-                            </h2>
-                            {{ .FillHTML }}
-                        </td>
-                    </tr>
-                </table>
-            </td></tr>
-            </table>
+                    <table role="presentation" width="720" cellspacing="0" cellpadding="0" style="width:720px;border-collapse:collapse;background:#ffffff;">
+                        <tr>
+                            <td style="padding:30px 42px 28px;">
+                                <p style="margin:0 0 14px;color:#565252;font-size:15px;font-weight:600;line-height:1.65;">Wishlist itu memang buat ditunggu momennya. Nggak perlu buru-buru. Kalau salah satu udah lama kamu incer, sekarang waktunya pas aja.</p>
+                                <p style="margin:0;color:#2d2d2d;font-size:15px;font-weight:900;line-height:1.5;">&mdash; Kouka &amp; Kousei, Kyou Hobby Shop</p>
+                            </td>
+                        </tr>
+                    </table>
 
-            <!-- ── CLOSING ── -->
-            <table role="presentation" width="720" cellspacing="0" cellpadding="0" style="width:720px;border-collapse:collapse;">
-            <tr><td style="padding:24px 20px 0;">
-                <table role="presentation" width="680" cellspacing="0" cellpadding="0" style="width:680px;border-collapse:collapse;">
-                    <tr>
-                        <td style="padding:0 12px;text-align:center;">
-                            <p style="margin:0;font-size:15px;font-weight:600;color:#4b5563;line-height:1.6;">
-                                {{ .Closing }}
-                            </p>
-                        </td>
-                    </tr>
-                </table>
-            </td></tr>
-            </table>
-
-            <!-- ── FOOTER ── -->
-            <table role="presentation" width="720" cellspacing="0" cellpadding="0" style="width:720px;border-collapse:collapse;">
-            <tr><td style="padding:28px 20px 0;text-align:center;">
-                <p style="margin:0 0 6px;font-size:12px;color:#9ca3af;">
-                    © 2025 Kyou.id · <a href="https://kyou.id/" style="color:#9ca3af;text-decoration:none;">kyou.id</a>
-                </p>
-                <p style="margin:0;font-size:11px;color:#d1d5db;">
-                    Kamu menerima email ini karena item di wishlistmu sedang dalam periode promo.
-                </p>
-            </td></tr>
-            </table>
-
-        </td></tr>
+                    <table role="presentation" width="720" cellspacing="0" cellpadding="0" style="width:720px;border-collapse:collapse;background:#f7f7f7;">
+                        <tr>
+                            <td style="padding:24px 30px 30px;text-align:center;">
+                                <p style="margin:0 0 8px;color:#565252;font-size:13px;font-weight:900;line-height:1.5;">Ayo cintai hobimu bareng Kyou!</p>
+                                <p style="margin:0 0 8px;color:#8b8b8b;font-size:12px;font-weight:700;line-height:1.5;">Toko fisik: Bekasi (&alpha;) &middot; Tangerang (&beta;) &middot; Surabaya (&gamma;)</p>
+                                <p style="margin:0;color:#a2a2a2;font-size:11px;line-height:1.5;">Kamu menerima email ini karena terdaftar sebagai member Kyou. &copy; 2026 Kyou Hobby Shop</p>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
         </table>
     </body>
 </html>
