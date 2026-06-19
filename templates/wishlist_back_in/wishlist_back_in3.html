@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Wishlist kamu ready lagi</title></head>
+<body style="margin:0;padding:0;background:#f3f3f3;font-family:Arial,sans-serif;color:#2d2d2d;">
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse;background:#f3f3f3;">
+<tr><td align="center" style="padding:24px 10px;">
+<table role="presentation" width="720" cellspacing="0" cellpadding="0" style="width:720px;max-width:100%;border-collapse:collapse;background:#ffffff;">
+<tr><td style="padding:30px 42px 22px;border-top:5px solid #fc4c02;">
+<p style="margin:0 0 8px;color:#fc4c02;font-size:13px;font-weight:900;line-height:1.4;text-transform:uppercase;">Wishlist Back In</p>
+<h1 style="margin:0 0 12px;font-size:30px;font-weight:900;line-height:1.18;">{{ .Greeting }}</h1>
+<p style="margin:0;color:#565252;font-size:16px;font-weight:600;line-height:1.6;">Ada kabar dari wishlist-mu: item incaran ini baru saja ready lagi.</p>
+</td></tr>
+<tr><td style="padding:12px 30px 24px;">{{ .BackInItemHTML }}</td></tr>
+{{ if .HasVoucher }}<tr><td style="padding:0 42px 28px;">
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse;background:#fff4ec;border-left:4px solid #fc4c02;">
+<tr><td style="padding:20px 22px;">
+<p style="margin:0 0 6px;color:#2d2d2d;font-size:16px;font-weight:900;">Bonus buat menyambut dia balik</p>
+<p style="margin:0 0 14px;color:#565252;font-size:14px;line-height:1.55;">Pakai voucher ini dalam 14 hari ke depan.</p>
+<p style="margin:0 0 16px;color:#fc4c02;font-size:23px;font-weight:900;letter-spacing:0;">{{ .VoucherCode }}</p>
+<a href="{{ .ActionURL }}" style="display:inline-block;padding:13px 20px;border-radius:6px;background:#fc4c02;color:#ffffff;font-size:14px;font-weight:900;text-decoration:none;">Ambil Voucher</a>
+</td></tr></table>
+</td></tr>{{ end }}
+{{ if .HasCompanion }}
+<tr><td style="padding:26px 42px 12px;border-top:1px solid #e5e7eb;">
+<p style="margin:0 0 6px;color:#fc4c02;font-size:12px;font-weight:900;text-transform:uppercase;">Pasangan koleksimu</p>
+<h2 style="margin:0 0 8px;font-size:22px;font-weight:900;line-height:1.3;">Gas buat nemenin {{ .CompanionName }}</h2>
+<p style="margin:0;color:#565252;font-size:14px;line-height:1.55;">Item yang kembali ini masih satu series atau kategori dengan koleksi yang pernah kamu beli.</p>
+</td></tr>
+<tr><td style="padding:8px 30px 28px;">{{ .CompanionHTML }}</td></tr>
+{{ end }}
+<tr><td style="padding:26px 42px;background:#f7f7f7;text-align:center;">
+<p style="margin:0 0 8px;font-size:14px;font-weight:900;">{{ .Closing }}</p>
+<p style="margin:0;color:#8b8b8b;font-size:11px;line-height:1.5;">Kamu menerima email ini karena item di wishlist-mu kembali tersedia. &copy; 2026 Kyou Hobby Shop</p>
+</td></tr>
+</table>
+</td></tr></table>
+</body>
+</html>

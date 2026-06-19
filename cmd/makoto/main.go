@@ -82,6 +82,21 @@ func main() {
 		}
 	}
 
+	// --- Wishlist Back In ---
+	wishlistBackInCampaign := campaign.WishlistBackInCampaign{
+		TemplateIDs: cfg.WishlistBackInTemplateIDs,
+		Greetings:   cfg.WishlistBackInGreetings,
+		ActionURL:   cfg.WishlistBackInActionURL,
+		Closing:     "Mumpung sudah kembali, jangan sampai kelewatan lagi ya!",
+	}
+	wishlistBackInProcessor := worker.NewWishlistBackInProcessor(sender, validator, wishlistBackInCampaign)
+	wishlistBackInProcessor.Domain = cfg.KirimEmailDomain
+	wishlistBackInProcessor.FromEmail = cfg.FromEmail
+	wishlistBackInProcessor.FromName = cfg.FromName
+	if cfg.WishlistBackInEmailTemplateDir != "" {
+		wishlistBackInProcessor.Renderer = emailtemplate.FileRenderer{Dir: cfg.WishlistBackInEmailTemplateDir, Subject: cfg.WishlistBackInEmailSubject}
+	}
+
 	// --- Winback ---
 	winbackCampaign := campaign.WinbackCampaign{
 		TemplateIDs: cfg.WinbackTemplateIDs,
@@ -148,6 +163,13 @@ func main() {
 		}
 	}()
 
+	wishlistBackInQueue := queue.NewWishlistBackInRedisQueue(cfg.RedisAddr, cfg.RedisPassword, cfg.RedisDB, cfg.WishlistBackInQueueName)
+	defer func() {
+		if err := wishlistBackInQueue.Close(); err != nil {
+			log.Printf("wishlist back in redis close failed: %v", err)
+		}
+	}()
+
 	winbackQueue := queue.NewWinbackRedisQueue(cfg.RedisAddr, cfg.RedisPassword, cfg.RedisDB, cfg.WinbackQueueName)
 	defer func() {
 		if err := winbackQueue.Close(); err != nil {
@@ -192,6 +214,12 @@ func main() {
 	discountedWishlistProcessor.BeforeSend = func(ctx context.Context, job domain.DiscountedWishlistJob, result worker.ProcessResult) error {
 		if err := auditLogger.MarkSending(ctx, auditInfoFromDiscountedWishlistJob(job, result)); err != nil {
 			log.Printf("discounted wishlist email audit sending update failed: job_id=%s user_id=%s err=%v", job.ID, job.UserID, err)
+		}
+		return nil
+	}
+	wishlistBackInProcessor.BeforeSend = func(ctx context.Context, job domain.WishlistBackInJob, result worker.ProcessResult) error {
+		if err := auditLogger.MarkSending(ctx, auditInfoFromWishlistBackInJob(job, result)); err != nil {
+			log.Printf("wishlist back in email audit sending update failed: job_id=%s user_id=%s err=%v", job.ID, job.UserID, err)
 		}
 		return nil
 	}
@@ -254,6 +282,20 @@ func main() {
 		}()
 	} else {
 		log.Print("MAKOTO_DISCOUNTED_WISHLIST_ENABLED is false; skipping discounted wishlist sender")
+	}
+
+	if cfg.WishlistBackInEnabled {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			runWishlistBackInSender(ctx, wishlistBackInQueue, wishlistBackInProcessor, discord, auditLogger, senderConfig{
+				rateLimitPerMinute: cfg.RateLimitPerMinute,
+				deadLetterQueue:    cfg.WishlistBackInDeadLetterQueue,
+				maxAttempts:        cfg.MaxAttempts,
+			})
+		}()
+	} else {
+		log.Print("MAKOTO_WISHLIST_BACK_IN_ENABLED is false; skipping wishlist back in sender")
 	}
 
 	if cfg.WinbackEnabled {
@@ -604,6 +646,18 @@ func auditInfoFromDiscountedWishlistJob(job domain.DiscountedWishlistJob, result
 	}
 }
 
+func auditInfoFromWishlistBackInJob(job domain.WishlistBackInJob, result worker.ProcessResult) audit.MessageInfo {
+	attempt := job.Attempt
+	if attempt <= 0 {
+		attempt = 1
+	}
+	return audit.MessageInfo{
+		JobID: job.ID, Attempt: attempt, TemplateID: result.TemplateID, Subject: result.Subject,
+		ActionURL: result.ActionURL, ProviderMessageID: result.SendResult.MessageID,
+		ProviderStatus: result.SendResult.StatusCode, ProviderResponse: result.SendResult.Response,
+	}
+}
+
 func auditInfoFromLeftoverCartJob(job domain.LeftoverCartJob, result worker.ProcessResult) audit.MessageInfo {
 	attempt := job.Attempt
 	if attempt <= 0 {
@@ -746,6 +800,62 @@ func runDiscountedWishlistSender(ctx context.Context, q *queue.DiscountedWishlis
 		}
 		log.Printf("discounted wishlist email sent: job_id=%s user_id=%s", job.ID, job.UserID)
 		_ = discord.Log(ctx, fmt.Sprintf("[Discounted Wishlist Email Sent]\nJob: %s\nUser: %s\nEmail: %s", job.ID, job.UserID, maskEmail(job.User.Email)))
+	}
+}
+
+func runWishlistBackInSender(ctx context.Context, q *queue.WishlistBackInRedisQueue, processor *worker.WishlistBackInProcessor, discord notify.DiscordLogger, auditLogger *audit.Logger, cfg senderConfig) {
+	if cfg.rateLimitPerMinute <= 0 {
+		cfg.rateLimitPerMinute = 100
+	}
+	if recovered, err := q.RecoverProcessing(ctx); err != nil {
+		log.Printf("wishlist back in redis processing recovery failed: %v", err)
+	} else if recovered > 0 {
+		log.Printf("wishlist back in redis processing recovery requeued %d job(s)", recovered)
+	}
+	interval := time.Minute / time.Duration(cfg.rateLimitPerMinute)
+	if interval <= 0 {
+		interval = time.Second
+	}
+	ticker := time.NewTicker(interval)
+	defer ticker.Stop()
+
+	for {
+		processingJob, err := q.Dequeue(ctx, 5*time.Second)
+		if errors.Is(err, redis.Nil) {
+			continue
+		}
+		if err != nil {
+			log.Printf("wishlist back in redis dequeue failed: %v", err)
+			continue
+		}
+		job := processingJob.Job
+		select {
+		case <-ctx.Done():
+			return
+		case <-ticker.C:
+		}
+
+		processResult, err := processor.Process(ctx, job)
+		auditInfo := auditInfoFromWishlistBackInJob(job, processResult)
+		if err != nil {
+			auditInfo.FailureReason = err.Error()
+			if auditErr := auditLogger.MarkFailed(ctx, auditInfo); auditErr != nil {
+				log.Printf("wishlist back in email audit failed update failed: job_id=%s err=%v", job.ID, auditErr)
+			}
+			if ackErr := q.Ack(ctx, processingJob.Payload); ackErr != nil {
+				log.Printf("wishlist back in email failed but ack failed: job_id=%s err=%v", job.ID, ackErr)
+			}
+			_ = discord.Log(ctx, fmt.Sprintf("[Wishlist Back In Email Failed]\nJob: %s\nUser: %s\nEmail: %s\nError: %v", job.ID, job.UserID, maskEmail(job.User.Email), err))
+			continue
+		}
+		if err := auditLogger.MarkSent(ctx, auditInfo); err != nil {
+			log.Printf("wishlist back in email audit sent update failed: job_id=%s err=%v", job.ID, err)
+		}
+		if err := q.Ack(ctx, processingJob.Payload); err != nil {
+			log.Printf("wishlist back in email sent but ack failed: job_id=%s err=%v", job.ID, err)
+			continue
+		}
+		log.Printf("wishlist back in email sent: job_id=%s user_id=%s", job.ID, job.UserID)
 	}
 }
 

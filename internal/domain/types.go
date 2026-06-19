@@ -119,6 +119,32 @@ type DiscountedWishlistJob struct {
 	Attempt int                      `json:"attempt"`
 }
 
+type WishlistBackInItem struct {
+	ID           string    `json:"id"`
+	Name         string    `json:"name"`
+	URL          string    `json:"url"`
+	ImageURL     string    `json:"image_url"`
+	Price        int       `json:"price"`
+	Status       string    `json:"status"`
+	Manufacturer string    `json:"manufacturer"`
+	SeriesName   string    `json:"series_name"`
+	CategoryName string    `json:"category_name"`
+	PopularScore int       `json:"popular_score"`
+	RestockedAt  time.Time `json:"restocked_at"`
+}
+
+type WishlistBackInJob struct {
+	ID            string             `json:"job_id"`
+	UserID        string             `json:"user_id"`
+	Date          time.Time          `json:"date"`
+	User          User               `json:"user"`
+	VoucherCode   string             `json:"voucher_code,omitempty"`
+	VoucherID     int64              `json:"voucher_id,omitempty"`
+	Item          WishlistBackInItem `json:"item"`
+	CompanionItem WishlistBackInItem `json:"companion_item"`
+	Attempt       int                `json:"attempt"`
+}
+
 type EmailMessage struct {
 	Domain           string
 	FromEmail        string

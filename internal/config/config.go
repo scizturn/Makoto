@@ -70,6 +70,14 @@ type Config struct {
 	WinbackEmailSubjects               []string
 	WinbackGreetings                   []string
 	WinbackActionURL                   string
+	WishlistBackInEnabled              bool
+	WishlistBackInQueueName            string
+	WishlistBackInDeadLetterQueue      string
+	WishlistBackInTemplateIDs          []string
+	WishlistBackInEmailTemplateDir     string
+	WishlistBackInEmailSubject         string
+	WishlistBackInGreetings            []string
+	WishlistBackInActionURL            string
 }
 
 func Load() Config {
@@ -159,7 +167,19 @@ func Load() Config {
 			"{{ .FirstName }}, ada yang nungguin kamu balik nih!",
 			"Psst {{ .FirstName }}, ada voucher spesial buat kamu!",
 		}),
-		WinbackActionURL: env("MAKOTO_WINBACK_ACTION_URL", "https://kyou.id/user/my-voucher"),
+		WinbackActionURL:               env("MAKOTO_WINBACK_ACTION_URL", "https://kyou.id/user/my-voucher"),
+		WishlistBackInEnabled:          envBool("MAKOTO_WISHLIST_BACK_IN_ENABLED", false),
+		WishlistBackInQueueName:        env("MAKOTO_WISHLIST_BACK_IN_QUEUE_NAME", "wishlist_back_in_email_jobs"),
+		WishlistBackInDeadLetterQueue:  env("MAKOTO_WISHLIST_BACK_IN_DEAD_LETTER_QUEUE", "wishlist_back_in_email_jobs_dead"),
+		WishlistBackInTemplateIDs:      envList("MAKOTO_WISHLIST_BACK_IN_TEMPLATE_IDS", []string{"wishlist_back_in1.html", "wishlist_back_in2.html", "wishlist_back_in3.html"}),
+		WishlistBackInEmailTemplateDir: os.Getenv("MAKOTO_WISHLIST_BACK_IN_EMAIL_TEMPLATE_DIR"),
+		WishlistBackInEmailSubject:     env("MAKOTO_WISHLIST_BACK_IN_EMAIL_SUBJECT", "{{ .FirstName }}, wishlist kamu tersedia lagi!"),
+		WishlistBackInGreetings: envListPipe("MAKOTO_WISHLIST_BACK_IN_GREETINGS", []string{
+			"Omatase, {{ .FirstName }}! Yang kamu tunggu akhirnya balik.",
+			"{{ .FirstName }}, penantiannya selesai. Wishlist kamu ready lagi!",
+			"Kabar baik, {{ .FirstName }}. Item incaranmu sudah kembali!",
+		}),
+		WishlistBackInActionURL: env("MAKOTO_WISHLIST_BACK_IN_ACTION_URL", "https://kyou.id/user/my-voucher"),
 	}
 }
 

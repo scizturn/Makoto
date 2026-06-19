@@ -1,0 +1,40 @@
+{
+  "job_id": "preview-wishlist-back-in-2026-06-19-user-147044",
+  "user_id": "147044",
+  "date": "2026-06-19T10:41:20.991498+07:00",
+  "user": {
+    "id": "147044",
+    "name": "Tegar",
+    "email": "tegaramir327@gmail.com",
+    "birthday": "0001-01-01T00:00:00Z",
+    "is_active": true
+  },
+  "voucher_code": "WBI-PREVIEW-14D",
+  "item": {
+    "id": "184002",
+    "name": "Banpresto Evolve Figure Tamamo Cross - Uma Musume: Cinderella Gray (20cm)",
+    "url": "https://kyou.id/items/184002/",
+    "image_url": "https://kyoucdn.id/items/revive-banpresto-evolve-figure-tamamo-cross-uma-musume-cinderella-gray-20cm-f33a226841f097d06cddf4c54972bc30a053f058f814c255bb2cb964a7a41dd9.jpg.webp",
+    "price": 660000,
+    "status": "ready",
+    "manufacturer": "Bandai Spirits",
+    "series_name": "Uma Musume",
+    "category_name": "Prize Figure",
+    "popular_score": 107,
+    "restocked_at": "2026-04-29T17:39:07Z"
+  },
+  "companion_item": {
+    "id": "",
+    "name": "",
+    "url": "",
+    "image_url": "",
+    "price": 0,
+    "status": "",
+    "manufacturer": "",
+    "series_name": "",
+    "category_name": "",
+    "popular_score": 0,
+    "restocked_at": "0001-01-01T00:00:00Z"
+  },
+  "attempt": 1
+}

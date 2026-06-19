@@ -81,6 +81,11 @@ type viewData struct {
 	PromoCount           string
 	DisplayWishlistCount string
 	DisplayFillCount     string
+	BackInItemHTML       template.HTML
+	CompanionHTML        template.HTML
+	CompanionName        string
+	HasCompanion         bool
+	HasVoucher           bool
 }
 
 func viewDataFromMergeData(data map[string]any) viewData {
@@ -110,7 +115,17 @@ func viewDataFromMergeData(data map[string]any) viewData {
 		PromoCount:           stringValue(data["promo_count"]),
 		DisplayWishlistCount: stringValue(data["display_wishlist_count"]),
 		DisplayFillCount:     stringValue(data["display_fill_count"]),
+		BackInItemHTML:       template.HTML(stringValue(data["back_in_item_html"])),
+		CompanionHTML:        template.HTML(stringValue(data["companion_html"])),
+		CompanionName:        stringValue(data["companion_name"]),
+		HasCompanion:         boolValue(data["has_companion"]),
+		HasVoucher:           boolValue(data["has_voucher"]),
 	}
+}
+
+func boolValue(value any) bool {
+	result, _ := value.(bool)
+	return result
 }
 
 func stringValue(value any) string {
