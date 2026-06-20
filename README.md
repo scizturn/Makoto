@@ -1,8 +1,8 @@
 # Makoto
 
-Birthday dan anniversary email sender untuk Kyou.id.
+Email campaign sender untuk Kyou.id, termasuk discounted wishlist.
 
-Makoto consume job dari Redis, render template HTML, dan kirim via Kirim.email. Dua worker berjalan concurrent: satu untuk birthday, satu untuk anniversary.
+Makoto consume job dari Redis, render template HTML, dan kirim via Kirim.email. Worker campaign yang enabled berjalan concurrent.
 
 ## Flow
 
@@ -24,14 +24,17 @@ Redis (birthday_email_jobs / anniversary_email_jobs)
 |---|---|---|---|
 | Birthday | `birthday_email_jobs` | `birthday_email_jobs_dead` | `templates/birthday` |
 | Anniversary | `anniversary_email_jobs` | `anniversary_email_jobs_dead` | `templates/anniversary` |
+| Discounted wishlist | `discounted_wishlist_email_jobs` | `discounted_wishlist_email_jobs_dead` | `templates/discounted_wishlist` |
 
 Anniversary dikontrol via `MAKOTO_ANNIVERSARY_ENABLED=true`. Kalau false, worker anniversary tidak dijalankan.
+Discounted wishlist dikontrol via `MAKOTO_DISCOUNTED_WISHLIST_ENABLED=true` dan default-nya false.
 
 ## Local Commands
 
 ```sh
 make test
 make build
+go run ./cmd/renderpreview-discounted-wishlist
 ```
 
 ## Environment
@@ -86,6 +89,14 @@ MAKOTO_ANNIVERSARY_EMAIL_TEMPLATE_DIR=templates/anniversary
 # Subject berotasi otomatis (3 variant). Override via MAKOTO_ANNIVERSARY_EMAIL_SUBJECTS
 # dengan separator pipe: "Subject 1|Subject 2|Subject 3"
 # Variabel tersedia: {{ .Name }}, {{ .FirstName }}, {{ .Years }}
+
+# Discounted wishlist
+MAKOTO_DISCOUNTED_WISHLIST_ENABLED=false
+MAKOTO_DISCOUNTED_WISHLIST_QUEUE_NAME=discounted_wishlist_email_jobs
+MAKOTO_DISCOUNTED_WISHLIST_DEAD_LETTER_QUEUE=discounted_wishlist_email_jobs_dead
+MAKOTO_DISCOUNTED_WISHLIST_TEMPLATE_IDS=discounted_wishlist1.html,discounted_wishlist2.html,discounted_wishlist3.html
+MAKOTO_DISCOUNTED_WISHLIST_EMAIL_TEMPLATE_DIR=templates/discounted_wishlist
+MAKOTO_DISCOUNTED_WISHLIST_URL=https://kyou.id/user/wishlist
 ```
 
 ## Template Variables
@@ -115,6 +126,27 @@ MAKOTO_ANNIVERSARY_EMAIL_TEMPLATE_DIR=templates/anniversary
 {{ .ActionURL }}          — URL klaim voucher
 {{ .Closing }}            — kalimat penutup
 ```
+
+### Discounted Wishlist
+
+```text
+{{ .FirstName }}            — nama depan user
+{{ .DiscountName }}         — nama campaign diskon
+{{ .FeaturedHTML }}         — item wishlist utama
+{{ .PromoHTML }}            — sisa wishlist + item fill
+{{ .WishlistURL }}          — CTA ke wishlist
+{{ .FooterHTML }}           — footer campaign
+```
+
+Template, subject, dan greeting dipilih deterministik dari tanggal + job ID, sehingga retry job yang sama tetap konsisten. Makoto hanya mengirim jika `user.is_active=true`, email tidak kosong, dan validator email menerima alamat tersebut.
+
+Preview seluruh tiga template:
+
+```sh
+go run ./cmd/renderpreview-discounted-wishlist
+```
+
+Output ditulis ke `templates/preview/discounted-wishlist*-preview.html`.
 
 ## Subject Rotation
 
@@ -168,11 +200,50 @@ Default subjects:
 }
 ```
 
+### Discounted Wishlist
+
+```json
+{
+  "job_id": "discounted-wishlist-2026-06-20-user-123",
+  "user_id": "123",
+  "date": "2026-06-20T00:00:00+07:00",
+  "user": { "id": "123", "name": "Budi Santoso", "email": "budi@example.com", "is_active": true },
+  "items": [
+    {
+      "id": "1001",
+      "name": "Nendoroid Example",
+      "character_name": "Example",
+      "url": "https://kyou.id/items/1001/",
+      "image_url": "https://kyoucdn.id/example.webp",
+      "original_price": 750000,
+      "discount_price": 600000,
+      "discount_name": "Mid Year Sale",
+      "status": "ready",
+      "is_wishlisted": true
+    }
+  ],
+  "attempt": 1
+}
+```
+
 ## Failed Jobs
 
 Birthday: retry hingga `MAKOTO_MAX_ATTEMPTS` dengan backoff (5 menit, 15 menit), lalu masuk dead letter queue.
 
 Anniversary: langsung mark failed dan ack — tidak ada retry chain.
+
+Discounted wishlist saat ini juga langsung mark failed dan ack. Walaupun dead-letter queue dan max attempts tersedia di config, keduanya belum dipakai oleh worker ini.
+
+## Discounted Wishlist Production Readiness
+
+Belum siap untuk mass-send. Sebelum enable di production:
+
+- implement retry + dead-letter handling; saat ini send/validation/render error langsung di-ack dan job hilang dari processing queue;
+- bedakan hasil `skipped` dari `sent`; processor saat ini mengembalikan sukses kosong untuk user inactive/email kosong/validation rejected, lalu worker menandai audit sebagai `sent`;
+- tambahkan unit test processor dan worker untuk valid send, inactive/invalid skip, render failure, provider failure, retry, dead letter, dan recovery;
+- lakukan inbox rendering test pada client utama dan pastikan kebutuhan unsubscribe/compliance campaign dipenuhi oleh template atau provider.
+
+Jangan set `MAKOTO_DISCOUNTED_WISHLIST_ENABLED=true` untuk mass-send sampai blocker di atas dan blocker Yukari di README-nya selesai.
 
 Retry manual dari dead letter:
 
@@ -182,4 +253,4 @@ go run ./cmd/retrydead --job-id birthday-2026-05-21-user-123
 
 ## Coolify
 
-Deploy sebagai long-running service (container tidak pernah exit). Makoto langsung mulai consume dari Redis saat container start. Pastikan `MAKOTO_ANNIVERSARY_ENABLED=true` di environment Coolify kalau anniversary aktif.
+Deploy sebagai long-running service (container tidak pernah exit). Makoto langsung mulai consume dari Redis saat container start. Queue name Yukari dan Makoto harus sama. Enable discounted wishlist hanya setelah checklist production readiness selesai.
