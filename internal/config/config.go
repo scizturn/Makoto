@@ -62,6 +62,7 @@ type Config struct {
 	DiscountedWishlistEmailSubjects    []string
 	DiscountedWishlistGreetings        []string
 	DiscountedWishlistURL              string
+	DiscountedWishlistUnsubscribeURL   string
 	WinbackEnabled                     bool
 	WinbackQueueName                   string
 	WinbackDeadLetterQueue             string
@@ -154,13 +155,14 @@ func Load() Config {
 			"Woi {{ .FirstName }}, item wishlist favoritmu lagi ada promo!",
 			"{{ .FirstName }}, jangan sampai nyesel — wishlistmu lagi diskon sekarang!",
 		}),
-		DiscountedWishlistURL:   env("MAKOTO_DISCOUNTED_WISHLIST_URL", "https://kyou.id/user/wishlist"),
-		WinbackEnabled:          envBool("MAKOTO_WINBACK_ENABLED", false),
-		WinbackQueueName:        env("MAKOTO_WINBACK_QUEUE_NAME", "winback_email_jobs"),
-		WinbackDeadLetterQueue:  env("MAKOTO_WINBACK_DEAD_LETTER_QUEUE", "winback_email_jobs_dead"),
-		WinbackTemplateIDs:      envList("MAKOTO_WINBACK_TEMPLATE_IDS", []string{"winback1.html", "winback2.html", "winback3.html"}),
-		WinbackEmailTemplateDir: os.Getenv("MAKOTO_WINBACK_EMAIL_TEMPLATE_DIR"),
-		WinbackEmailSubject:     env("MAKOTO_WINBACK_EMAIL_SUBJECT", "{{ .FirstName }}, kita kangen kamu nih!"),
+		DiscountedWishlistURL:            env("MAKOTO_DISCOUNTED_WISHLIST_URL", "https://kyou.id/user/wishlist"),
+		DiscountedWishlistUnsubscribeURL: os.Getenv("MAKOTO_DISCOUNTED_WISHLIST_UNSUBSCRIBE_URL"),
+		WinbackEnabled:                   envBool("MAKOTO_WINBACK_ENABLED", false),
+		WinbackQueueName:                 env("MAKOTO_WINBACK_QUEUE_NAME", "winback_email_jobs"),
+		WinbackDeadLetterQueue:           env("MAKOTO_WINBACK_DEAD_LETTER_QUEUE", "winback_email_jobs_dead"),
+		WinbackTemplateIDs:               envList("MAKOTO_WINBACK_TEMPLATE_IDS", []string{"winback1.html", "winback2.html", "winback3.html"}),
+		WinbackEmailTemplateDir:          os.Getenv("MAKOTO_WINBACK_EMAIL_TEMPLATE_DIR"),
+		WinbackEmailSubject:              env("MAKOTO_WINBACK_EMAIL_SUBJECT", "{{ .FirstName }}, kita kangen kamu nih!"),
 		WinbackEmailSubjects: envListPipe("MAKOTO_WINBACK_EMAIL_SUBJECTS", []string{
 			"{{ .FirstName }}, kita kangen kamu nih!",
 			"Ada voucher spesial buat kamu, {{ .FirstName }}!",

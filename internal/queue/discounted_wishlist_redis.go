@@ -38,6 +38,21 @@ func (q *DiscountedWishlistRedisQueue) Close() error {
 	return q.client.Close()
 }
 
+func (q *DiscountedWishlistRedisQueue) Enqueue(ctx context.Context, job domain.DiscountedWishlistJob) error {
+	return q.EnqueueTo(ctx, q.name, job)
+}
+
+func (q *DiscountedWishlistRedisQueue) EnqueueTo(ctx context.Context, name string, job domain.DiscountedWishlistJob) error {
+	payload, err := EncodeDiscountedWishlistJob(job)
+	if err != nil {
+		return err
+	}
+	if name == "" {
+		name = q.name
+	}
+	return q.client.RPush(ctx, name, payload).Err()
+}
+
 func (q *DiscountedWishlistRedisQueue) Dequeue(ctx context.Context, timeout time.Duration) (DiscountedWishlistProcessingJob, error) {
 	payload, err := q.client.BLMove(ctx, q.name, q.processingName(), "LEFT", "RIGHT", timeout).Result()
 	if err != nil {

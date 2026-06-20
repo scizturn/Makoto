@@ -206,6 +206,17 @@ func TestDiscountedPromoGridRendersTapedWishlistCards(t *testing.T) {
 	}
 }
 
+func TestDiscountedWishlistFooterIncludesValidatedUnsubscribeLink(t *testing.T) {
+	c := DiscountedWishlistCampaign{
+		UnsubscribeURL: "https://kyou.id/user/notification-settings",
+	}
+	data := c.BuildMergeData(domain.User{Name: "Budi"}, nil, "")
+	footer, _ := data["footer_html"].(string)
+	if !containsAll(footer, []string{"Atur preferensi email", "https://kyou.id/user/notification-settings"}) {
+		t.Fatalf("expected unsubscribe preference link, got %q", footer)
+	}
+}
+
 func TestRenderFYPHTMLUsesImageCardsWhenImageURLExists(t *testing.T) {
 	got := RenderFYPHTML([]domain.FYPItem{
 		{

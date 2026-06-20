@@ -32,8 +32,11 @@ func NewDiscountedWishlistProcessor(sender email.Sender, validator email.Validat
 func (p *DiscountedWishlistProcessor) Process(ctx context.Context, job domain.DiscountedWishlistJob) (ProcessResult, error) {
 	user := job.User
 
-	if !user.IsActive || user.Email == "" {
-		return ProcessResult{}, nil
+	if !user.IsActive {
+		return ProcessResult{Outcome: ProcessOutcomeSkipped, SkipReason: "inactive_user"}, nil
+	}
+	if user.Email == "" {
+		return ProcessResult{Outcome: ProcessOutcomeSkipped, SkipReason: "missing_email"}, nil
 	}
 
 	valid, err := p.validator.Validate(ctx, user.Email)
@@ -41,7 +44,7 @@ func (p *DiscountedWishlistProcessor) Process(ctx context.Context, job domain.Di
 		return ProcessResult{}, err
 	}
 	if !valid {
-		return ProcessResult{}, nil
+		return ProcessResult{Outcome: ProcessOutcomeSkipped, SkipReason: "email_validation_rejected"}, nil
 	}
 
 	greetingTpl := p.campaign.SelectGreeting(job.Date, job.ID)
@@ -84,5 +87,8 @@ func (p *DiscountedWishlistProcessor) Process(ctx context.Context, job domain.Di
 	}
 	sendResult, err := p.sender.SendTemplate(ctx, msg)
 	result.SendResult = sendResult
+	if err == nil {
+		result.Outcome = ProcessOutcomeSent
+	}
 	return result, err
 }

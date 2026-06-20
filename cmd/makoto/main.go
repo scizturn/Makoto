@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"net/url"
 	"strings"
 	"sync"
 	"time"
@@ -26,6 +27,11 @@ import (
 func main() {
 	ctx := context.Background()
 	cfg := config.Load()
+	if cfg.DiscountedWishlistEnabled {
+		if err := validateHTTPURL(cfg.DiscountedWishlistUnsubscribeURL); err != nil {
+			log.Fatalf("MAKOTO_DISCOUNTED_WISHLIST_UNSUBSCRIBE_URL is required when discounted wishlist is enabled: %v", err)
+		}
+	}
 
 	// --- Birthday ---
 	birthdayCampaign := campaign.BirthdayCampaign{
@@ -66,11 +72,12 @@ func main() {
 
 	// --- Discounted Wishlist ---
 	discountedWishlistCampaign := campaign.DiscountedWishlistCampaign{
-		TemplateIDs: cfg.DiscountedWishlistTemplateIDs,
-		Subjects:    cfg.DiscountedWishlistEmailSubjects,
-		Greetings:   cfg.DiscountedWishlistGreetings,
-		WishlistURL: cfg.DiscountedWishlistURL,
-		Closing:     "Jangan sampai kehabisan — yuk cek wishlistmu sekarang di Kyou!",
+		TemplateIDs:    cfg.DiscountedWishlistTemplateIDs,
+		Subjects:       cfg.DiscountedWishlistEmailSubjects,
+		Greetings:      cfg.DiscountedWishlistGreetings,
+		WishlistURL:    cfg.DiscountedWishlistURL,
+		UnsubscribeURL: cfg.DiscountedWishlistUnsubscribeURL,
+		Closing:        "Jangan sampai kehabisan — yuk cek wishlistmu sekarang di Kyou!",
 	}
 	discountedWishlistProcessor := worker.NewDiscountedWishlistProcessor(sender, validator, discountedWishlistCampaign)
 	discountedWishlistProcessor.Domain = cfg.KirimEmailDomain
@@ -313,6 +320,17 @@ func main() {
 		log.Print("MAKOTO_WINBACK_ENABLED is false; skipping winback sender")
 	}
 	wg.Wait()
+}
+
+func validateHTTPURL(rawURL string) error {
+	parsed, err := url.ParseRequestURI(strings.TrimSpace(rawURL))
+	if err != nil {
+		return err
+	}
+	if (parsed.Scheme != "https" && parsed.Scheme != "http") || parsed.Host == "" {
+		return fmt.Errorf("must be an absolute http(s) URL")
+	}
+	return nil
 }
 
 func buildAuditLogger(cfg config.Config) (*audit.Logger, error) {
@@ -564,11 +582,13 @@ func handleFailedJob(ctx context.Context, redisQueue retryQueue, auditLogger *au
 
 	if attempt >= cfg.maxAttempts {
 		job.Attempt = attempt
-		if err := redisQueue.EnqueueTo(ctx, cfg.deadLetterQueue, job); err != nil {
-			return failedJobResult{}, err
-		}
 		if err := auditLogger.MarkDeadLetter(ctx, auditInfo); err != nil {
 			return failedJobResult{}, err
+		}
+		if err := redisQueue.EnqueueTo(ctx, cfg.deadLetterQueue, job); err != nil {
+			failedAuditInfo := auditInfo
+			failedAuditInfo.FailureReason = "dead-letter enqueue failed: " + err.Error()
+			return failedJobResult{}, errors.Join(err, auditLogger.MarkFailed(ctx, failedAuditInfo))
 		}
 		return failedJobResult{state: "dead-letter", attempt: attempt}, nil
 	}
@@ -587,11 +607,14 @@ func handleFailedJob(ctx context.Context, redisQueue retryQueue, auditLogger *au
 		case <-timer.C:
 		}
 	}
-	if err := redisQueue.Enqueue(ctx, job); err != nil {
-		return failedJobResult{}, err
-	}
 	if err := auditLogger.InsertRetryQueued(ctx, job.ID, attempt); err != nil {
 		return failedJobResult{}, err
+	}
+	if err := redisQueue.Enqueue(ctx, job); err != nil {
+		retryAuditInfo := auditInfo
+		retryAuditInfo.Attempt = job.Attempt
+		retryAuditInfo.FailureReason = "retry enqueue failed: " + err.Error()
+		return failedJobResult{}, errors.Join(err, auditLogger.MarkFailed(ctx, retryAuditInfo))
 	}
 	return failedJobResult{state: "requeued", attempt: job.Attempt, delay: delay}, nil
 }
@@ -747,6 +770,9 @@ func runDiscountedWishlistSender(ctx context.Context, q *queue.DiscountedWishlis
 	if cfg.maxAttempts <= 0 {
 		cfg.maxAttempts = 3
 	}
+	if len(cfg.retryBackoffs) == 0 {
+		cfg.retryBackoffs = []time.Duration{5 * time.Minute, 15 * time.Minute}
+	}
 	if recovered, err := q.RecoverProcessing(ctx); err != nil {
 		log.Printf("discounted wishlist redis processing recovery failed: %v", err)
 	} else if recovered > 0 {
@@ -780,14 +806,29 @@ func runDiscountedWishlistSender(ctx context.Context, q *queue.DiscountedWishlis
 		processResult, err := processor.Process(ctx, job)
 		auditInfo := auditInfoFromDiscountedWishlistJob(job, processResult)
 		if err != nil {
-			log.Printf("discounted wishlist email failed: job_id=%s user_id=%s err=%v", job.ID, job.UserID, err)
-			_ = discord.Log(ctx, fmt.Sprintf("[Discounted Wishlist Email Failed]\nJob: %s\nUser: %s\nEmail: %s\nError: %v", job.ID, job.UserID, maskEmail(job.User.Email), err))
+			result, failureErr := handleFailedDiscountedWishlistJob(ctx, q, auditLogger, auditInfo, job, err, cfg)
+			if failureErr != nil {
+				log.Printf("discounted wishlist failure handling failed: job_id=%s user_id=%s err=%v failure_err=%v", job.ID, job.UserID, err, failureErr)
+				_ = discord.Log(ctx, fmt.Sprintf("[Discounted Wishlist Failure Handling Failed]\nJob: %s\nUser: %s\nEmail: %s\nError: %v\nFailure handling error: %v", job.ID, job.UserID, maskEmail(job.User.Email), err, failureErr))
+				continue
+			}
 			if ackErr := q.Ack(ctx, processingJob.Payload); ackErr != nil {
-				log.Printf("discounted wishlist email failed but ack failed: job_id=%s err=%v ack_err=%v", job.ID, err, ackErr)
+				log.Printf("discounted wishlist failed but processing ack failed: job_id=%s user_id=%s err=%v ack_err=%v", job.ID, job.UserID, err, ackErr)
+				continue
 			}
-			if err := auditLogger.MarkFailed(ctx, auditInfo); err != nil {
-				log.Printf("discounted wishlist email audit failed update failed: job_id=%s err=%v", job.ID, err)
+			log.Printf("discounted wishlist email failed: job_id=%s user_id=%s attempt=%d state=%s err=%v", job.ID, job.UserID, result.attempt, result.state, err)
+			_ = discord.Log(ctx, fmt.Sprintf("[Discounted Wishlist Email Failed]\nJob: %s\nUser: %s\nEmail: %s\nAttempt: %d/%d\nState: %s\nRetry delay: %s\nError: %v", job.ID, job.UserID, maskEmail(job.User.Email), result.attempt, cfg.maxAttempts, result.state, result.delay, err))
+			continue
+		}
+		if processResult.Outcome == worker.ProcessOutcomeSkipped {
+			if err := auditLogger.MarkSkipped(ctx, auditInfo, processResult.SkipReason); err != nil {
+				log.Printf("discounted wishlist email audit skipped update failed: job_id=%s user_id=%s err=%v", job.ID, job.UserID, err)
 			}
+			if err := q.Ack(ctx, processingJob.Payload); err != nil {
+				log.Printf("discounted wishlist email skipped but ack failed: job_id=%s user_id=%s err=%v", job.ID, job.UserID, err)
+				continue
+			}
+			log.Printf("discounted wishlist email skipped: job_id=%s user_id=%s reason=%s", job.ID, job.UserID, processResult.SkipReason)
 			continue
 		}
 
@@ -802,6 +843,53 @@ func runDiscountedWishlistSender(ctx context.Context, q *queue.DiscountedWishlis
 		log.Printf("discounted wishlist email sent: job_id=%s user_id=%s", job.ID, job.UserID)
 		_ = discord.Log(ctx, fmt.Sprintf("[Discounted Wishlist Email Sent]\nJob: %s\nUser: %s\nEmail: %s", job.ID, job.UserID, maskEmail(job.User.Email)))
 	}
+}
+
+type discountedWishlistRetryQueue interface {
+	Enqueue(ctx context.Context, job domain.DiscountedWishlistJob) error
+	EnqueueTo(ctx context.Context, name string, job domain.DiscountedWishlistJob) error
+}
+
+func handleFailedDiscountedWishlistJob(ctx context.Context, redisQueue discountedWishlistRetryQueue, auditLogger *audit.Logger, auditInfo audit.MessageInfo, job domain.DiscountedWishlistJob, processErr error, cfg senderConfig) (failedJobResult, error) {
+	attempt := job.Attempt
+	if attempt <= 0 {
+		attempt = 1
+	}
+	auditInfo.Attempt = attempt
+	auditInfo.FailureReason = processErr.Error()
+
+	if attempt >= cfg.maxAttempts {
+		job.Attempt = attempt
+		if err := redisQueue.EnqueueTo(ctx, cfg.deadLetterQueue, job); err != nil {
+			return failedJobResult{}, err
+		}
+		if err := auditLogger.MarkDeadLetter(ctx, auditInfo); err != nil {
+			return failedJobResult{}, err
+		}
+		return failedJobResult{state: "dead-letter", attempt: attempt}, nil
+	}
+
+	if err := auditLogger.MarkFailed(ctx, auditInfo); err != nil {
+		return failedJobResult{}, err
+	}
+	job.Attempt = attempt + 1
+	delay := retryDelay(attempt, cfg.retryBackoffs)
+	if delay > 0 {
+		timer := time.NewTimer(delay)
+		select {
+		case <-ctx.Done():
+			timer.Stop()
+			return failedJobResult{}, ctx.Err()
+		case <-timer.C:
+		}
+	}
+	if err := redisQueue.Enqueue(ctx, job); err != nil {
+		return failedJobResult{}, err
+	}
+	if err := auditLogger.InsertRetryQueued(ctx, job.ID, attempt); err != nil {
+		return failedJobResult{}, err
+	}
+	return failedJobResult{state: "requeued", attempt: job.Attempt, delay: delay}, nil
 }
 
 func runWishlistBackInSender(ctx context.Context, q *queue.WishlistBackInRedisQueue, processor *worker.WishlistBackInProcessor, discord notify.DiscordLogger, auditLogger *audit.Logger, cfg senderConfig) {

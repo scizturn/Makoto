@@ -21,6 +21,7 @@ func main() {
 	templateDir := env("MAKOTO_DISCOUNTED_WISHLIST_EMAIL_TEMPLATE_DIR", "templates/discounted_wishlist")
 	subject := env("MAKOTO_DISCOUNTED_WISHLIST_EMAIL_SUBJECT", "{{ .FirstName }}, wishlist kamu lagi diskon nih!")
 	wishlistURL := env("MAKOTO_DISCOUNTED_WISHLIST_URL", "https://kyou.id/user/wishlist")
+	unsubscribeURL := env("MAKOTO_DISCOUNTED_WISHLIST_UNSUBSCRIBE_URL", "https://example.test/email-preferences")
 
 	payload, err := os.ReadFile(jobPath)
 	if err != nil {
@@ -32,9 +33,10 @@ func main() {
 	}
 
 	dw := campaign.DiscountedWishlistCampaign{
-		WishlistURL: wishlistURL,
-		Closing:     "Jangan sampai kehabisan — yuk cek wishlistmu sekarang di Kyou!",
-		RandomIntn:  func(n int) int { return 0 },
+		WishlistURL:    wishlistURL,
+		UnsubscribeURL: unsubscribeURL,
+		Closing:        "Jangan sampai kehabisan — yuk cek wishlistmu sekarang di Kyou!",
+		RandomIntn:     func(n int) int { return 0 },
 	}
 
 	greetingTpl := "Psst {{ .FirstName }}, wishlist incaran kamu lagi diskon nih!"

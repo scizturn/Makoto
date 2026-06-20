@@ -8,6 +8,17 @@ import (
 	"github.com/kyou-id/makoto/internal/domain"
 )
 
+func TestValidateHTTPURL(t *testing.T) {
+	for _, rawURL := range []string{"", "javascript:alert(1)", "/relative"} {
+		if err := validateHTTPURL(rawURL); err == nil {
+			t.Fatalf("expected %q to be rejected", rawURL)
+		}
+	}
+	if err := validateHTTPURL("https://kyou.id/user/notification-settings"); err != nil {
+		t.Fatalf("expected absolute HTTPS URL to pass: %v", err)
+	}
+}
+
 func TestHandleFailedJobRequeuesUntilMaxAttempts(t *testing.T) {
 	queue := &fakeRetryQueue{}
 	job := domain.BirthdayJob{ID: "job-1", Attempt: 1}
@@ -54,6 +65,38 @@ func TestHandleFailedJobMovesToDeadLetterAtMaxAttempts(t *testing.T) {
 	}
 }
 
+func TestHandleFailedDiscountedWishlistJobRequeuesUntilMaxAttempts(t *testing.T) {
+	queue := &fakeDiscountedWishlistRetryQueue{}
+	job := domain.DiscountedWishlistJob{ID: "discounted-job-1", Attempt: 1}
+
+	result, err := handleFailedDiscountedWishlistJob(context.Background(), queue, nil, audit.MessageInfo{JobID: job.ID}, job, assertError("send failed"), senderConfig{
+		maxAttempts:     3,
+		deadLetterQueue: "discounted_wishlist_email_jobs_dead",
+	})
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if result.state != "requeued" || result.attempt != 2 || len(queue.requeued) != 1 || queue.requeued[0].Attempt != 2 {
+		t.Fatalf("unexpected retry result=%#v queue=%#v", result, queue)
+	}
+}
+
+func TestHandleFailedDiscountedWishlistJobMovesToDeadLetter(t *testing.T) {
+	queue := &fakeDiscountedWishlistRetryQueue{}
+	job := domain.DiscountedWishlistJob{ID: "discounted-job-1", Attempt: 3}
+
+	result, err := handleFailedDiscountedWishlistJob(context.Background(), queue, nil, audit.MessageInfo{JobID: job.ID}, job, assertError("send failed"), senderConfig{
+		maxAttempts:     3,
+		deadLetterQueue: "discounted_wishlist_email_jobs_dead",
+	})
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if result.state != "dead-letter" || len(queue.deadLetters) != 1 || queue.deadLetters[0].name != "discounted_wishlist_email_jobs_dead" {
+		t.Fatalf("unexpected dead-letter result=%#v queue=%#v", result, queue)
+	}
+}
+
 type assertError string
 
 func (e assertError) Error() string {
@@ -68,6 +111,26 @@ type fakeRetryQueue struct {
 type namedJob struct {
 	name string
 	job  domain.BirthdayJob
+}
+
+type fakeDiscountedWishlistRetryQueue struct {
+	requeued    []domain.DiscountedWishlistJob
+	deadLetters []namedDiscountedWishlistJob
+}
+
+type namedDiscountedWishlistJob struct {
+	name string
+	job  domain.DiscountedWishlistJob
+}
+
+func (q *fakeDiscountedWishlistRetryQueue) Enqueue(_ context.Context, job domain.DiscountedWishlistJob) error {
+	q.requeued = append(q.requeued, job)
+	return nil
+}
+
+func (q *fakeDiscountedWishlistRetryQueue) EnqueueTo(_ context.Context, name string, job domain.DiscountedWishlistJob) error {
+	q.deadLetters = append(q.deadLetters, namedDiscountedWishlistJob{name: name, job: job})
+	return nil
 }
 
 func (q *fakeRetryQueue) Enqueue(_ context.Context, job domain.BirthdayJob) error {

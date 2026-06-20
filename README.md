@@ -97,6 +97,8 @@ MAKOTO_DISCOUNTED_WISHLIST_DEAD_LETTER_QUEUE=discounted_wishlist_email_jobs_dead
 MAKOTO_DISCOUNTED_WISHLIST_TEMPLATE_IDS=discounted_wishlist1.html,discounted_wishlist2.html,discounted_wishlist3.html
 MAKOTO_DISCOUNTED_WISHLIST_EMAIL_TEMPLATE_DIR=templates/discounted_wishlist
 MAKOTO_DISCOUNTED_WISHLIST_URL=https://kyou.id/user/wishlist
+# Required when the worker is enabled. Point this at the real preference center.
+MAKOTO_DISCOUNTED_WISHLIST_UNSUBSCRIBE_URL=
 ```
 
 ## Template Variables
@@ -232,18 +234,22 @@ Birthday: retry hingga `MAKOTO_MAX_ATTEMPTS` dengan backoff (5 menit, 15 menit),
 
 Anniversary: langsung mark failed dan ack — tidak ada retry chain.
 
-Discounted wishlist saat ini juga langsung mark failed dan ack. Walaupun dead-letter queue dan max attempts tersedia di config, keduanya belum dipakai oleh worker ini.
+Discounted wishlist retry hingga `MAKOTO_MAX_ATTEMPTS` dengan backoff 5 dan 15 menit. Attempt terakhir dipindahkan ke `MAKOTO_DISCOUNTED_WISHLIST_DEAD_LETTER_QUEUE`, baru payload processing di-ack.
 
-## Discounted Wishlist Production Readiness
+## Discounted Wishlist Release Checklist
 
-Belum siap untuk mass-send. Sebelum enable di production:
+Code blocker sebelumnya sudah ditangani:
 
-- implement retry + dead-letter handling; saat ini send/validation/render error langsung di-ack dan job hilang dari processing queue;
-- bedakan hasil `skipped` dari `sent`; processor saat ini mengembalikan sukses kosong untuk user inactive/email kosong/validation rejected, lalu worker menandai audit sebagai `sent`;
-- tambahkan unit test processor dan worker untuk valid send, inactive/invalid skip, render failure, provider failure, retry, dead letter, dan recovery;
-- lakukan inbox rendering test pada client utama dan pastikan kebutuhan unsubscribe/compliance campaign dipenuhi oleh template atau provider.
+- send/validation/render error menggunakan retry dan dead letter;
+- inactive user, email kosong, dan email yang ditolak validator dicatat `skipped`, bukan `sent`;
+- processor dan failure handler memiliki test untuk send, skip, retry, dan dead letter;
+- worker menolak start ketika enabled tanpa absolute HTTP(S) `MAKOTO_DISCOUNTED_WISHLIST_UNSUBSCRIBE_URL`, dan footer menampilkan link preference center tersebut.
 
-Jangan set `MAKOTO_DISCOUNTED_WISHLIST_ENABLED=true` untuk mass-send sampai blocker di atas dan blocker Yukari di README-nya selesai.
+Sebelum mass-send, tim tetap harus:
+
+- mengganti contoh URL dengan preference center Kyou yang benar-benar menyimpan opt-out;
+- mengirim seed email dan memeriksa Gmail, Outlook, serta mobile;
+- memastikan unsubscribe webhook/suppression Kirim.email dikonfigurasi di environment provider. Transactional API yang dipakai repo ini tidak mendokumentasikan field custom `List-Unsubscribe`, jadi jangan mengasumsikan header tersebut aktif tanpa verifikasi provider.
 
 Retry manual dari dead letter:
 
@@ -253,4 +259,4 @@ go run ./cmd/retrydead --job-id birthday-2026-05-21-user-123
 
 ## Coolify
 
-Deploy sebagai long-running service (container tidak pernah exit). Makoto langsung mulai consume dari Redis saat container start. Queue name Yukari dan Makoto harus sama. Enable discounted wishlist hanya setelah checklist production readiness selesai.
+Deploy sebagai long-running service (container tidak pernah exit). Makoto langsung mulai consume dari Redis saat container start. Queue name Yukari dan Makoto harus sama. Enable discounted wishlist hanya setelah release checklist selesai.

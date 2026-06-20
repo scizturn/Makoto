@@ -14,12 +14,13 @@ import (
 )
 
 type DiscountedWishlistCampaign struct {
-	TemplateIDs []string
-	Subjects    []string
-	Greetings   []string
-	WishlistURL string
-	Closing     string
-	RandomIntn  func(n int) int
+	TemplateIDs    []string
+	Subjects       []string
+	Greetings      []string
+	WishlistURL    string
+	UnsubscribeURL string
+	Closing        string
+	RandomIntn     func(n int) int
 }
 
 const discountedWishlistPromoLimit = 12
@@ -148,7 +149,7 @@ func (c DiscountedWishlistCampaign) BuildMergeData(user domain.User, items []dom
 		"display_fill_count":     displayFillCount,
 		"wishlist_url":           c.WishlistURL,
 		"closing":                c.Closing,
-		"footer_html":            RenderMemberversaryFooterHTML(c.Closing),
+		"footer_html":            RenderMemberversaryFooterHTMLWithUnsubscribe(c.Closing, c.UnsubscribeURL),
 	}
 }
 

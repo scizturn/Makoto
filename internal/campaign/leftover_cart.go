@@ -82,11 +82,21 @@ func (c LeftoverCartCampaign) BuildMergeData(user domain.User, cartItems []domai
 }
 
 func RenderMemberversaryFooterHTML(closing string) string {
+	return RenderMemberversaryFooterHTMLWithUnsubscribe(closing, "")
+}
+
+func RenderMemberversaryFooterHTMLWithUnsubscribe(closing, unsubscribeURL string) string {
 	closing = strings.TrimSpace(closing)
 	if closing == "" {
 		closing = "Sampai ketemu lagi di Kyou!"
 	}
-	return strings.Replace(memberversaryFooterHTML, "{{closing}}", html.EscapeString(closing), 1)
+	unsubscribeHTML := ""
+	unsubscribeURL = strings.TrimSpace(unsubscribeURL)
+	if parsed, err := url.ParseRequestURI(unsubscribeURL); err == nil && (parsed.Scheme == "https" || parsed.Scheme == "http") && parsed.Host != "" {
+		unsubscribeHTML = fmt.Sprintf(`<p style="margin:12px 0 0;color:rgba(255,255,255,0.55);font-size:12px;line-height:1.5;">Tidak ingin menerima promo wishlist? <a href="%s" style="color:#ffffff;text-decoration:underline;">Atur preferensi email</a>.</p>`, html.EscapeString(unsubscribeURL))
+	}
+	footer := strings.Replace(memberversaryFooterHTML, "{{closing}}", html.EscapeString(closing), 1)
+	return strings.Replace(footer, "{{unsubscribe}}", unsubscribeHTML, 1)
 }
 
 const memberversaryFooterHTML = `
@@ -200,6 +210,7 @@ const memberversaryFooterHTML = `
                 <p style="margin:0;color:rgba(255,255,255,0.4);font-size:14px;font-weight:500;line-height:1.55;">
                     Kamu menerima email ini karena terdaftar sebagai Teman Kyou.
                 </p>
+                {{unsubscribe}}
             </td></tr>
             </table>
 `

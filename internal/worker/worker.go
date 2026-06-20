@@ -41,7 +41,16 @@ type ProcessResult struct {
 	Subject    string
 	ActionURL  string
 	SendResult domain.SendResult
+	Outcome    ProcessOutcome
+	SkipReason string
 }
+
+type ProcessOutcome string
+
+const (
+	ProcessOutcomeSent    ProcessOutcome = "sent"
+	ProcessOutcomeSkipped ProcessOutcome = "skipped"
+)
 
 type Renderer interface {
 	Render(templateID string, mergeData map[string]any) (subject string, html string, err error)

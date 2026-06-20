@@ -108,6 +108,26 @@ WHERE job_id = ?
 	return err
 }
 
+func (l *Logger) MarkSkipped(ctx context.Context, info MessageInfo, reason string) error {
+	if l == nil {
+		return nil
+	}
+	_, err := l.db.ExecContext(ctx, `
+UPDATE email_delivery_logs
+SET
+  status = 'skipped',
+  skip_reason = ?,
+  skipped_at = NOW(),
+  updated_at = NOW()
+WHERE job_id = ?
+  AND attempt = ?`,
+		reason,
+		info.JobID,
+		normalizedAttempt(info.Attempt),
+	)
+	return err
+}
+
 func (l *Logger) MarkFailed(ctx context.Context, info MessageInfo) error {
 	if l == nil {
 		return nil
