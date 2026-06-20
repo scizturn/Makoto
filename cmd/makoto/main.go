@@ -67,6 +67,7 @@ func main() {
 	// --- Discounted Wishlist ---
 	discountedWishlistCampaign := campaign.DiscountedWishlistCampaign{
 		TemplateIDs: cfg.DiscountedWishlistTemplateIDs,
+		Subjects:    cfg.DiscountedWishlistEmailSubjects,
 		Greetings:   cfg.DiscountedWishlistGreetings,
 		WishlistURL: cfg.DiscountedWishlistURL,
 		Closing:     "Jangan sampai kehabisan — yuk cek wishlistmu sekarang di Kyou!",

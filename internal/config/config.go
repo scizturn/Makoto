@@ -59,6 +59,7 @@ type Config struct {
 	DiscountedWishlistTemplateIDs      []string
 	DiscountedWishlistEmailTemplateDir string
 	DiscountedWishlistEmailSubject     string
+	DiscountedWishlistEmailSubjects    []string
 	DiscountedWishlistGreetings        []string
 	DiscountedWishlistURL              string
 	WinbackEnabled                     bool
@@ -141,6 +142,11 @@ func Load() Config {
 		DiscountedWishlistTemplateIDs:      envList("MAKOTO_DISCOUNTED_WISHLIST_TEMPLATE_IDS", []string{"discounted_wishlist1.html", "discounted_wishlist2.html", "discounted_wishlist3.html"}),
 		DiscountedWishlistEmailTemplateDir: os.Getenv("MAKOTO_DISCOUNTED_WISHLIST_EMAIL_TEMPLATE_DIR"),
 		DiscountedWishlistEmailSubject:     env("MAKOTO_DISCOUNTED_WISHLIST_EMAIL_SUBJECT", "{{ .FirstName }}, wishlist kamu lagi diskon nih!"),
+		DiscountedWishlistEmailSubjects: envListPipe("MAKOTO_DISCOUNTED_WISHLIST_EMAIL_SUBJECTS", []string{
+			"Ssst... Kyou lihat wishlist {{ .FirstName }} lagi diskon nih!",
+			"Tadaaa~ Kyou nyempilin diskon di wishlist {{ .FirstName }}!",
+			"Okaeri {{ .FirstName }}! Kyou kasih potongan buat wishlist kamu!",
+		}),
 		DiscountedWishlistGreetings: envListPipe("MAKOTO_DISCOUNTED_WISHLIST_GREETINGS", []string{
 			"Psst {{ .FirstName }}, wishlist incaran kamu lagi diskon nih!",
 			"Hei {{ .FirstName }}, ada kabar bagus buat koleksimu!",

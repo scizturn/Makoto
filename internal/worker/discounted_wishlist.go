@@ -66,6 +66,12 @@ func (p *DiscountedWishlistProcessor) Process(ctx context.Context, job domain.Di
 		if err != nil {
 			return ProcessResult{}, err
 		}
+		if subjectTpl := p.campaign.SelectSubject(job.Date, job.ID); subjectTpl != "" {
+			subject, err = p.campaign.RenderSubject(subjectTpl, user)
+			if err != nil {
+				return ProcessResult{}, err
+			}
+		}
 		msg.Subject = subject
 		msg.HTMLBody = htmlBody
 		msg.TextBody = subject + "\n\n" + user.Name

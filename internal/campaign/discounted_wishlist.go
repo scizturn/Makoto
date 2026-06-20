@@ -15,6 +15,7 @@ import (
 
 type DiscountedWishlistCampaign struct {
 	TemplateIDs []string
+	Subjects    []string
 	Greetings   []string
 	WishlistURL string
 	Closing     string
@@ -32,6 +33,33 @@ func (c DiscountedWishlistCampaign) SelectTemplate(now time.Time, key string) st
 		randomIntn = rand.New(rand.NewSource(templateSeed(now, key))).Intn
 	}
 	return c.TemplateIDs[randomIntn(len(c.TemplateIDs))]
+}
+
+func (c DiscountedWishlistCampaign) SelectSubject(now time.Time, key string) string {
+	if len(c.Subjects) == 0 {
+		return ""
+	}
+	randomIntn := c.RandomIntn
+	if randomIntn == nil {
+		randomIntn = rand.New(rand.NewSource(templateSeed(now, key+"_subject"))).Intn
+	}
+	return c.Subjects[randomIntn(len(c.Subjects))]
+}
+
+func (c DiscountedWishlistCampaign) RenderSubject(tpl string, user domain.User) (string, error) {
+	firstName := user.Name
+	if i := strings.Index(user.Name, " "); i > 0 {
+		firstName = user.Name[:i]
+	}
+	t, err := texttemplate.New("subject").Parse(tpl)
+	if err != nil {
+		return tpl, err
+	}
+	var buf strings.Builder
+	if err := t.Execute(&buf, struct{ Name, FirstName string }{user.Name, firstName}); err != nil {
+		return tpl, err
+	}
+	return buf.String(), nil
 }
 
 func (c DiscountedWishlistCampaign) SelectGreeting(now time.Time, key string) string {
@@ -244,7 +272,7 @@ func renderDiscountedFeaturedCard(item domain.DiscountedWishlistItem) string {
 	}
 	discountText := ""
 	if pct := discountPercent(item); pct > 0 {
-		discountText = fmt.Sprintf(`&nbsp;turun %d%%,`, pct)
+		discountText = fmt.Sprintf(` %d%%`, pct)
 	}
 	priceText := formatIDR(effectiveDiscountedPrice(item))
 	originalPriceText := formatIDR(item.OriginalPrice)
@@ -252,9 +280,11 @@ func renderDiscountedFeaturedCard(item domain.DiscountedWishlistItem) string {
 		priceText = "harga promo"
 	}
 
-	originalPriceHTML := ""
+	originalPriceStr := ""
 	if originalPriceText != "" && item.DiscountPrice > 0 && item.OriginalPrice != item.DiscountPrice {
-		originalPriceHTML = fmt.Sprintf(`&nbsp;dari <span style="color:#8f8f8f;text-decoration:line-through;">%s</span>`, originalPriceText)
+		originalPriceStr = fmt.Sprintf(`Dari <span style="color:#8f8f8f;text-decoration:line-through;">%s</span>, sekarang <strong style="color:#fc4c02;">%s</strong>.`, originalPriceText, priceText)
+	} else {
+		originalPriceStr = fmt.Sprintf(`Sekarang <strong style="color:#fc4c02;">%s</strong>.`, priceText)
 	}
 
 	safeDiscountName := html.EscapeString(strings.Trim(item.DiscountName, "[]"))
@@ -263,10 +293,10 @@ func renderDiscountedFeaturedCard(item domain.DiscountedWishlistItem) string {
 	}
 
 	return fmt.Sprintf(
-		`<div style="width:660px;margin:0 auto;"><table role="presentation" width="660" cellspacing="0" cellpadding="0" style="width:660px;border-collapse:separate;border-spacing:0;border:2px solid #fc4c02;border-radius:12px;background:#ffffff;overflow:hidden;"><tr><td width="224" valign="top" style="width:224px;padding:17px 0 17px 17px;">%s</td><td width="436" valign="middle" style="width:436px;padding:20px 24px 20px 14px;"><div style="margin-bottom:12px;"><span style="display:inline-block;padding:6px 14px;border-radius:999px;background:#fc4c02;color:#ffffff;font-size:11px;font-weight:900;line-height:1.2;letter-spacing:1px;text-transform:uppercase;">&hearts; DARI WISHLIST KAMU</span></div><h2 style="margin:0 0 8px;color:#2d2d2d;font-size:18px;font-weight:900;line-height:1.2;">Inget nggak? Kamu pernah nyimpen ini.</h2><p style="margin:0 0 16px;color:#565252;font-size:14px;font-weight:600;line-height:1.5;"><strong style="color:#2d2d2d;">%s%s</strong>%s pas %s%s jadi&nbsp;<strong style="color:#fc4c02;">%s</strong>%s.</p><a href="%s" style="display:inline-block;padding:12px 24px;border-radius:8px;background:#fc4c02;color:#ffffff;font-size:14px;font-weight:900;line-height:1;text-decoration:none;">Ambil Sekarang</a></td></tr></table></div>`,
+		`<div style="width:660px;margin:0 auto;"><table role="presentation" width="660" cellspacing="0" cellpadding="0" style="width:660px;border-collapse:separate;border-spacing:0;border:2px solid #fc4c02;border-radius:12px;background:#ffffff;overflow:hidden;"><tr><td width="224" valign="top" style="width:224px;padding:17px 0 17px 17px;">%s</td><td width="436" valign="middle" style="width:436px;padding:20px 24px 20px 14px;"><div style="margin-bottom:12px;"><span style="display:inline-block;padding:6px 14px;border-radius:999px;background:#fc4c02;color:#ffffff;font-size:11px;font-weight:900;line-height:1.2;letter-spacing:1px;text-transform:uppercase;">&hearts; DARI WISHLIST KAMU</span></div><h2 style="margin:0 0 8px;color:#2d2d2d;font-size:18px;font-weight:900;line-height:1.2;">Kouka simpenin baik-baik, soalnya tahu ini spesial buat kamu</h2><p style="margin:0 0 16px;color:#565252;font-size:14px;font-weight:600;line-height:1.5;">Pas banget, <strong style="color:#2d2d2d;">%s%s</strong>%s lagi diskon%s di %s. %s</p><a href="%s" style="display:inline-block;padding:12px 24px;border-radius:8px;background:#fc4c02;color:#ffffff;font-size:14px;font-weight:900;line-height:1;text-decoration:none;">Belanja sekarang</a></td></tr></table></div>`,
 		imgHTML,
 		safeFullName, versionText,
-		seriesText, safeDiscountName, discountText, priceText, originalPriceHTML,
+		seriesText, discountText, safeDiscountName, originalPriceStr,
 		safeURL,
 	)
 }
