@@ -108,7 +108,10 @@ func (c WinbackCampaign) BuildMergeData(user domain.User, voucherCode string, wi
 	}
 }
 
-const winbackReadyLimit = 2
+const (
+	winbackReadyLimit = 12
+	winbackReadyCols  = 3
+)
 
 // RenderWinbackPastPolaroidsHTML renders the user's past purchase as a single
 // centered scrapbook polaroid ("halaman lama dari rak kamu").
@@ -120,7 +123,7 @@ func RenderWinbackPastPolaroidsHTML(item domain.HistoricalItem) string {
 	if !item.OrderDate.IsZero() {
 		caption = caption + " · " + item.OrderDate.Format("Jan '06")
 	}
-	card := winbackPolaroidCard(item.ImageURL, caption, "#4a3b2a", "")
+	card := winbackPolaroidCard(item.ImageURL, caption, "#4a3b2a", false, "")
 	return `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;"><tr><td align="center" style="padding:0;"><table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;"><tr><td width="250" style="width:250px;padding:0;">` + card + `</td></tr></table></td></tr></table>`
 }
 
@@ -133,19 +136,32 @@ func RenderWinbackReadyPolaroidsHTML(items []domain.WishlistItem) string {
 	if len(items) > winbackReadyLimit {
 		items = items[:winbackReadyLimit]
 	}
-	var cells strings.Builder
-	for _, item := range items {
-		caption := winbackCaption(item.Name)
-		if price := formatIDR(item.Price); price != "" {
-			caption = caption + " · " + price
+	var b strings.Builder
+	b.WriteString(`<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;">`)
+	for row := 0; row < len(items); row += winbackReadyCols {
+		if row > 0 {
+			b.WriteString(`<tr><td colspan="3" style="height:16px;line-height:16px;font-size:16px;">&nbsp;</td></tr>`)
 		}
-		card := winbackPolaroidCard(item.ImageURL, caption, "#4a3b2a", item.URL)
-		cells.WriteString(`<td width="50%" valign="top" align="center" style="padding:0 8px;">` + card + `</td>`)
+		b.WriteString(`<tr>`)
+		end := row + winbackReadyCols
+		if end > len(items) {
+			end = len(items)
+		}
+		for i := row; i < end; i++ {
+			caption := winbackCaption(items[i].Name)
+			if price := formatIDR(items[i].Price); price != "" {
+				caption = caption + " · " + price
+			}
+			card := winbackPolaroidCard(items[i].ImageURL, caption, "#4a3b2a", items[i].IsWishlisted, items[i].URL)
+			b.WriteString(`<td width="33.33%" valign="top" align="center" style="padding:0 6px;">` + card + `</td>`)
+		}
+		for i := end; i < row+winbackReadyCols; i++ {
+			b.WriteString(`<td width="33.33%">&nbsp;</td>`)
+		}
+		b.WriteString(`</tr>`)
 	}
-	if len(items) == 1 {
-		cells.WriteString(`<td width="50%">&nbsp;</td>`)
-	}
-	return `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;"><tr>` + cells.String() + `</tr></table>`
+	b.WriteString(`</table>`)
+	return b.String()
 }
 
 // winbackPolaroidCard renders one scrapbook polaroid as a nested <table>. It uses
@@ -153,21 +169,28 @@ func RenderWinbackReadyPolaroidsHTML(items []domain.WishlistItem) string {
 // ignores it, and Apple Mail would honour it — producing inconsistent tilt
 // between recipients). The card is designed flat so the preview matches what
 // every email client actually shows.
-func winbackPolaroidCard(imageURL, caption, captionColor, linkURL string) string {
+func winbackPolaroidCard(imageURL, caption, captionColor string, highlight bool, linkURL string) string {
 	safeCaption := html.EscapeString(caption)
 	safeImage := html.EscapeString(imageURL)
 
 	// alt is intentionally empty: the caption <div> right below already names the
 	// item, so a meaningful alt would duplicate that text (visible when images are
 	// blocked or when the email text is extracted).
-	imgHTML := fmt.Sprintf(`<img src="%s" alt="" width="210" style="display:block;width:100%%;max-width:210px;height:auto;border:0;">`, safeImage)
+	imgHTML := fmt.Sprintf(`<img src="%s" alt="" width="190" style="display:block;width:100%%;max-width:190px;height:auto;border:0;">`, safeImage)
 	if safeImage == "" {
-		imgHTML = `<div style="height:150px;background:#efe7d3;"></div>`
+		imgHTML = `<div style="height:140px;background:#efe7d3;"></div>`
+	}
+
+	// The user's own wishlist items get a 2px orange border to stand apart from
+	// the popular-ready fill items.
+	borderStyle := "border:1px solid #ece3d0;"
+	if highlight {
+		borderStyle = "border:2px solid #fc4c02;"
 	}
 
 	card := fmt.Sprintf(
-		`<table role="presentation" width="210" cellspacing="0" cellpadding="0" style="width:210px;margin:0 auto;border-collapse:collapse;background:#fffdf6;box-shadow:2px 4px 9px rgba(74,59,42,0.2);"><tr><td style="padding:9px 9px 12px;"><div style="background:#efe7d3;font-size:0;line-height:0;">%s</div><div style="font-family:'Nunito',Arial,Helvetica,sans-serif;font-weight:800;font-size:15px;color:%s;text-align:center;padding:9px 4px 0;line-height:1.25;">%s</div></td></tr></table>`,
-		imgHTML, captionColor, safeCaption,
+		`<table role="presentation" width="190" cellspacing="0" cellpadding="0" style="width:190px;margin:0 auto;border-collapse:collapse;background:#fffdf6;box-shadow:2px 4px 9px rgba(74,59,42,0.2);%s"><tr><td style="padding:8px 8px 11px;"><div style="background:#efe7d3;font-size:0;line-height:0;">%s</div><div style="font-family:'Nunito',Arial,Helvetica,sans-serif;font-weight:800;font-size:14px;color:%s;text-align:center;padding:8px 3px 0;line-height:1.25;">%s</div></td></tr></table>`,
+		borderStyle, imgHTML, captionColor, safeCaption,
 	)
 	if strings.TrimSpace(linkURL) == "" {
 		return card
