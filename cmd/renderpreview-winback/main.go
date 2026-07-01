@@ -32,7 +32,7 @@ func main() {
 
 	wb := campaign.WinbackCampaign{
 		ActionURL:  actionURL,
-		Closing:    "Yuk balik lagi — masih banyak koleksi keren yang nunggu kamu di Kyou!",
+		Closing:    "Yuk balik lagi, masih banyak koleksi keren yang nunggu kamu di Kyou!",
 		RandomIntn: func(n int) int { return 0 },
 	}
 

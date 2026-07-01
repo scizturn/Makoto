@@ -104,7 +104,7 @@ func main() {
 		Subjects:    cfg.WinbackEmailSubjects,
 		Greetings:   cfg.WinbackGreetings,
 		ActionURL:   cfg.WinbackActionURL,
-		Closing:     "Yuk balik lagi — masih banyak koleksi keren yang nunggu kamu di Kyou!",
+		Closing:     "Yuk balik lagi, masih banyak koleksi keren yang nunggu kamu di Kyou!",
 	}
 	winbackProcessor := worker.NewWinbackProcessor(sender, validator, winbackCampaign)
 	winbackProcessor.Domain = cfg.KirimEmailDomain
