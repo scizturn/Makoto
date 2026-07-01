@@ -33,7 +33,7 @@ func main() {
 
 	dw := campaign.DiscountedWishlistCampaign{
 		WishlistURL:    wishlistURL,
-		Closing:        "Jangan sampai kehabisan — yuk cek wishlistmu sekarang di Kyou!",
+		Closing:        "Yuk cek wishlistmu di Kyou sekarang!",
 		RandomIntn:     func(n int) int { return 0 },
 	}
 

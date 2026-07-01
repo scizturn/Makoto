@@ -70,7 +70,7 @@ func main() {
 		Subjects:       cfg.DiscountedWishlistEmailSubjects,
 		Greetings:      cfg.DiscountedWishlistGreetings,
 		WishlistURL:    cfg.DiscountedWishlistURL,
-		Closing:        "Jangan sampai kehabisan — yuk cek wishlistmu sekarang di Kyou!",
+		Closing:        "Yuk cek wishlistmu di Kyou sekarang!",
 	}
 	discountedWishlistProcessor := worker.NewDiscountedWishlistProcessor(sender, validator, discountedWishlistCampaign)
 	discountedWishlistProcessor.Domain = cfg.KirimEmailDomain
