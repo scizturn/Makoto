@@ -81,22 +81,35 @@ func (c LeftoverCartCampaign) BuildMergeData(user domain.User, cartItems []domai
 	}
 }
 
+const (
+	defaultFooterCTAURL   = "https://kyou.id/user/wishlist"
+	defaultFooterCTALabel = "Cek wishlist kamu lainnya!"
+)
+
 func RenderMemberversaryFooterHTML(closing string) string {
-	return RenderMemberversaryFooterHTMLWithUnsubscribe(closing, "")
+	return RenderMemberversaryFooterHTMLWithCTA(closing, defaultFooterCTAURL, defaultFooterCTALabel)
 }
 
-func RenderMemberversaryFooterHTMLWithUnsubscribe(closing, unsubscribeURL string) string {
+// RenderMemberversaryFooterHTMLWithCTA renders the shared footer, letting each
+// campaign override the primary CTA button (label + link). Empty overrides fall
+// back to the default "Cek wishlist kamu lainnya!" button.
+func RenderMemberversaryFooterHTMLWithCTA(closing, ctaURL, ctaLabel string) string {
 	closing = strings.TrimSpace(closing)
 	if closing == "" {
 		closing = "Sampai ketemu lagi di Kyou!"
 	}
-	unsubscribeHTML := ""
-	unsubscribeURL = strings.TrimSpace(unsubscribeURL)
-	if parsed, err := url.ParseRequestURI(unsubscribeURL); err == nil && (parsed.Scheme == "https" || parsed.Scheme == "http") && parsed.Host != "" {
-		unsubscribeHTML = fmt.Sprintf(`<p style="margin:12px 0 0;color:rgba(255,255,255,0.55);font-size:12px;line-height:1.5;">Tidak ingin menerima promo wishlist? <a href="%s" style="color:#ffffff;text-decoration:underline;">Atur preferensi email</a>.</p>`, html.EscapeString(unsubscribeURL))
+	ctaURL = strings.TrimSpace(ctaURL)
+	if ctaURL == "" {
+		ctaURL = defaultFooterCTAURL
+	}
+	ctaLabel = strings.TrimSpace(ctaLabel)
+	if ctaLabel == "" {
+		ctaLabel = defaultFooterCTALabel
 	}
 	footer := strings.Replace(memberversaryFooterHTML, "{{closing}}", html.EscapeString(closing), 1)
-	return strings.Replace(footer, "{{unsubscribe}}", unsubscribeHTML, 1)
+	footer = strings.Replace(footer, "{{primary_cta_url}}", html.EscapeString(ctaURL), 1)
+	footer = strings.Replace(footer, "{{primary_cta_label}}", html.EscapeString(ctaLabel), 1)
+	return footer
 }
 
 const memberversaryFooterHTML = `
@@ -117,11 +130,11 @@ const memberversaryFooterHTML = `
                        style="width:646px;border-collapse:collapse;">
                 <tr>
                     <td width="50%" style="padding:0 4px 0 0;">
-                        <a href="https://kyou.id/user/wishlist"
+                        <a href="{{primary_cta_url}}"
                            style="display:block;padding:20px 18px 18px;border:4px solid #5a351d;border-radius:999px;background:#ff5a0a;box-shadow:0 7px 0 #5a351d;color:#ffffff;font-size:16px;font-weight:900;letter-spacing:1px;line-height:1;text-align:center;text-decoration:none;">
                             <img src="https://kyoucdn.id/static/assets/k-mail.png" alt="" width="24" height="24"
                                  style="display:inline-block;width:24px;height:24px;margin:0 8px 0 0;border:0;vertical-align:middle;" />
-                            <span style="display:inline-block;vertical-align:middle;">Cek wishlist kamu lainnya!</span>
+                            <span style="display:inline-block;vertical-align:middle;">{{primary_cta_label}}</span>
                         </a>
                     </td>
                     <td width="50%" style="padding:0 0 0 4px;">
@@ -210,7 +223,6 @@ const memberversaryFooterHTML = `
                 <p style="margin:0;color:rgba(255,255,255,0.4);font-size:14px;font-weight:500;line-height:1.55;">
                     Kamu menerima email ini karena terdaftar sebagai Teman Kyou.
                 </p>
-                {{unsubscribe}}
             </td></tr>
             </table>
 `

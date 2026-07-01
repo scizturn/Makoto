@@ -150,7 +150,8 @@ func (c DiscountedWishlistCampaign) BuildMergeData(user domain.User, items []dom
 		"closing":                c.Closing,
 		// Unsubscribe di-handle oleh Kirim.email (List-Unsubscribe / footer provider),
 		// jadi Makoto tidak lagi merender link unsubscribe sendiri.
-		"footer_html": RenderMemberversaryFooterHTML(c.Closing),
+		// Footer CTA khusus discounted wishlist: "Explore kyou yuk!" ke homepage.
+		"footer_html": RenderMemberversaryFooterHTMLWithCTA(c.Closing, "https://kyou.id/", "Explore kyou yuk!"),
 	}
 }
 
@@ -284,9 +285,9 @@ func renderDiscountedFeaturedCard(item domain.DiscountedWishlistItem) string {
 
 	originalPriceStr := ""
 	if originalPriceText != "" && item.DiscountPrice > 0 && item.OriginalPrice != item.DiscountPrice {
-		originalPriceStr = fmt.Sprintf(`Dari <span style="color:#8f8f8f;text-decoration:line-through;">%s</span>, sekarang <strong style="color:#fc4c02;">%s</strong>.`, originalPriceText, priceText)
+		originalPriceStr = fmt.Sprintf(`Dari&nbsp;<span style="color:#8f8f8f;text-decoration:line-through;">%s</span>, sekarang&nbsp;<strong style="color:#fc4c02;">%s</strong>.`, originalPriceText, priceText)
 	} else {
-		originalPriceStr = fmt.Sprintf(`Sekarang <strong style="color:#fc4c02;">%s</strong>.`, priceText)
+		originalPriceStr = fmt.Sprintf(`Sekarang&nbsp;<strong style="color:#fc4c02;">%s</strong>.`, priceText)
 	}
 
 	safeDiscountName := html.EscapeString(strings.Trim(item.DiscountName, "[]"))
@@ -295,7 +296,7 @@ func renderDiscountedFeaturedCard(item domain.DiscountedWishlistItem) string {
 	}
 
 	return fmt.Sprintf(
-		`<div style="width:660px;margin:0 auto;"><table role="presentation" width="660" cellspacing="0" cellpadding="0" style="width:660px;border-collapse:separate;border-spacing:0;border:2px solid #fc4c02;border-radius:12px;background:#ffffff;overflow:hidden;"><tr><td width="224" valign="top" style="width:224px;padding:17px 0 17px 17px;">%s</td><td width="436" valign="middle" style="width:436px;padding:20px 24px 20px 14px;"><div style="margin-bottom:12px;"><span style="display:inline-block;padding:6px 14px;border-radius:999px;background:#fc4c02;color:#ffffff;font-size:11px;font-weight:900;line-height:1.2;letter-spacing:1px;text-transform:uppercase;">&hearts; DARI WISHLIST KAMU</span></div><h2 style="margin:0 0 8px;color:#2d2d2d;font-size:18px;font-weight:900;line-height:1.2;">Kouka simpenin baik-baik, soalnya tahu ini spesial buat kamu</h2><p style="margin:0 0 16px;color:#565252;font-size:14px;font-weight:600;line-height:1.5;">Pas banget, <strong style="color:#2d2d2d;">%s%s</strong>%s lagi diskon%s di %s. %s</p><a href="%s" style="display:inline-block;padding:12px 24px;border-radius:8px;background:#fc4c02;color:#ffffff;font-size:14px;font-weight:900;line-height:1;text-decoration:none;">Belanja sekarang</a></td></tr></table></div>`,
+		`<div style="width:660px;margin:0 auto;"><table role="presentation" width="660" cellspacing="0" cellpadding="0" style="width:660px;border-collapse:separate;border-spacing:0;border:2px solid #fc4c02;border-radius:12px;background:#ffffff;overflow:hidden;"><tr><td width="224" valign="top" style="width:224px;padding:17px 0 17px 17px;">%s</td><td width="436" valign="middle" style="width:436px;padding:20px 24px 20px 14px;"><div style="margin-bottom:12px;"><span style="display:inline-block;padding:6px 14px;border-radius:999px;background:#fc4c02;color:#ffffff;font-size:11px;font-weight:900;line-height:1.2;letter-spacing:1px;text-transform:uppercase;">&hearts; DARI WISHLIST KAMU</span></div><h2 style="margin:0 0 8px;color:#2d2d2d;font-size:18px;font-weight:900;line-height:1.2;">Kouka simpenin baik-baik, soalnya tahu ini spesial buat kamu</h2><p style="margin:0 0 16px;color:#565252;font-size:14px;font-weight:600;line-height:1.5;">Pas banget,&nbsp;<strong style="color:#2d2d2d;">%s%s</strong>%s&nbsp;lagi diskon%s di %s. %s</p><a href="%s" style="display:inline-block;padding:12px 24px;border-radius:8px;background:#fc4c02;color:#ffffff;font-size:14px;font-weight:900;line-height:1;text-decoration:none;">Belanja sekarang</a></td></tr></table></div>`,
 		imgHTML,
 		safeFullName, versionText,
 		seriesText, discountText, safeDiscountName, originalPriceStr,
