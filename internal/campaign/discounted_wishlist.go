@@ -18,7 +18,6 @@ type DiscountedWishlistCampaign struct {
 	Subjects       []string
 	Greetings      []string
 	WishlistURL    string
-	UnsubscribeURL string
 	Closing        string
 	RandomIntn     func(n int) int
 }
@@ -149,7 +148,9 @@ func (c DiscountedWishlistCampaign) BuildMergeData(user domain.User, items []dom
 		"display_fill_count":     displayFillCount,
 		"wishlist_url":           c.WishlistURL,
 		"closing":                c.Closing,
-		"footer_html":            RenderMemberversaryFooterHTMLWithUnsubscribe(c.Closing, c.UnsubscribeURL),
+		// Unsubscribe di-handle oleh Kirim.email (List-Unsubscribe / footer provider),
+		// jadi Makoto tidak lagi merender link unsubscribe sendiri.
+		"footer_html": RenderMemberversaryFooterHTML(c.Closing),
 	}
 }
 

@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"net/url"
 	"strings"
 	"sync"
 	"time"
@@ -27,11 +26,6 @@ import (
 func main() {
 	ctx := context.Background()
 	cfg := config.Load()
-	if cfg.DiscountedWishlistEnabled {
-		if err := validateHTTPURL(cfg.DiscountedWishlistUnsubscribeURL); err != nil {
-			log.Fatalf("MAKOTO_DISCOUNTED_WISHLIST_UNSUBSCRIBE_URL is required when discounted wishlist is enabled: %v", err)
-		}
-	}
 
 	// --- Birthday ---
 	birthdayCampaign := campaign.BirthdayCampaign{
@@ -76,7 +70,6 @@ func main() {
 		Subjects:       cfg.DiscountedWishlistEmailSubjects,
 		Greetings:      cfg.DiscountedWishlistGreetings,
 		WishlistURL:    cfg.DiscountedWishlistURL,
-		UnsubscribeURL: cfg.DiscountedWishlistUnsubscribeURL,
 		Closing:        "Jangan sampai kehabisan — yuk cek wishlistmu sekarang di Kyou!",
 	}
 	discountedWishlistProcessor := worker.NewDiscountedWishlistProcessor(sender, validator, discountedWishlistCampaign)
@@ -320,17 +313,6 @@ func main() {
 		log.Print("MAKOTO_WINBACK_ENABLED is false; skipping winback sender")
 	}
 	wg.Wait()
-}
-
-func validateHTTPURL(rawURL string) error {
-	parsed, err := url.ParseRequestURI(strings.TrimSpace(rawURL))
-	if err != nil {
-		return err
-	}
-	if (parsed.Scheme != "https" && parsed.Scheme != "http") || parsed.Host == "" {
-		return fmt.Errorf("must be an absolute http(s) URL")
-	}
-	return nil
 }
 
 func buildAuditLogger(cfg config.Config) (*audit.Logger, error) {

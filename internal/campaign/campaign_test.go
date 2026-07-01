@@ -2,6 +2,7 @@ package campaign
 
 import (
 	"os"
+	"strings"
 	"testing"
 	"time"
 
@@ -206,14 +207,14 @@ func TestDiscountedPromoGridRendersTapedWishlistCards(t *testing.T) {
 	}
 }
 
-func TestDiscountedWishlistFooterIncludesValidatedUnsubscribeLink(t *testing.T) {
-	c := DiscountedWishlistCampaign{
-		UnsubscribeURL: "https://kyou.id/user/notification-settings",
-	}
+func TestDiscountedWishlistFooterOmitsSelfRenderedUnsubscribeLink(t *testing.T) {
+	// Unsubscribe is handled by Kirim.email (List-Unsubscribe / provider footer),
+	// so Makoto must not render its own unsubscribe link into the body.
+	c := DiscountedWishlistCampaign{}
 	data := c.BuildMergeData(domain.User{Name: "Budi"}, nil, "")
 	footer, _ := data["footer_html"].(string)
-	if !containsAll(footer, []string{"Atur preferensi email", "https://kyou.id/user/notification-settings"}) {
-		t.Fatalf("expected unsubscribe preference link, got %q", footer)
+	if strings.Contains(footer, "Atur preferensi email") {
+		t.Fatalf("expected no self-rendered unsubscribe link, got %q", footer)
 	}
 }
 

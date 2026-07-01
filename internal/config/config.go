@@ -62,7 +62,6 @@ type Config struct {
 	DiscountedWishlistEmailSubjects    []string
 	DiscountedWishlistGreetings        []string
 	DiscountedWishlistURL              string
-	DiscountedWishlistUnsubscribeURL   string
 	WinbackEnabled                     bool
 	WinbackQueueName                   string
 	WinbackDeadLetterQueue             string
@@ -156,7 +155,6 @@ func Load() Config {
 			"{{ .FirstName }}, jangan sampai nyesel — wishlistmu lagi diskon sekarang!",
 		}),
 		DiscountedWishlistURL:            env("MAKOTO_DISCOUNTED_WISHLIST_URL", "https://kyou.id/user/wishlist"),
-		DiscountedWishlistUnsubscribeURL: os.Getenv("MAKOTO_DISCOUNTED_WISHLIST_UNSUBSCRIBE_URL"),
 		WinbackEnabled:                   envBool("MAKOTO_WINBACK_ENABLED", false),
 		WinbackQueueName:                 env("MAKOTO_WINBACK_QUEUE_NAME", "winback_email_jobs"),
 		WinbackDeadLetterQueue:           env("MAKOTO_WINBACK_DEAD_LETTER_QUEUE", "winback_email_jobs_dead"),
