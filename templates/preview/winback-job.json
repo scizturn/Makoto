@@ -1,82 +1,146 @@
 {
-  "job_id": "preview-winback-2026-06-15-080000-user-147044",
-  "user_id": "147044",
-  "date": "2026-06-15T08:00:00+07:00",
+  "job_id": "preview-winback-user-98091",
+  "user_id": "98091",
+  "date": "2026-07-01T17:09:36.018575+07:00",
   "user": {
-    "id": "147044",
-    "name": "Cheeazy Preview",
-    "email": "cheeazyyy@gmail.com",
+    "id": "98091",
+    "name": "Silvester Axeldio Laksmana",
+    "email": "axeldio696@gmail.com",
+    "birthday": "0001-01-01T00:00:00Z",
     "is_active": true
   },
-  "voucher_code": "WBPREVIEW2026",
-  "historical_item": {
-    "name": "[FLASH PO] Nendoroid Rin Shima - Touring Ver.",
-    "image_url": "https://kyoucdn.id/items/64964-nendoroid-rin-shima-touring-ver.jpg.webp",
-    "order_date": "2024-09-01T10:00:00Z",
-    "days_ago": 287
-  },
+  "voucher_code": "KANGEN98091",
   "wishlist_items": [
     {
-      "id": "103969",
-      "name": "PVC Figure Mihono Bourbon - Uma Musume Pretty Derby (20cm)",
-      "url": "https://kyou.id/items/103969/",
-      "image_url": "https://kyoucdn.id/items/167314-revive-pvc-figure-mihono-bourbon-uma-musume-pretty-derby-20cm-1459445050.jpg.webp",
-      "price": 320000,
-      "status": "ready",
-      "manufacturer": "Bandai Spirits",
-      "series_name": "Uma Musume"
+      "id": "192504",
+      "name": "[Exclusive Sale] [with Bonus] PVC Figure 1/7 Raiden Shogun / Ei - Plane of Euthymia Ver. Genshin Impact",
+      "url": "https://kyou.id/items/192504/",
+      "image_url": "https://kyoucdn.id/items/pvc-figure-17-raiden-shogun-ei-plane-of-euthymia-ver-genshin-impact-73376477.jpg.webp",
+      "price": 4950000,
+      "status": "PO",
+      "manufacturer": "APEX",
+      "series_name": "Genshin Impact",
+      "po_deadline": "2026-07-19T00:00:00Z",
+      "po_release_at": "2027-08-01T00:00:00Z",
+      "is_wishlisted": true
     },
     {
-      "id": "165913",
-      "name": "Espresto Figure Fujita Kotone - Charming Pose Ver. Gakuen iDOLM@STER (18cm)",
-      "url": "https://kyou.id/items/165913/",
-      "image_url": "https://kyoucdn.id/items/390842-espresto-figure-fujita-kotone-charming-pose-ver-gakuen-idolm-at-ster-size-tba.jpg.webp",
-      "price": 420000,
+      "id": "227953",
+      "name": "[PSA 10] Ludicolo AR (M2 081/080) - Expansion Pack Inferno X Pokémon Japan Trading Card Game (PTCG JP)",
+      "url": "https://kyou.id/items/227953/",
+      "image_url": "https://kyoucdn.id/items/psa-10-ludicolo-ar-m2-081080-expansion-pack-inferno-x-pokemon-japan-trading-card-game-ptcg-jp-abd20267.jpg.webp",
+      "price": 1150000,
       "status": "ready",
-      "manufacturer": "Bandai Spirits",
-      "series_name": "Gakuen iDOLM@STER"
+      "manufacturer": "The Pokemon Company",
+      "series_name": "Pokemon"
     },
     {
-      "id": "158513",
-      "name": "Kuripan Plushie Awa Subaru - Girls Band Cry (17cm)",
-      "url": "https://kyou.id/items/158513/",
-      "image_url": "https://kyoucdn.id/items/kuripan-plushie-awa-subaru-girls-band-cry-17cm-e664c409.jpg.webp",
+      "id": "227954",
+      "name": "[PSA 10] Misdreavus AR (M2a 202/193) - High Class Pack MEGA Dream ex Pokémon Japan Trading Card Game (PTCG JP)",
+      "url": "https://kyou.id/items/227954/",
+      "image_url": "https://kyoucdn.id/items/psa-10-misdreavus-ar-m2a-202193-high-class-pack-mega-dream-ex-pokemon-japan-trading-card-game-ptcg-jp-6cf6d7c5.jpg.webp",
+      "price": 1150000,
+      "status": "ready",
+      "manufacturer": "The Pokemon Company",
+      "series_name": "Pokemon"
+    },
+    {
+      "id": "227955",
+      "name": "[PSA 10] Nymble AR (M2 082/080) - Expansion Pack Inferno X Pokémon Japan Trading Card Game (PTCG JP)",
+      "url": "https://kyou.id/items/227955/",
+      "image_url": "https://kyoucdn.id/items/psa-10-nymble-ar-m2-082080-expansion-pack-inferno-x-pokemon-japan-trading-card-game-ptcg-jp-b5300585.jpg.webp",
+      "price": 1150000,
+      "status": "ready",
+      "manufacturer": "The Pokemon Company",
+      "series_name": "Pokemon"
+    },
+    {
+      "id": "227956",
+      "name": "[PSA 10] Shroodle AR (M1L 072/063) - Expansion Pack Mega Brave Pokémon Japan Trading Card Game (PTCG JP)",
+      "url": "https://kyou.id/items/227956/",
+      "image_url": "https://kyoucdn.id/items/psa-10-shroodle-ar-m1l-072063-expansion-pack-mega-brave-pokemon-japan-trading-card-game-ptcg-jp-30b70a8c.jpg.webp",
+      "price": 1150000,
+      "status": "ready",
+      "manufacturer": "The Pokemon Company",
+      "series_name": "Pokemon"
+    },
+    {
+      "id": "227990",
+      "name": "[Damge A] [Wakeari] PVC Figure 1/6 Succubus Iinchou-san / Succubus Monitor Miona - Illustration by Ban",
+      "url": "https://kyou.id/items/227990/",
+      "image_url": "https://kyoucdn.id/items/damge-a-wakeari-pvc-figure-16-succubus-iinchou-san-succubus-monitor-miona-illustration-by-ban-53be1399.jpg.webp",
       "price": 850000,
       "status": "ready",
-      "manufacturer": "Good Smile Company",
-      "series_name": "Girls Band Cry"
+      "manufacturer": "AniMester",
+      "series_name": "Original Character"
     },
     {
-      "id": "200151",
-      "name": "Nami Egghead Island Ver. Badge - One Piece",
-      "url": "https://kyou.id/items/200151/",
-      "image_url": "https://kyoucdn.id/items/508115-nami-egghead-island-ver-badge-one-piece.jpg.webp",
-      "price": 80000,
+      "id": "227991",
+      "name": "[Damge B] [Wakeari] PVC Figure 1/6 Succubus Iinchou-san / Succubus Monitor Miona - Illustration by Ban",
+      "url": "https://kyou.id/items/227991/",
+      "image_url": "https://kyoucdn.id/items/damge-b-wakeari-pvc-figure-16-succubus-iinchou-san-succubus-monitor-miona-illustration-by-ban-96989b11.jpg.webp",
+      "price": 1000000,
       "status": "ready",
-      "manufacturer": "BOOM COMIC",
-      "series_name": "One Piece"
+      "manufacturer": "AniMester",
+      "series_name": "Original Character"
     },
     {
-      "id": "92977",
-      "name": "PVC Figure Gojo Satoru - Jujutsu Kaisen the Movie Jukon no Kata (18cm)",
-      "url": "https://kyou.id/items/92977/",
-      "image_url": "https://kyoucdn.id/items/92422-revive-pvc-figure-gojo-satoru-jujutsu-kaisen-the-movie-jukon-no-kata-18cm-1768360090.jpg.webp",
-      "price": 320000,
+      "id": "227992",
+      "name": "[Wakeari] [Loose / No Box] Espresto Figure Sumika Shiun - Green Accent Ver. Gakuen iDOLM@STER (22cm)",
+      "url": "https://kyou.id/items/227992/",
+      "image_url": "https://kyoucdn.id/items/wakeari-loose-no-box-espresto-figure-sumika-shiun-green-accent-ver-gakuen-idolm-at-ster-22cm-cd6448bf.jpg.webp",
+      "price": 350000,
       "status": "ready",
       "manufacturer": "Bandai Spirits",
-      "series_name": "Jujutsu Kaisen"
+      "series_name": "The iDOLM@STER"
     },
     {
-      "id": "173409",
-      "name": "Castorice Chrysos Heirs Series Laser Collectible Card - Honkai: Star Rail (7x12cm)",
-      "url": "https://kyou.id/items/173409/",
-      "image_url": "https://kyoucdn.id/items/371729-castorice-amphoreus-saga-of-heroes-series-laser-collectible-card-honkai-star-rail-7x12cm.jpg.webp",
-      "price": 60000,
+      "id": "227993",
+      "name": "[Wakeari] [Box Damaged] [without Dongle Receiver for PC] Hatsune Miku x GameSir Collaboration X5s Wireless Mobile Gamepad Controller",
+      "url": "https://kyou.id/items/227993/",
+      "image_url": "https://kyoucdn.id/items/wakeari-box-damaged-without-dongle-receiver-for-pc-hatsune-miku-x-gamesir-collaboration-x5s-wireless-mobile-gamepad-controller-8ff935e1.jpg.webp",
+      "price": 1050000,
       "status": "ready",
-      "manufacturer": "Mihoyo",
-      "series_name": "Honkai: Star Rail"
+      "manufacturer": "GameSir",
+      "series_name": "Vocaloid"
+    },
+    {
+      "id": "227994",
+      "name": "[Wakeari] ALTAiR Figure 1/8 Pretender / Oberon Vortigern - Fate/Grand Order",
+      "url": "https://kyou.id/items/227994/",
+      "image_url": "https://kyoucdn.id/items/wakeari-altair-figure-18-pretender-oberon-vortigern-fategrand-order-f63cf438.jpg.webp",
+      "price": 6950000,
+      "status": "ready",
+      "manufacturer": "ALTER",
+      "series_name": "Fate"
+    },
+    {
+      "id": "227995",
+      "name": "[Wakeari] [With Bonus] PVC Figure 1/7 Lappland - The Elegant Omen Deluxe Ver. Arknights",
+      "url": "https://kyou.id/items/227995/",
+      "image_url": "https://kyoucdn.id/items/wakeari-with-bonus-pvc-figure-17-lappland-the-elegant-omen-deluxe-ver-arknights-b4b7a4f4.jpg.webp",
+      "price": 6950000,
+      "status": "ready",
+      "manufacturer": "ALTER",
+      "series_name": "Arknights"
+    },
+    {
+      "id": "227957",
+      "name": "[PSA 10] Rapidash AR (SV9a 069/063) - Enhanced Expansion Pack Hot Wind Arena (Heat Wave Arena) Pokémon Japan Trading Card Game (PTCG JP)",
+      "url": "https://kyou.id/items/227957/",
+      "image_url": "https://kyoucdn.id/items/psa-10-rapidash-ar-sv9a-069063-enhanced-expansion-pack-hot-wind-arena-heat-wave-arena-pokemon-japan-trading-card-game-ptcg-jp-9ad00d87.jpg.webp",
+      "price": 1350000,
+      "status": "ready",
+      "manufacturer": "The Pokemon Company",
+      "series_name": "Pokemon"
     }
   ],
-  "popular_items": [],
+  "historical_item": {
+    "name": "hololive English Koseki Bijou Birthday 2026 Pebble Beanie",
+    "image_url": "https://kyoucdn.id/items/hololive-english-koseki-bijou-birthday-2026-pebble-beanie-0d8e63ab344f16ed66fb2f58d14affe13d98dd211755bdba826200c481fbf9af.jpg.webp",
+    "order_date": "2026-05-01T20:04:25Z",
+    "days_ago": 60
+  },
+  "popular_items": null,
   "attempt": 1
 }
