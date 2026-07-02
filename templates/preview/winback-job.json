@@ -1,7 +1,7 @@
 {
-  "job_id": "preview-winback-2026-07-02-130454-user-31877",
+  "job_id": "preview-winback-2026-07-02-134348-user-31877",
   "user_id": "31877",
-  "date": "2026-07-02T13:04:54.617193+07:00",
+  "date": "2026-07-02T13:43:48.703726+07:00",
   "user": {
     "id": "31877",
     "name": "Abimanyu Nugroho",
@@ -64,71 +64,71 @@
       "series_name": "Pokemon"
     },
     {
-      "id": "227990",
-      "name": "[Damge A] [Wakeari] PVC Figure 1/6 Succubus Iinchou-san / Succubus Monitor Miona - Illustration by Ban",
-      "url": "https://kyou.id/items/227990/",
-      "image_url": "https://kyoucdn.id/items/damge-a-wakeari-pvc-figure-16-succubus-iinchou-san-succubus-monitor-miona-illustration-by-ban-53be1399.jpg.webp",
-      "price": 850000,
-      "status": "ready",
-      "manufacturer": "AniMester",
-      "series_name": "Original Character"
-    },
-    {
-      "id": "227991",
-      "name": "[Damge B] [Wakeari] PVC Figure 1/6 Succubus Iinchou-san / Succubus Monitor Miona - Illustration by Ban",
-      "url": "https://kyou.id/items/227991/",
-      "image_url": "https://kyoucdn.id/items/damge-b-wakeari-pvc-figure-16-succubus-iinchou-san-succubus-monitor-miona-illustration-by-ban-96989b11.jpg.webp",
-      "price": 1000000,
-      "status": "ready",
-      "manufacturer": "AniMester",
-      "series_name": "Original Character"
-    },
-    {
-      "id": "227992",
-      "name": "[Wakeari] [Loose / No Box] Espresto Figure Sumika Shiun - Green Accent Ver. Gakuen iDOLM@STER (22cm)",
-      "url": "https://kyou.id/items/227992/",
-      "image_url": "https://kyoucdn.id/items/wakeari-loose-no-box-espresto-figure-sumika-shiun-green-accent-ver-gakuen-idolm-at-ster-22cm-cd6448bf.jpg.webp",
-      "price": 350000,
-      "status": "ready",
-      "manufacturer": "Bandai Spirits",
-      "series_name": "The iDOLM@STER"
-    },
-    {
-      "id": "227993",
-      "name": "[Wakeari] [Box Damaged] [without Dongle Receiver for PC] Hatsune Miku x GameSir Collaboration X5s Wireless Mobile Gamepad Controller",
-      "url": "https://kyou.id/items/227993/",
-      "image_url": "https://kyoucdn.id/items/wakeari-box-damaged-without-dongle-receiver-for-pc-hatsune-miku-x-gamesir-collaboration-x5s-wireless-mobile-gamepad-controller-8ff935e1.jpg.webp",
-      "price": 1050000,
-      "status": "ready",
-      "manufacturer": "GameSir",
-      "series_name": "Vocaloid"
-    },
-    {
-      "id": "227994",
-      "name": "[Wakeari] ALTAiR Figure 1/8 Pretender / Oberon Vortigern - Fate/Grand Order",
-      "url": "https://kyou.id/items/227994/",
-      "image_url": "https://kyoucdn.id/items/wakeari-altair-figure-18-pretender-oberon-vortigern-fategrand-order-f63cf438.jpg.webp",
-      "price": 6950000,
-      "status": "ready",
-      "manufacturer": "ALTER",
-      "series_name": "Fate"
-    },
-    {
-      "id": "227995",
-      "name": "[Wakeari] [With Bonus] PVC Figure 1/7 Lappland - The Elegant Omen Deluxe Ver. Arknights",
-      "url": "https://kyou.id/items/227995/",
-      "image_url": "https://kyoucdn.id/items/wakeari-with-bonus-pvc-figure-17-lappland-the-elegant-omen-deluxe-ver-arknights-b4b7a4f4.jpg.webp",
-      "price": 6950000,
-      "status": "ready",
-      "manufacturer": "ALTER",
-      "series_name": "Arknights"
-    },
-    {
       "id": "227957",
       "name": "[PSA 10] Rapidash AR (SV9a 069/063) - Enhanced Expansion Pack Hot Wind Arena (Heat Wave Arena) Pokémon Japan Trading Card Game (PTCG JP)",
       "url": "https://kyou.id/items/227957/",
       "image_url": "https://kyoucdn.id/items/psa-10-rapidash-ar-sv9a-069063-enhanced-expansion-pack-hot-wind-arena-heat-wave-arena-pokemon-japan-trading-card-game-ptcg-jp-9ad00d87.jpg.webp",
       "price": 1350000,
+      "status": "ready",
+      "manufacturer": "The Pokemon Company",
+      "series_name": "Pokemon"
+    },
+    {
+      "id": "227958",
+      "name": "[PSA 10] Shedinja AR (M1S 072/063) - Expansion Pack Mega Symphonia Pokémon Japan Trading Card Game (PTCG JP)",
+      "url": "https://kyou.id/items/227958/",
+      "image_url": "https://kyoucdn.id/items/psa-10-shedinja-ar-m1s-072063-expansion-pack-mega-symphonia-pokemon-japan-trading-card-game-ptcg-jp-c9d2638a.jpg.webp",
+      "price": 1150000,
+      "status": "ready",
+      "manufacturer": "The Pokemon Company",
+      "series_name": "Pokemon"
+    },
+    {
+      "id": "227959",
+      "name": "[PSA 10] Clawitzer AR (M1S 068/063) - Expansion Pack Mega Symphonia Pokémon Japan Trading Card Game (PTCG JP)",
+      "url": "https://kyou.id/items/227959/",
+      "image_url": "https://kyoucdn.id/items/psa-10-clawitzer-ar-m1s-068063-expansion-pack-mega-symphonia-pokemon-japan-trading-card-game-ptcg-jp-5e6a5b78.jpg.webp",
+      "price": 1150000,
+      "status": "ready",
+      "manufacturer": "The Pokemon Company",
+      "series_name": "Pokemon"
+    },
+    {
+      "id": "227960",
+      "name": "[PSA 10] Togekiss AR (M2a 203/193) - High Class Pack MEGA Dream ex Pokémon Japan Trading Card Game (PTCG JP)",
+      "url": "https://kyou.id/items/227960/",
+      "image_url": "https://kyoucdn.id/items/psa-10-togekiss-ar-m2a-203193-high-class-pack-mega-dream-ex-pokemon-japan-trading-card-game-ptcg-jp-2809da68.jpg.webp",
+      "price": 1150000,
+      "status": "ready",
+      "manufacturer": "The Pokemon Company",
+      "series_name": "Pokemon"
+    },
+    {
+      "id": "227961",
+      "name": "[PSA 10] Exeggutor AR (M1L 066/063) - Expansion Pack Mega Brave Pokémon Japan Trading Card Game (PTCG JP)",
+      "url": "https://kyou.id/items/227961/",
+      "image_url": "https://kyoucdn.id/items/psa-10-exeggutor-ar-m1l-066063-expansion-pack-mega-brave-pokemon-japan-trading-card-game-ptcg-jp-4d61eb55.jpg.webp",
+      "price": 1150000,
+      "status": "ready",
+      "manufacturer": "The Pokemon Company",
+      "series_name": "Pokemon"
+    },
+    {
+      "id": "227962",
+      "name": "[PSA 10] Snorunt AR (M2a 200/193) - High Class Pack MEGA Dream ex Pokémon Japan Trading Card Game (PTCG JP)",
+      "url": "https://kyou.id/items/227962/",
+      "image_url": "https://kyoucdn.id/items/psa-10-snorunt-ar-m2a-200193-high-class-pack-mega-dream-ex-pokemon-japan-trading-card-game-ptcg-jp-2e1f69eb.jpg.webp",
+      "price": 1150000,
+      "status": "ready",
+      "manufacturer": "The Pokemon Company",
+      "series_name": "Pokemon"
+    },
+    {
+      "id": "227951",
+      "name": "[PSA 10] Litleo AR (M1S 066/063) - Expansion Pack Mega Symphonia Pokémon Japan Trading Card Game (PTCG JP)",
+      "url": "https://kyou.id/items/227951/",
+      "image_url": "https://kyoucdn.id/items/psa-10-litleo-ar-m1s-066063-expansion-pack-mega-symphonia-pokemon-japan-trading-card-game-ptcg-jp-6ad3ce3d.jpg.webp",
+      "price": 1150000,
       "status": "ready",
       "manufacturer": "The Pokemon Company",
       "series_name": "Pokemon"
@@ -166,42 +166,43 @@
   ],
   "popular_items": [
     {
-      "id": "228611",
-      "name": "Noodle Stopper Figure Ryuuk - Death Note (13cm)",
-      "kind": "character",
-      "series_id": "2147",
-      "image_url": "https://kyoucdn.id/items/noodle-stopper-figure-ryuuk-death-note-13cm-84f884a6.jpg.webp",
-      "price": 380000,
-      "status": "PO",
-      "manufacturer": "FuRyu",
-      "series_name": "Death Note",
-      "po_release_at": "2026-08-02T00:00:00Z"
-    },
-    {
-      "id": "228610",
-      "name": "hololive English Cecilia Immergreen 2nd Anniversary Otomo Otomo Plushie Plushie",
+      "id": "228595",
+      "name": "hololive Japan AZKi Birthday 2026 Double Layered Acrylic Panel",
       "kind": "character",
       "series_id": "4413",
-      "image_url": "https://kyoucdn.id/items/hololive-english-cecilia-immergreen-2nd-anniversary-otomo-otomo-plushie-plushie-d091cf07.jpg.webp",
-      "price": 660000,
+      "image_url": "https://kyoucdn.id/items/hololive-japan-azki-birthday-2026-double-layered-acrylic-panel-8462a7c8.jpg.webp",
+      "price": 900000,
       "status": "PO",
       "manufacturer": "Cover",
       "series_name": "hololive production",
       "po_deadline": "2026-07-17T00:00:00Z",
-      "po_release_at": "2026-12-01T00:00:00Z"
+      "po_release_at": "2027-02-01T00:00:00Z"
     },
     {
-      "id": "228609",
-      "name": "hololive English Cecilia Immergreen 2nd Anniversary Immer-Spin-To-Win Handheld Fan",
+      "id": "228596",
+      "name": "[Random] hololive Japan AZKi Birthday 2026 Rubber Keychain",
       "kind": "character",
       "series_id": "4413",
-      "image_url": "https://kyoucdn.id/items/hololive-english-cecilia-immergreen-2nd-anniversary-immer-spin-to-win-handheld-fan-cc384039.jpg.webp",
-      "price": 560000,
+      "image_url": "https://kyoucdn.id/items/random-hololive-japan-azki-birthday-2026-rubber-keychain-00e14831.jpg.webp",
+      "price": 220000,
       "status": "PO",
       "manufacturer": "Cover",
       "series_name": "hololive production",
       "po_deadline": "2026-07-17T00:00:00Z",
-      "po_release_at": "2026-12-01T00:00:00Z"
+      "po_release_at": "2027-02-01T00:00:00Z"
+    },
+    {
+      "id": "228597",
+      "name": "hololive Japan AZKi Birthday 2026 Plushie Keychain Little Devil Outfit ver.",
+      "kind": "character",
+      "series_id": "4413",
+      "image_url": "https://kyoucdn.id/items/hololive-japan-azki-birthday-2026-plushie-keychain-little-devil-outfit-ver-47172ec6.jpg.webp",
+      "price": 700000,
+      "status": "PO",
+      "manufacturer": "Cover",
+      "series_name": "hololive production",
+      "po_deadline": "2026-07-17T00:00:00Z",
+      "po_release_at": "2027-02-01T00:00:00Z"
     }
   ],
   "attempt": 1

@@ -60,7 +60,7 @@
                   <div style="font-family:'Nunito',Arial,Helvetica,sans-serif;font-size:13px;color:#5a4a36;">min. belanja IDR 300.000 &middot; maks. potongan IDR 130.000</div>
                   <div style="border-top:2px dashed #cbb079;margin:16px 6px;"></div>
                   <div style="font-family:'Nunito',Arial,Helvetica,sans-serif;font-size:12px;color:#8a7355;margin-bottom:8px;">pakai kode ini pas checkout:</div>
-                  <div style="display:inline-block;font-family:'Nunito',Arial,Helvetica,sans-serif;font-size:18px;letter-spacing:3px;color:#4a3b2a;background:#fffdf6;border:1px solid #9c7a2f;padding:9px 18px;">{{ .VoucherCode }}</div>
+                  <a href="{{ .ActionURL }}" style="display:inline-block;font-family:'Nunito',Arial,Helvetica,sans-serif;font-size:18px;letter-spacing:3px;color:#4a3b2a;background:#fffdf6;border:1px solid #9c7a2f;padding:9px 18px;text-decoration:none;">{{ .VoucherCode }}</a>
                   <div style="font-family:'Nunito',Arial,Helvetica,sans-serif;font-style:italic;font-size:12.5px;color:#8a7355;margin-top:12px;">berlaku 14 hari, cuma bisa dipakai 1x. Buruan ya!</div>
                 </div>
               </div>
@@ -74,9 +74,7 @@
 
               <!-- closing -->
               <div style="text-align:center;padding:6px 0 26px;">
-                <div style="font-family:'Nunito',Arial,Helvetica,sans-serif;font-weight:700;font-size:32px;color:#4a3b2a;line-height:1.1;">Yuk, lanjutin cerita kita.</div>
-                <a href="{{ .ActionURL }}" style="display:inline-block;margin-top:16px;background:#fc4c02;color:#fffdf6;font-family:'Nunito',Arial,Helvetica,sans-serif;font-size:14px;letter-spacing:1px;padding:14px 28px;text-decoration:none;box-shadow:3px 3px 0 rgba(74,59,42,0.35);">&hearts; Buka Wishlist-ku</a>
-              </div>
+                <div style="font-family:'Nunito',Arial,Helvetica,sans-serif;font-weight:700;font-size:32px;color:#4a3b2a;line-height:1.1;">Yuk, lanjutin cerita kita.</div>              </div>
 
             </td>
           </tr>

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"html"
 	"math/rand"
+	"strconv"
 	"strings"
 	texttemplate "text/template"
 	"time"
@@ -102,7 +103,7 @@ func (c WinbackCampaign) BuildMergeData(user domain.User, voucherCode string, wi
 		// collection is a list (thumbnail + name + purchase date); the ready
 		// wishlist stays a polaroid grid.
 		"historical_html": RenderWinbackPastListHTML(historicalItems),
-		"wishlist_html":   RenderWinbackReadyPolaroidsHTML(wishlist),
+		"wishlist_html":   RenderWinbackReadyStampsHTML(wishlist),
 		"action_url":      actionURLWithClaim(c.ActionURL, voucherCode),
 		"closing":         c.Closing,
 		// Shared Kyou footer (same as discounted wishlist).
@@ -111,9 +112,15 @@ func (c WinbackCampaign) BuildMergeData(user domain.User, voucherCode string, wi
 }
 
 const (
-	winbackReadyLimit = 12
-	winbackReadyCols  = 3
+	// The ready wishlist/fill grid is a 2-column × 3-row sheet of postage stamps.
+	winbackReadyCols  = 2
+	winbackReadyLimit = 6
 )
+
+// winbackStampMat is the color of the "page" behind each stamp — it must match
+// the lined-paper background the winback templates place the grid on so the
+// perforation notches (radial-gradient holes) blend into the page.
+const winbackStampMat = "#f4ecd7"
 
 // winbackPastLimit caps how many past orders the "past collection" list shows.
 const winbackPastLimit = 3
@@ -176,7 +183,7 @@ func winbackPastRow(item domain.HistoricalItem) string {
 
 // winbackListCaption cleans an item name for the wider list layout: it strips
 // leading bracket tags (e.g. "[PSA 10] [with Bonus] Foo" → "Foo") and truncates
-// what remains. The polaroid grid uses the tighter winbackCaption.
+// what remains. The stamp grid uses the tighter winbackStampCaption.
 func winbackListCaption(name string) string {
 	name = stripBracketPrefixes(name)
 	runes := []rune(name)
@@ -210,9 +217,21 @@ func winbackOrderDateText(t time.Time) string {
 	return fmt.Sprintf("Dibeli %d %s %d", t.Day(), idMonths[t.Month()], t.Year())
 }
 
-// RenderWinbackReadyPolaroidsHTML renders up to two wishlist items as
-// polaroids ("wishlist kamu, ready stock").
-func RenderWinbackReadyPolaroidsHTML(items []domain.WishlistItem) string {
+// RenderWinbackReadyStampsHTML renders the ready wishlist/fill items as a
+// 2-column × 3-row sheet of postage stamps ("wishlist kamu, ready stock").
+func RenderWinbackReadyStampsHTML(items []domain.WishlistItem) string {
+	// Drop "wakeari" (imperfect-grade) items before capping, so they never take a
+	// stamp slot even if they slipped in via the user's own wishlist or a job
+	// enqueued before winback_fill_items.sql filtered them out. Adult items are
+	// already excluded upstream in SQL (isAdult=0).
+	kept := items[:0:0]
+	for _, item := range items {
+		if isWakeariName(item.Name) {
+			continue
+		}
+		kept = append(kept, item)
+	}
+	items = kept
 	if len(items) == 0 {
 		return `<div style="font-family:'Nunito',Arial,Helvetica,sans-serif;font-style:italic;font-size:13px;color:#9a866a;text-align:center;padding:6px 0 4px;">Wishlist kamu lagi kosong — mampir yuk, banyak rilisan baru yang nunggu.</div>`
 	}
@@ -223,7 +242,7 @@ func RenderWinbackReadyPolaroidsHTML(items []domain.WishlistItem) string {
 	b.WriteString(`<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;">`)
 	for row := 0; row < len(items); row += winbackReadyCols {
 		if row > 0 {
-			b.WriteString(`<tr><td colspan="3" style="height:16px;line-height:16px;font-size:16px;">&nbsp;</td></tr>`)
+			b.WriteString(fmt.Sprintf(`<tr><td colspan="%d" style="height:18px;line-height:18px;font-size:18px;">&nbsp;</td></tr>`, winbackReadyCols))
 		}
 		b.WriteString(`<tr>`)
 		end := row + winbackReadyCols
@@ -231,15 +250,10 @@ func RenderWinbackReadyPolaroidsHTML(items []domain.WishlistItem) string {
 			end = len(items)
 		}
 		for i := row; i < end; i++ {
-			caption := winbackCaption(items[i].Name)
-			if price := formatIDR(items[i].Price); price != "" {
-				caption = caption + " · " + price
-			}
-			card := winbackPolaroidCard(items[i].ImageURL, caption, "#4a3b2a", items[i].IsWishlisted, items[i].URL)
-			b.WriteString(`<td width="33.33%" valign="top" align="center" style="padding:0 6px;">` + card + `</td>`)
+			b.WriteString(`<td width="50%" valign="top" align="center" style="padding:0 8px;">` + winbackStampCard(items[i]) + `</td>`)
 		}
 		for i := end; i < row+winbackReadyCols; i++ {
-			b.WriteString(`<td width="33.33%">&nbsp;</td>`)
+			b.WriteString(`<td width="50%">&nbsp;</td>`)
 		}
 		b.WriteString(`</tr>`)
 	}
@@ -247,45 +261,87 @@ func RenderWinbackReadyPolaroidsHTML(items []domain.WishlistItem) string {
 	return b.String()
 }
 
-// winbackPolaroidCard renders one scrapbook polaroid as a nested <table>. It uses
-// no position:absolute (Gmail/Outlook strip it) and no transform:rotate (Outlook
-// ignores it, and Apple Mail would honour it — producing inconsistent tilt
-// between recipients). The card is designed flat so the preview matches what
-// every email client actually shows.
-func winbackPolaroidCard(imageURL, caption, captionColor string, highlight bool, linkURL string) string {
-	safeCaption := html.EscapeString(caption)
-	safeImage := html.EscapeString(imageURL)
+// winbackStampCard renders one wishlist item as a postage stamp: a cream sheet
+// with perforated edges (radial-gradient holes in the page color, revealed only
+// in the padding ring around a solid inner panel), the item photo, and an
+// issuer/denomination banner along the bottom — like a real perangko. It avoids
+// position:absolute and transform (Outlook strips them); where radial-gradient
+// is unsupported it degrades to a clean cream card, so no client breaks.
+func winbackStampCard(item domain.WishlistItem) string {
+	safeImage := html.EscapeString(item.ImageURL)
 
-	// alt is intentionally empty: the caption <div> right below already names the
-	// item, so a meaningful alt would duplicate that text (visible when images are
-	// blocked or when the email text is extracted).
-	imgHTML := fmt.Sprintf(`<img src="%s" alt="" width="190" style="display:block;width:100%%;max-width:190px;height:auto;border:0;">`, safeImage)
+	// Square 1:1 crop to match how these items appear as most-popular thumbnails
+	// on /search. aspect-ratio + object-fit give an exact square in modern clients
+	// (Apple Mail, iOS, Gmail); Outlook ignores them and shows the image at its
+	// natural ratio — still visible, just not cropped.
+	imgHTML := fmt.Sprintf(`<img src="%s" alt="" width="300" style="display:block;width:100%%;height:auto;aspect-ratio:1/1;object-fit:cover;border:0;background:#efe7d3;">`, safeImage)
 	if safeImage == "" {
-		imgHTML = `<div style="height:140px;background:#efe7d3;"></div>`
+		imgHTML = `<div style="width:100%;aspect-ratio:1/1;background:#efe7d3;"></div>`
 	}
 
-	// The user's own wishlist items get a 2px orange border to stand apart from
-	// the popular-ready fill items.
-	borderStyle := "border:1px solid #ece3d0;"
-	if highlight {
-		borderStyle = "border:2px solid #fc4c02;"
+	// The user's own wishlist items get an orange issuer banner; popular-ready
+	// fill items get the muted brown banner so they stand apart.
+	bannerBG := "#4a3b2a"
+	issuer := "KYOU.ID"
+	if item.IsWishlisted {
+		bannerBG = "#fc4c02"
+		issuer = "&hearts; WISHLIST-KU"
 	}
 
-	card := fmt.Sprintf(
-		`<table role="presentation" width="190" cellspacing="0" cellpadding="0" style="width:190px;margin:0 auto;border-collapse:collapse;background:#fffdf6;box-shadow:2px 4px 9px rgba(74,59,42,0.2);%s"><tr><td style="padding:8px 8px 11px;"><div style="background:#efe7d3;font-size:0;line-height:0;">%s</div><div style="font-family:'Nunito',Arial,Helvetica,sans-serif;font-weight:800;font-size:14px;color:%s;text-align:center;padding:8px 3px 0;line-height:1.25;">%s</div></td></tr></table>`,
-		borderStyle, imgHTML, captionColor, safeCaption,
+	denom := ""
+	if price := winbackStampPrice(item.Price); price != "" {
+		denom = fmt.Sprintf(`<td align="right" style="padding:0;"><span style="font-family:Georgia,'Times New Roman',serif;font-weight:700;font-size:13px;color:#fbe6d0;">%s</span></td>`, html.EscapeString(price))
+	}
+
+	banner := fmt.Sprintf(
+		`<tr><td style="background:%s;padding:7px 11px;"><table role="presentation" width="100%%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;"><tr><td align="left" style="padding:0;"><span style="font-family:'Nunito',Arial,Helvetica,sans-serif;font-weight:800;font-size:11px;letter-spacing:2px;color:#fbe6d0;">%s</span></td>%s</tr></table></td></tr>`,
+		bannerBG, issuer, denom,
 	)
-	if strings.TrimSpace(linkURL) == "" {
-		return card
+
+	// Outer table paints mat-colored perforation dots over cream; the inner panel
+	// (cream) covers the center, so the holes only show in the 9px padding ring.
+	perf := fmt.Sprintf("background-color:#fffdf6;background-image:radial-gradient(circle,%s 3px,rgba(244,236,215,0) 3.5px);background-size:13px 13px;background-position:center;", winbackStampMat)
+	card := fmt.Sprintf(
+		`<table role="presentation" width="100%%" cellspacing="0" cellpadding="0" style="max-width:300px;margin:0 auto;border-collapse:collapse;%sbox-shadow:2px 4px 9px rgba(74,59,42,0.22);"><tr><td style="padding:9px;"><table role="presentation" width="100%%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;background:#fffdf6;border:1px solid #e3d7bb;"><tr><td style="padding:0;font-size:0;line-height:0;">%s</td></tr>%s</table></td></tr></table>`,
+		perf, imgHTML, banner,
+	)
+
+	caption := fmt.Sprintf(
+		`<div style="font-family:'Nunito',Arial,Helvetica,sans-serif;font-weight:700;font-size:13px;color:#4a3b2a;text-align:center;padding:9px 4px 0;line-height:1.3;max-width:300px;margin:0 auto;">%s</div>`,
+		html.EscapeString(winbackStampCaption(item.Name)),
+	)
+
+	stamp := card + caption
+	if strings.TrimSpace(item.URL) == "" {
+		return stamp
 	}
-	return fmt.Sprintf(`<a href="%s" style="text-decoration:none;color:inherit;display:block;">%s</a>`, html.EscapeString(linkURL), card)
+	return fmt.Sprintf(`<a href="%s" style="text-decoration:none;color:inherit;display:block;">%s</a>`, html.EscapeString(item.URL), stamp)
 }
 
-func winbackCaption(name string) string {
-	name = strings.TrimSpace(name)
+// winbackStampPrice formats a price as a compact stamp denomination, e.g.
+// 320000 → "320K", 6950000 → "6950K". Returns "" for a non-positive price.
+func winbackStampPrice(price int) string {
+	if price <= 0 {
+		return ""
+	}
+	if price >= 1000 {
+		return strconv.Itoa(price/1000) + "K"
+	}
+	return strconv.Itoa(price)
+}
+
+// isWakeariName reports whether an item name carries the "wakeari" (訳あり /
+// imperfect-grade) tag. There is no dedicated flag on the item, so the name is
+// the only signal.
+func isWakeariName(name string) bool {
+	return strings.Contains(strings.ToLower(name), "wakeari")
+}
+
+func winbackStampCaption(name string) string {
+	name = stripBracketPrefixes(name)
 	runes := []rune(name)
-	if len(runes) > 24 {
-		return strings.TrimSpace(string(runes[:24])) + "…"
+	if len(runes) > 46 {
+		return strings.TrimSpace(string(runes[:46])) + "…"
 	}
 	return name
 }

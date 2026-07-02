@@ -1,6 +1,7 @@
 package campaign
 
 import (
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -43,6 +44,63 @@ func TestRenderWinbackPastListOmitsLinkWhenURLMissing(t *testing.T) {
 	}
 	if !strings.Contains(html, "Pebble Beanie") {
 		t.Fatalf("item name missing, got: %s", html)
+	}
+}
+
+func TestRenderWinbackReadyStampsCapsAtSixAndLinks(t *testing.T) {
+	items := make([]domain.WishlistItem, 8)
+	for i := range items {
+		items[i] = domain.WishlistItem{
+			ID:       strconv.Itoa(i),
+			Name:     "Item " + strconv.Itoa(i),
+			URL:      "https://kyou.id/items/" + strconv.Itoa(i) + "/",
+			ImageURL: "https://kyoucdn.id/x.webp",
+			Price:    320000,
+		}
+	}
+	items[0].IsWishlisted = true
+
+	html := RenderWinbackReadyStampsHTML(items)
+
+	if got := strings.Count(html, "radial-gradient(circle,"+winbackStampMat); got != winbackReadyLimit {
+		t.Fatalf("expected %d stamps (2x3), got %d", winbackReadyLimit, got)
+	}
+	if !strings.Contains(html, "WISHLIST-KU") {
+		t.Fatalf("the user's own wishlist item should get the WISHLIST-KU banner")
+	}
+	if !strings.Contains(html, "KYOU.ID") {
+		t.Fatalf("fill items should get the KYOU.ID banner")
+	}
+	if !strings.Contains(html, ">320K<") {
+		t.Fatalf("price should render as a compact denomination, got: %s", html)
+	}
+	if !strings.Contains(html, `href="https://kyou.id/items/0/"`) {
+		t.Fatalf("each stamp should link to its item")
+	}
+}
+
+func TestRenderWinbackReadyStampsSkipsWakeari(t *testing.T) {
+	items := []domain.WishlistItem{
+		{ID: "1", Name: "[Wakeari] PVC Figure Lappland", URL: "https://kyou.id/items/1/", ImageURL: "https://x/1.webp", Price: 6950000},
+		{ID: "2", Name: "PSA 10 Ludicolo AR", URL: "https://kyou.id/items/2/", ImageURL: "https://x/2.webp", Price: 1150000},
+	}
+
+	html := RenderWinbackReadyStampsHTML(items)
+
+	if strings.Contains(html, "https://kyou.id/items/1/") {
+		t.Fatalf("wakeari item should be skipped, got: %s", html)
+	}
+	if !strings.Contains(html, "https://kyou.id/items/2/") {
+		t.Fatalf("non-wakeari item should render, got: %s", html)
+	}
+	if got := strings.Count(html, "radial-gradient(circle,"+winbackStampMat); got != 1 {
+		t.Fatalf("expected 1 stamp after skipping wakeari, got %d", got)
+	}
+}
+
+func TestRenderWinbackReadyStampsEmpty(t *testing.T) {
+	if html := RenderWinbackReadyStampsHTML(nil); !strings.Contains(html, "Wishlist kamu lagi kosong") {
+		t.Fatalf("empty wishlist should render the fallback message, got: %s", html)
 	}
 }
 
