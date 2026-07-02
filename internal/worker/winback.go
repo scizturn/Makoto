@@ -21,6 +21,18 @@ type WinbackProcessor struct {
 	BeforeSend func(ctx context.Context, job domain.WinbackJob, result ProcessResult) error
 }
 
+// winbackHistoricalItems returns the job's past-purchase list, falling back to
+// the single HistoricalItem for jobs enqueued before HistoricalItems existed.
+func winbackHistoricalItems(job domain.WinbackJob) []domain.HistoricalItem {
+	if len(job.HistoricalItems) > 0 {
+		return job.HistoricalItems
+	}
+	if job.HistoricalItem.Name != "" || job.HistoricalItem.ImageURL != "" {
+		return []domain.HistoricalItem{job.HistoricalItem}
+	}
+	return nil
+}
+
 func NewWinbackProcessor(sender email.Sender, validator email.Validator, c campaign.WinbackCampaign) *WinbackProcessor {
 	return &WinbackProcessor{
 		sender:    sender,
@@ -47,7 +59,7 @@ func (p *WinbackProcessor) Process(ctx context.Context, job domain.WinbackJob) (
 	greetingTpl := p.campaign.SelectGreeting(job.Date, job.ID)
 	greeting := p.campaign.RenderGreeting(greetingTpl, user)
 	templateID := p.campaign.SelectTemplate(job.Date, job.ID)
-	mergeData := p.campaign.BuildMergeData(user, job.VoucherCode, job.WishlistItems, job.HistoricalItem, greeting)
+	mergeData := p.campaign.BuildMergeData(user, job.VoucherCode, job.WishlistItems, winbackHistoricalItems(job), greeting)
 
 	result := ProcessResult{
 		TemplateID: templateID,

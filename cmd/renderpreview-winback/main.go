@@ -38,7 +38,11 @@ func main() {
 
 	greetingTpl := "Hei {{ .FirstName }}, udah lama banget nih nggak ketemu!"
 	greeting := wb.RenderGreeting(greetingTpl, job.User)
-	mergeData := wb.BuildMergeData(job.User, job.VoucherCode, job.WishlistItems, job.HistoricalItem, greeting)
+	historicalItems := job.HistoricalItems
+	if len(historicalItems) == 0 && (job.HistoricalItem.Name != "" || job.HistoricalItem.ImageURL != "") {
+		historicalItems = []domain.HistoricalItem{job.HistoricalItem}
+	}
+	mergeData := wb.BuildMergeData(job.User, job.VoucherCode, job.WishlistItems, historicalItems, greeting)
 
 	renderer := emailtemplate.FileRenderer{Dir: templateDir, Subject: subject}
 

@@ -1,27 +1,26 @@
 {
-  "job_id": "preview-winback-user-98091",
-  "user_id": "98091",
-  "date": "2026-07-01T17:09:36.018575+07:00",
+  "job_id": "preview-winback-2026-07-02-130454-user-31877",
+  "user_id": "31877",
+  "date": "2026-07-02T13:04:54.617193+07:00",
   "user": {
-    "id": "98091",
-    "name": "Silvester Axeldio Laksmana",
-    "email": "axeldio696@gmail.com",
-    "birthday": "0001-01-01T00:00:00Z",
+    "id": "31877",
+    "name": "Abimanyu Nugroho",
+    "email": "manyu555abi@gmail.com",
+    "birthday": "2001-08-06T00:00:00Z",
     "is_active": true
   },
-  "voucher_code": "KANGEN98091",
+  "voucher_code": "KANGEN31877",
   "wishlist_items": [
     {
-      "id": "192504",
-      "name": "[Exclusive Sale] [with Bonus] PVC Figure 1/7 Raiden Shogun / Ei - Plane of Euthymia Ver. Genshin Impact",
-      "url": "https://kyou.id/items/192504/",
-      "image_url": "https://kyoucdn.id/items/pvc-figure-17-raiden-shogun-ei-plane-of-euthymia-ver-genshin-impact-73376477.jpg.webp",
-      "price": 4950000,
-      "status": "PO",
-      "manufacturer": "APEX",
-      "series_name": "Genshin Impact",
-      "po_deadline": "2026-07-19T00:00:00Z",
-      "po_release_at": "2027-08-01T00:00:00Z",
+      "id": "103969",
+      "name": "PVC Figure Mihono Bourbon - Uma Musume Pretty Derby (20cm)",
+      "url": "https://kyou.id/items/103969/",
+      "image_url": "https://kyoucdn.id/items/167314-revive-pvc-figure-mihono-bourbon-uma-musume-pretty-derby-20cm-1459445050.jpg.webp",
+      "price": 320000,
+      "status": "ready",
+      "manufacturer": "Bandai Spirits",
+      "series_name": "Uma Musume",
+      "po_release_at": "2025-08-08T00:00:00Z",
       "is_wishlisted": true
     },
     {
@@ -136,11 +135,74 @@
     }
   ],
   "historical_item": {
-    "name": "hololive English Koseki Bijou Birthday 2026 Pebble Beanie",
-    "image_url": "https://kyoucdn.id/items/hololive-english-koseki-bijou-birthday-2026-pebble-beanie-0d8e63ab344f16ed66fb2f58d14affe13d98dd211755bdba826200c481fbf9af.jpg.webp",
-    "order_date": "2026-05-01T20:04:25Z",
-    "days_ago": 60
+    "name": "Kuripan Plushie Awa Subaru - Girls Band Cry (17cm)",
+    "image_url": "https://kyoucdn.id/items/kuripan-plushie-awa-subaru-girls-band-cry-17cm-e664c409.jpg.webp",
+    "url": "https://kyou.id/items/158513/",
+    "order_date": "2026-06-15T21:18:36Z",
+    "days_ago": 15
   },
-  "popular_items": null,
+  "historical_items": [
+    {
+      "name": "Kuripan Plushie Awa Subaru - Girls Band Cry (17cm)",
+      "image_url": "https://kyoucdn.id/items/kuripan-plushie-awa-subaru-girls-band-cry-17cm-e664c409.jpg.webp",
+      "url": "https://kyou.id/items/158513/",
+      "order_date": "2026-06-15T21:18:36Z",
+      "days_ago": 15
+    },
+    {
+      "name": "Girls Band Cry DIAMOND DUST Storage Pouch (19x10cm)",
+      "image_url": "https://kyoucdn.id/items/414439-girls-band-cry-diamond-dust-storage-bag-19x10cm-570292311.jpg.webp",
+      "url": "https://kyou.id/items/183841/",
+      "order_date": "2026-03-10T12:36:19Z",
+      "days_ago": 113
+    },
+    {
+      "name": "Desktop Cute Figure Shiro - Nekomimi T-Shirt ver. Renewal No Game No Life (13cm)",
+      "image_url": "https://kyoucdn.id/items/511574-desktop-cute-figure-shiro-nekomimi-t-shirt-ver-renewal-no-game-no-life-13cm.jpg.webp",
+      "url": "https://kyou.id/items/207332/",
+      "order_date": "2026-03-02T09:42:19Z",
+      "days_ago": 121
+    }
+  ],
+  "popular_items": [
+    {
+      "id": "228611",
+      "name": "Noodle Stopper Figure Ryuuk - Death Note (13cm)",
+      "kind": "character",
+      "series_id": "2147",
+      "image_url": "https://kyoucdn.id/items/noodle-stopper-figure-ryuuk-death-note-13cm-84f884a6.jpg.webp",
+      "price": 380000,
+      "status": "PO",
+      "manufacturer": "FuRyu",
+      "series_name": "Death Note",
+      "po_release_at": "2026-08-02T00:00:00Z"
+    },
+    {
+      "id": "228610",
+      "name": "hololive English Cecilia Immergreen 2nd Anniversary Otomo Otomo Plushie Plushie",
+      "kind": "character",
+      "series_id": "4413",
+      "image_url": "https://kyoucdn.id/items/hololive-english-cecilia-immergreen-2nd-anniversary-otomo-otomo-plushie-plushie-d091cf07.jpg.webp",
+      "price": 660000,
+      "status": "PO",
+      "manufacturer": "Cover",
+      "series_name": "hololive production",
+      "po_deadline": "2026-07-17T00:00:00Z",
+      "po_release_at": "2026-12-01T00:00:00Z"
+    },
+    {
+      "id": "228609",
+      "name": "hololive English Cecilia Immergreen 2nd Anniversary Immer-Spin-To-Win Handheld Fan",
+      "kind": "character",
+      "series_id": "4413",
+      "image_url": "https://kyoucdn.id/items/hololive-english-cecilia-immergreen-2nd-anniversary-immer-spin-to-win-handheld-fan-cc384039.jpg.webp",
+      "price": 560000,
+      "status": "PO",
+      "manufacturer": "Cover",
+      "series_name": "hololive production",
+      "po_deadline": "2026-07-17T00:00:00Z",
+      "po_release_at": "2026-12-01T00:00:00Z"
+    }
+  ],
   "attempt": 1
 }

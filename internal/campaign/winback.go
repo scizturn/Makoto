@@ -85,7 +85,7 @@ func (c WinbackCampaign) RenderGreeting(tpl string, user domain.User) string {
 	return buf.String()
 }
 
-func (c WinbackCampaign) BuildMergeData(user domain.User, voucherCode string, wishlist []domain.WishlistItem, historicalItem domain.HistoricalItem, greeting string) map[string]any {
+func (c WinbackCampaign) BuildMergeData(user domain.User, voucherCode string, wishlist []domain.WishlistItem, historicalItems []domain.HistoricalItem, greeting string) map[string]any {
 	firstName := user.Name
 	if i := strings.Index(user.Name, " "); i > 0 {
 		firstName = user.Name[:i]
@@ -96,10 +96,12 @@ func (c WinbackCampaign) BuildMergeData(user domain.User, voucherCode string, wi
 		"greeting":     greeting,
 		"voucher_code": voucherCode,
 		"has_voucher":  strings.TrimSpace(voucherCode) != "",
-		// "Album Kenangan" scrapbook polaroids from real data. Reuse the existing
+		// "Album Kenangan" scrapbook from real data. Reuse the existing
 		// historical_html/wishlist_html merge keys so no new viewData field is
-		// needed — winback templates render their own scrapbook style.
-		"historical_html": RenderWinbackPastPolaroidsHTML(historicalItem),
+		// needed — winback templates render their own scrapbook style. The past
+		// collection is a list (thumbnail + name + purchase date); the ready
+		// wishlist stays a polaroid grid.
+		"historical_html": RenderWinbackPastListHTML(historicalItems),
 		"wishlist_html":   RenderWinbackReadyPolaroidsHTML(wishlist),
 		"action_url":      actionURLWithClaim(c.ActionURL, voucherCode),
 		"closing":         c.Closing,
@@ -113,18 +115,99 @@ const (
 	winbackReadyCols  = 3
 )
 
-// RenderWinbackPastPolaroidsHTML renders the user's past purchase as a single
-// centered scrapbook polaroid ("halaman lama dari rak kamu").
-func RenderWinbackPastPolaroidsHTML(item domain.HistoricalItem) string {
-	if strings.TrimSpace(item.Name) == "" && strings.TrimSpace(item.ImageURL) == "" {
+// winbackPastLimit caps how many past orders the "past collection" list shows.
+const winbackPastLimit = 3
+
+// RenderWinbackPastListHTML renders the user's most-recent purchases (up to
+// winbackPastLimit) as a vertical list: a thumbnail on the left, the item name
+// and purchase date on the right ("halaman lama dari rak kamu").
+func RenderWinbackPastListHTML(items []domain.HistoricalItem) string {
+	cleaned := make([]domain.HistoricalItem, 0, len(items))
+	for _, item := range items {
+		if strings.TrimSpace(item.Name) == "" && strings.TrimSpace(item.ImageURL) == "" {
+			continue
+		}
+		cleaned = append(cleaned, item)
+	}
+	if len(cleaned) == 0 {
 		return `<div style="font-family:'Nunito',Arial,Helvetica,sans-serif;font-style:italic;font-size:13px;color:#9a866a;text-align:center;padding:6px 0 4px;">Rak kamu masih rapih nyimpen semua koleksi lama — nunggu halaman baru dari kamu.</div>`
 	}
-	caption := winbackCaption(item.Name)
-	if !item.OrderDate.IsZero() {
-		caption = caption + " · " + item.OrderDate.Format("Jan '06")
+	if len(cleaned) > winbackPastLimit {
+		cleaned = cleaned[:winbackPastLimit]
 	}
-	card := winbackPolaroidCard(item.ImageURL, caption, "#4a3b2a", false, "")
-	return `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;"><tr><td align="center" style="padding:0;"><table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;"><tr><td width="250" style="width:250px;padding:0;">` + card + `</td></tr></table></td></tr></table>`
+	var b strings.Builder
+	b.WriteString(`<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;">`)
+	for i, item := range cleaned {
+		if i > 0 {
+			b.WriteString(`<tr><td style="height:10px;line-height:10px;font-size:10px;">&nbsp;</td></tr>`)
+		}
+		b.WriteString(`<tr><td style="padding:0;">` + winbackPastRow(item) + `</td></tr>`)
+	}
+	b.WriteString(`</table>`)
+	return b.String()
+}
+
+// winbackPastRow renders one past-purchase list row as a nested <table>:
+// thumbnail on the left, item name and purchase date stacked on the right.
+func winbackPastRow(item domain.HistoricalItem) string {
+	safeName := html.EscapeString(winbackListCaption(item.Name))
+	safeImage := html.EscapeString(item.ImageURL)
+
+	imgHTML := fmt.Sprintf(`<img src="%s" alt="" width="200" height="200" style="display:block;width:200px;height:200px;border:0;border-radius:10px;">`, safeImage)
+	if safeImage == "" {
+		imgHTML = `<div style="width:200px;height:200px;background:#efe7d3;border-radius:10px;"></div>`
+	}
+
+	dateHTML := ""
+	if dateText := winbackOrderDateText(item.OrderDate); dateText != "" {
+		dateHTML = fmt.Sprintf(`<div style="font-family:'Nunito',Arial,Helvetica,sans-serif;font-size:13.5px;color:#9a866a;margin-top:7px;">%s</div>`, html.EscapeString(dateText))
+	}
+
+	row := fmt.Sprintf(
+		`<table role="presentation" width="100%%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;background:#fffdf6;border:1px solid #ece3d0;box-shadow:1px 2px 6px rgba(74,59,42,0.12);"><tr><td width="200" valign="top" style="width:200px;padding:16px;">%s</td><td valign="middle" style="padding:16px 20px 16px 0;"><div style="font-family:'Nunito',Arial,Helvetica,sans-serif;font-weight:800;font-size:18px;color:#4a3b2a;line-height:1.35;">%s</div>%s</td></tr></table>`,
+		imgHTML, safeName, dateHTML,
+	)
+	// Each row links to the item so the reader can jump straight to its page.
+	if strings.TrimSpace(item.URL) == "" {
+		return row
+	}
+	return fmt.Sprintf(`<a href="%s" style="text-decoration:none;color:inherit;display:block;">%s</a>`, html.EscapeString(item.URL), row)
+}
+
+// winbackListCaption cleans an item name for the wider list layout: it strips
+// leading bracket tags (e.g. "[PSA 10] [with Bonus] Foo" → "Foo") and truncates
+// what remains. The polaroid grid uses the tighter winbackCaption.
+func winbackListCaption(name string) string {
+	name = stripBracketPrefixes(name)
+	runes := []rune(name)
+	if len(runes) > 60 {
+		return strings.TrimSpace(string(runes[:60])) + "…"
+	}
+	return name
+}
+
+// stripBracketPrefixes removes one or more leading "[...]" tags (and the
+// whitespace around them) from an item name, so store labels like
+// "[Exclusive Sale] [with Bonus] Figure ..." render as just "Figure ...".
+func stripBracketPrefixes(name string) string {
+	name = strings.TrimSpace(name)
+	for strings.HasPrefix(name, "[") {
+		end := strings.IndexByte(name, ']')
+		if end < 0 {
+			break
+		}
+		name = strings.TrimSpace(name[end+1:])
+	}
+	return name
+}
+
+// winbackOrderDateText formats a purchase date in Indonesian, e.g.
+// "Dibeli 1 Mei 2026". Returns "" for a zero date.
+func winbackOrderDateText(t time.Time) string {
+	if t.IsZero() {
+		return ""
+	}
+	return fmt.Sprintf("Dibeli %d %s %d", t.Day(), idMonths[t.Month()], t.Year())
 }
 
 // RenderWinbackReadyPolaroidsHTML renders up to two wishlist items as
