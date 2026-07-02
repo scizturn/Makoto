@@ -71,8 +71,8 @@ func TestRenderWinbackReadyStampsCapsAtSixAndLinks(t *testing.T) {
 	if !strings.Contains(html, "KYOU.ID") {
 		t.Fatalf("fill items should get the KYOU.ID banner")
 	}
-	if !strings.Contains(html, ">320K<") {
-		t.Fatalf("price should render as a compact denomination, got: %s", html)
+	if strings.Contains(html, "320K") || strings.Contains(html, "1150K") {
+		t.Fatalf("price should not render on stamps anymore, got: %s", html)
 	}
 	if !strings.Contains(html, `href="https://kyou.id/items/0/"`) {
 		t.Fatalf("each stamp should link to its item")

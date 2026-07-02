@@ -7,7 +7,7 @@
   <title>Memori Kyou · buat kamu</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 </head>
 <body style="margin:0;padding:0;background:#ffffff;font-family:'Nunito',Arial,Helvetica,sans-serif;color:#4a3b2a;-webkit-text-size-adjust:none;text-size-adjust:none;">
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;background:#ffffff;">
@@ -36,45 +36,45 @@
               <!-- cover title -->
               <div style="text-align:center;margin-bottom:24px;">
                 <div style="display:inline-block;background:#fc4c02;color:#f4ecd7;font-family:'Nunito',Arial,Helvetica,sans-serif;font-size:11px;letter-spacing:2px;padding:5px 14px;box-shadow:2px 2px 0 rgba(0,0,0,0.15);">MEMORI KYOU</div>
-                <div style="font-family:'Nunito',Arial,Helvetica,sans-serif;font-weight:700;font-size:44px;color:#4a3b2a;line-height:1;margin-top:10px;">Kita, Dulu &amp; Sekarang</div>
+                <div style="font-family:'Caveat','Segoe Print','Bradley Hand',cursive;font-weight:700;font-size:60px;color:#4a3b2a;line-height:1;margin-top:6px;">Kita, Dulu &amp; Sekarang</div>
                 <div style="font-family:'Nunito',Arial,Helvetica,sans-serif;font-size:12px;color:#8a7355;margin-top:4px;">sejak 2014</div>
               </div>
 
-              <!-- hero note -->
-              <div style="background:#fffdf6;padding:22px 20px;box-shadow:2px 4px 10px rgba(74,59,42,0.18);margin-bottom:30px;">
-                <div style="font-family:'Nunito',Arial,Helvetica,sans-serif;font-weight:700;font-size:24px;color:#fc4c02;line-height:1.15;">{{ .Greeting }}</div>
-                <div style="font-family:'Nunito',Arial,Helvetica,sans-serif;font-size:14.5px;line-height:1.65;color:#5a4a36;margin-top:10px;">Udah lama sejak halaman terakhir kita, {{ .FirstName }}. Rak kamu masih nyimpen semua koleksi lama, dan kita sisain satu halaman kosong khusus nunggu kamu balik ngisi lagi.</div>
-                <div style="font-family:'Nunito',Arial,Helvetica,sans-serif;font-weight:700;font-size:16px;color:#fc4c02;margin-top:8px;">salam kangen, Kyou &hearts;</div>
+              <!-- hero note — kartu kertas bergaris, lebih tinggi & berkesan kertas -->
+              <div style="background:#fffdf6;background-image:repeating-linear-gradient(180deg,#fffdf6,#fffdf6 31px,#e9dec3 32px);padding:40px 34px 36px;box-shadow:2px 4px 10px rgba(74,59,42,0.18);border:1px solid #ece1c9;margin-bottom:30px;">
+                <div style="font-family:'Nunito',Arial,Helvetica,sans-serif;font-weight:700;font-size:24px;color:#fc4c02;line-height:1.3;">{{ .Greeting }}</div>
+                <div style="font-family:'Nunito',Arial,Helvetica,sans-serif;font-size:15px;line-height:2;color:#5a4a36;margin-top:16px;">Udah lama sejak halaman terakhir kita, {{ .FirstName }}. Rak kamu masih nyimpen semua koleksi lama, dan kita sisain satu halaman kosong khusus nunggu kamu balik ngisi lagi.</div>
+                <div style="font-family:'Nunito',Arial,Helvetica,sans-serif;font-weight:700;font-size:16px;color:#fc4c02;margin-top:18px;">salam kangen, Kyou &hearts;</div>
               </div>
 
               <!-- past collection -->
-              <div style="font-family:'Nunito',Arial,Helvetica,sans-serif;font-weight:700;font-size:30px;color:#4a3b2a;margin-bottom:18px;">Masih inget koleksi lamamu?</div>
+              <div style="font-family:'Caveat','Segoe Print','Bradley Hand',cursive;font-weight:700;font-size:40px;color:#4a3b2a;margin-bottom:14px;">Masih inget koleksi lamamu?</div>
               <div style="margin-bottom:30px;">{{ .HistoricalHTML }}</div>
 
               {{ if .VoucherCode }}
-              <!-- kupon kangen -->
+              <!-- kupon kangen — seluruh kupon bisa diklik untuk klaim voucher -->
               <div style="background:#e9c877;background-image:repeating-linear-gradient(45deg,#e9c877,#e9c877 9px,#e4bf63 9px,#e4bf63 18px);padding:6px;box-shadow:2px 4px 10px rgba(74,59,42,0.22);margin-bottom:32px;">
+                <a href="{{ .ActionURL }}" style="text-decoration:none;color:inherit;display:block;">
                 <div style="border:2px dashed #9c7a2f;background:#fbf3dd;padding:22px 18px;text-align:center;">
                   <div style="font-family:'Nunito',Arial,Helvetica,sans-serif;font-size:12px;letter-spacing:2px;color:#9c7a2f;">KUPON KANGEN</div>
                   <div style="font-family:'Nunito',Arial,Helvetica,sans-serif;font-weight:900;font-size:52px;color:#fc4c02;line-height:1;margin:6px 0 2px;">Diskon 12%</div>
                   <div style="font-family:'Nunito',Arial,Helvetica,sans-serif;font-size:13px;color:#5a4a36;">min. belanja IDR 300.000 &middot; maks. potongan IDR 130.000</div>
                   <div style="border-top:2px dashed #cbb079;margin:16px 6px;"></div>
                   <div style="font-family:'Nunito',Arial,Helvetica,sans-serif;font-size:12px;color:#8a7355;margin-bottom:8px;">pakai kode ini pas checkout:</div>
-                  <a href="{{ .ActionURL }}" style="display:inline-block;font-family:'Nunito',Arial,Helvetica,sans-serif;font-size:18px;letter-spacing:3px;color:#4a3b2a;background:#fffdf6;border:1px solid #9c7a2f;padding:9px 18px;text-decoration:none;">{{ .VoucherCode }}</a>
+                  <span style="display:inline-block;font-family:'Nunito',Arial,Helvetica,sans-serif;font-size:18px;letter-spacing:3px;color:#4a3b2a;background:#fffdf6;border:1px solid #9c7a2f;padding:9px 18px;">{{ .VoucherCode }}</span>
                   <div style="font-family:'Nunito',Arial,Helvetica,sans-serif;font-style:italic;font-size:12.5px;color:#8a7355;margin-top:12px;">berlaku 14 hari, cuma bisa dipakai 1x. Buruan ya!</div>
                 </div>
+                </a>
               </div>
               {{ end }}
 
               <!-- ready polaroids -->
-              <div style="font-family:'Nunito',Arial,Helvetica,sans-serif;font-weight:700;font-size:30px;color:#4a3b2a;margin-bottom:4px;">Yang kamu tunggu udah nyampe!</div>
-              <div style="font-family:'Nunito',Arial,Helvetica,sans-serif;font-size:11px;color:#8a7355;margin-bottom:18px;">// wishlist kamu, ready stock</div>
-              <div style="margin-bottom:8px;">{{ .WishlistHTML }}</div>
-              <div style="font-family:'Nunito',Arial,Helvetica,sans-serif;font-size:12px;color:#9a866a;margin-top:14px;margin-bottom:26px;text-align:center;">Border <span style="color:#fc4c02;font-weight:800;">oranye</span> = wishlist kamu. Sisanya lagi paling dicari minggu ini.</div>
+              <div style="font-family:'Caveat','Segoe Print','Bradley Hand',cursive;font-weight:700;font-size:40px;color:#4a3b2a;margin-bottom:14px;">Yang kamu tunggu udah nyampe!</div>
+              <div style="margin-bottom:26px;">{{ .WishlistHTML }}</div>
 
               <!-- closing -->
               <div style="text-align:center;padding:6px 0 26px;">
-                <div style="font-family:'Nunito',Arial,Helvetica,sans-serif;font-weight:700;font-size:32px;color:#4a3b2a;line-height:1.1;">Balik yuk, kita udah kangen.</div>              </div>
+                <div style="font-family:'Caveat','Segoe Print','Bradley Hand',cursive;font-weight:700;font-size:44px;color:#4a3b2a;line-height:1.05;">Balik yuk, kita udah kangen.</div>              </div>
 
             </td>
           </tr>

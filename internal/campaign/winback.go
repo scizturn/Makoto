@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"html"
 	"math/rand"
-	"strconv"
 	"strings"
 	texttemplate "text/template"
 	"time"
@@ -160,19 +159,31 @@ func winbackPastRow(item domain.HistoricalItem) string {
 	safeName := html.EscapeString(winbackListCaption(item.Name))
 	safeImage := html.EscapeString(item.ImageURL)
 
-	imgHTML := fmt.Sprintf(`<img src="%s" alt="" width="200" height="200" style="display:block;width:200px;height:200px;border:0;border-radius:10px;">`, safeImage)
-	if safeImage == "" {
-		imgHTML = `<div style="width:200px;height:200px;background:#efe7d3;border-radius:10px;"></div>`
+	// The photo is styled like a printed polaroid taped into a scrapbook: a white
+	// frame with a soft drop shadow and a handwritten date caption underneath —
+	// the "ini ada memori-nya banget" feel. To force a hard 1:1 square in every
+	// renderer, the photo lives inside a fixed 170x170 box with overflow:hidden
+	// (box dimensions are honored far more widely than <img> height). object-fit:
+	// cover crops the photo to fill that square in clients that support it (iOS
+	// Mail, Gmail, Apple Mail). The Caveat handwriting font is loaded by the
+	// winback templates this HTML injects into.
+	photoInner := ""
+	if safeImage != "" {
+		photoInner = fmt.Sprintf(`<img src="%s" alt="" width="170" height="170" style="display:block;width:170px;height:170px;object-fit:cover;border:0;">`, safeImage)
 	}
-
-	dateHTML := ""
+	photo := fmt.Sprintf(`<div style="width:170px;height:170px;overflow:hidden;background:#efe7d3;font-size:0;line-height:0;">%s</div>`, photoInner)
+	handDate := ""
 	if dateText := winbackOrderDateText(item.OrderDate); dateText != "" {
-		dateHTML = fmt.Sprintf(`<div style="font-family:'Nunito',Arial,Helvetica,sans-serif;font-size:13.5px;color:#9a866a;margin-top:7px;">%s</div>`, html.EscapeString(dateText))
+		handDate = fmt.Sprintf(`<div style="width:170px;font-family:'Caveat','Segoe Print','Bradley Hand',cursive;font-weight:700;font-size:17px;color:#9a6f45;text-align:center;line-height:1.15;padding:8px 0 1px;">&hearts; %s</div>`, html.EscapeString(dateText))
 	}
+	// The polaroid is pinned to the photo's 170px width so the photo and the
+	// handwritten caption share one column and stay centered together (otherwise
+	// a caption wider than the photo makes the frame grow and misaligns them).
+	polaroid := fmt.Sprintf(`<div style="width:170px;background:#ffffff;padding:9px 9px 6px;border:1px solid #e6dcc6;box-shadow:2px 3px 8px rgba(74,59,42,0.22);">%s%s</div>`, photo, handDate)
 
 	row := fmt.Sprintf(
-		`<table role="presentation" width="100%%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;background:#fffdf6;border:1px solid #ece3d0;box-shadow:1px 2px 6px rgba(74,59,42,0.12);"><tr><td width="200" valign="top" style="width:200px;padding:16px;">%s</td><td valign="middle" style="padding:16px 20px 16px 0;"><div style="font-family:'Nunito',Arial,Helvetica,sans-serif;font-weight:800;font-size:18px;color:#4a3b2a;line-height:1.35;">%s</div>%s</td></tr></table>`,
-		imgHTML, safeName, dateHTML,
+		`<table role="presentation" width="100%%" cellspacing="0" cellpadding="0" style="border-collapse:separate;border-radius:16px;background:#fffdf6;border:1px solid #ece3d0;box-shadow:1px 2px 6px rgba(74,59,42,0.12);overflow:hidden;"><tr><td width="220" valign="middle" style="width:220px;padding:20px 8px 20px 20px;">%s</td><td valign="middle" style="padding:16px 22px;"><div style="font-family:'Nunito',Arial,Helvetica,sans-serif;font-weight:800;font-size:18px;color:#4a3b2a;line-height:1.4;">%s</div></td></tr></table>`,
+		polaroid, safeName,
 	)
 	// Each row links to the item so the reader can jump straight to its page.
 	if strings.TrimSpace(item.URL) == "" {
@@ -288,14 +299,9 @@ func winbackStampCard(item domain.WishlistItem) string {
 		issuer = "&hearts; WISHLIST-KU"
 	}
 
-	denom := ""
-	if price := winbackStampPrice(item.Price); price != "" {
-		denom = fmt.Sprintf(`<td align="right" style="padding:0;"><span style="font-family:Georgia,'Times New Roman',serif;font-weight:700;font-size:13px;color:#fbe6d0;">%s</span></td>`, html.EscapeString(price))
-	}
-
 	banner := fmt.Sprintf(
-		`<tr><td style="background:%s;padding:7px 11px;"><table role="presentation" width="100%%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;"><tr><td align="left" style="padding:0;"><span style="font-family:'Nunito',Arial,Helvetica,sans-serif;font-weight:800;font-size:11px;letter-spacing:2px;color:#fbe6d0;">%s</span></td>%s</tr></table></td></tr>`,
-		bannerBG, issuer, denom,
+		`<tr><td style="background:%s;padding:7px 11px;"><span style="font-family:'Nunito',Arial,Helvetica,sans-serif;font-weight:800;font-size:11px;letter-spacing:2px;color:#fbe6d0;">%s</span></td></tr>`,
+		bannerBG, issuer,
 	)
 
 	// Outer table paints mat-colored perforation dots over cream; the inner panel
@@ -318,18 +324,6 @@ func winbackStampCard(item domain.WishlistItem) string {
 	return fmt.Sprintf(`<a href="%s" style="text-decoration:none;color:inherit;display:block;">%s</a>`, html.EscapeString(item.URL), stamp)
 }
 
-// winbackStampPrice formats a price as a compact stamp denomination, e.g.
-// 320000 → "320K", 6950000 → "6950K". Returns "" for a non-positive price.
-func winbackStampPrice(price int) string {
-	if price <= 0 {
-		return ""
-	}
-	if price >= 1000 {
-		return strconv.Itoa(price/1000) + "K"
-	}
-	return strconv.Itoa(price)
-}
-
 // isWakeariName reports whether an item name carries the "wakeari" (訳あり /
 // imperfect-grade) tag. There is no dedicated flag on the item, so the name is
 // the only signal.
@@ -337,11 +331,9 @@ func isWakeariName(name string) bool {
 	return strings.Contains(strings.ToLower(name), "wakeari")
 }
 
+// winbackStampCaption cleans an item name for the stamp grid: it strips leading
+// bracket tags (e.g. "[PSA 10] Foo" → "Foo") but shows the full remaining name —
+// no truncation — so the fill items read in full under each stamp.
 func winbackStampCaption(name string) string {
-	name = stripBracketPrefixes(name)
-	runes := []rune(name)
-	if len(runes) > 46 {
-		return strings.TrimSpace(string(runes[:46])) + "…"
-	}
-	return name
+	return stripBracketPrefixes(name)
 }
