@@ -1,7 +1,7 @@
 {
-  "job_id": "preview-winback-2026-07-02-161644-user-31877",
+  "job_id": "preview-winback-2026-07-02-172247-user-31877",
   "user_id": "31877",
-  "date": "2026-07-02T16:16:44.924191+07:00",
+  "date": "2026-07-02T17:22:47.831971+07:00",
   "user": {
     "id": "31877",
     "name": "Abimanyu Nugroho",
@@ -44,16 +44,6 @@
       "series_name": "Zenless Zone Zero"
     },
     {
-      "id": "126373",
-      "name": "HELLO! GOOD SMILE Shirakami Fubuki - hololive production",
-      "url": "https://kyou.id/items/126373/",
-      "image_url": "https://kyoucdn.id/items/203766-hello-good-smile-shirakami-fubuki-hololive-production-1996230475.jpg.webp",
-      "price": 260000,
-      "status": "ready",
-      "manufacturer": "Good Smile Company",
-      "series_name": "hololive production"
-    },
-    {
       "id": "221562",
       "name": "Pokemon Scarlet \u0026 Violet Gem Pack Vol. 9 Stellar Crystal CSV9C Coin Set Simplified Chinese",
       "url": "https://kyou.id/items/221562/",
@@ -64,6 +54,16 @@
       "series_name": "Pokemon"
     },
     {
+      "id": "126373",
+      "name": "HELLO! GOOD SMILE Shirakami Fubuki - hololive production",
+      "url": "https://kyou.id/items/126373/",
+      "image_url": "https://kyoucdn.id/items/203766-hello-good-smile-shirakami-fubuki-hololive-production-1996230475.jpg.webp",
+      "price": 260000,
+      "status": "ready",
+      "manufacturer": "Good Smile Company",
+      "series_name": "hololive production"
+    },
+    {
       "id": "185960",
       "name": "PVC Figure 1/6 Mari Hanamiya - The Gentle Shop Assistant Ver. Illustration by POPQN",
       "url": "https://kyou.id/items/185960/",
@@ -72,16 +72,6 @@
       "status": "ready",
       "manufacturer": "AniMester",
       "series_name": "Original Character"
-    },
-    {
-      "id": "183219",
-      "name": "[Exclusive Sale] Nendoroid Kafka - Honkai: Star Rail",
-      "url": "https://kyou.id/items/183219/",
-      "image_url": "https://kyoucdn.id/items/470520-exclusive-sale-nendoroid-kafka-honkai-star-rail.jpg.webp",
-      "price": 950000,
-      "status": "ready",
-      "manufacturer": "Good Smile Company",
-      "series_name": "Honkai: Star Rail"
     },
     {
       "id": "196627",
@@ -105,14 +95,14 @@
       "series_name": "Pokemon"
     },
     {
-      "id": "196516",
-      "name": "Limbus Company Plushie Don Quixote (17cm)",
-      "url": "https://kyou.id/items/196516/",
-      "image_url": "https://kyoucdn.id/items/limbus-company-plushie-don-quixote-17cm-02805088.jpg.webp",
-      "price": 1050000,
+      "id": "183219",
+      "name": "[Exclusive Sale] Nendoroid Kafka - Honkai: Star Rail",
+      "url": "https://kyou.id/items/183219/",
+      "image_url": "https://kyoucdn.id/items/470520-exclusive-sale-nendoroid-kafka-honkai-star-rail.jpg.webp",
+      "price": 950000,
       "status": "ready",
       "manufacturer": "Good Smile Company",
-      "series_name": "Limbus Company"
+      "series_name": "Honkai: Star Rail"
     },
     {
       "id": "221561",
@@ -123,6 +113,16 @@
       "status": "ready",
       "manufacturer": "Pokemon China",
       "series_name": "Pokemon"
+    },
+    {
+      "id": "196516",
+      "name": "Limbus Company Plushie Don Quixote (17cm)",
+      "url": "https://kyou.id/items/196516/",
+      "image_url": "https://kyoucdn.id/items/limbus-company-plushie-don-quixote-17cm-02805088.jpg.webp",
+      "price": 1050000,
+      "status": "ready",
+      "manufacturer": "Good Smile Company",
+      "series_name": "Limbus Company"
     },
     {
       "id": "212770",
@@ -137,6 +137,7 @@
   ],
   "historical_item": {
     "name": "Kuripan Plushie Awa Subaru - Girls Band Cry (17cm)",
+    "series_name": "Girls Band Cry",
     "image_url": "https://kyoucdn.id/items/kuripan-plushie-awa-subaru-girls-band-cry-17cm-e664c409.jpg.webp",
     "url": "https://kyou.id/items/158513/",
     "order_date": "2026-06-15T21:18:36Z",
@@ -145,6 +146,7 @@
   "historical_items": [
     {
       "name": "Desktop Cute Figure Shiro - Nekomimi T-Shirt ver. Renewal No Game No Life (13cm)",
+      "series_name": "No Game No Life",
       "image_url": "https://kyoucdn.id/items/511574-desktop-cute-figure-shiro-nekomimi-t-shirt-ver-renewal-no-game-no-life-13cm.jpg.webp",
       "url": "https://kyou.id/items/207332/",
       "order_date": "2026-03-02T09:42:19Z",
@@ -152,6 +154,7 @@
     },
     {
       "name": "Girls Band Cry DIAMOND DUST Storage Pouch (19x10cm)",
+      "series_name": "Girls Band Cry",
       "image_url": "https://kyoucdn.id/items/414439-girls-band-cry-diamond-dust-storage-bag-19x10cm-570292311.jpg.webp",
       "url": "https://kyou.id/items/183841/",
       "order_date": "2026-03-10T12:36:19Z",
@@ -159,6 +162,7 @@
     },
     {
       "name": "Kuripan Plushie Awa Subaru - Girls Band Cry (17cm)",
+      "series_name": "Girls Band Cry",
       "image_url": "https://kyoucdn.id/items/kuripan-plushie-awa-subaru-girls-band-cry-17cm-e664c409.jpg.webp",
       "url": "https://kyou.id/items/158513/",
       "order_date": "2026-06-15T21:18:36Z",
@@ -167,43 +171,43 @@
   ],
   "popular_items": [
     {
-      "id": "228215",
-      "name": "DORO GNF TOYZ Goddes of Victory: Nikke x Kakao Happi Bustling DORO World",
+      "id": "228637",
+      "name": "PVC Figure 1/6 Livian - Succubus Academy Swimming Club Deluxe Edition Ver. Illustration by Ulrich",
       "kind": "character",
-      "series_id": "5564",
-      "image_url": "https://kyoucdn.id/items/doro-gnf-toyz-goddes-of-victory-nikke-x-kakao-happi-bustling-doro-world-c3f9c3ed.jpg.webp",
-      "price": 1100000,
+      "series_id": "915",
+      "image_url": "https://kyoucdn.id/items/pvc-figure-16-livian-succubus-academy-swimming-club-deluxe-edition-ver-illustration-by-ulrich-fe6aaf57.jpg.webp",
+      "price": 2150000,
       "status": "PO",
-      "manufacturer": "GNFTOYZ",
-      "series_name": "Goddess of Victory: Nikke",
-      "po_deadline": "2026-08-01T00:00:00Z",
-      "po_release_at": "2026-11-01T00:00:00Z"
+      "manufacturer": "Poi² Anime",
+      "series_name": "Original Character",
+      "po_deadline": "2026-10-29T00:00:00Z",
+      "po_release_at": "2027-06-01T00:00:00Z"
     },
     {
-      "id": "228216",
-      "name": "[Random] DORO \u0026 Choonsik GNF TOYZ Goddes of Victory: Nikke x Kakao Friends 3D Sticker",
+      "id": "228629",
+      "name": "PVC Figure 1/6 Livian - Succubus Academy Swimming Club Regular Edition Ver. Illustration by Ulrich",
       "kind": "character",
-      "series_id": "5564",
-      "image_url": "https://kyoucdn.id/items/random-doro-choonsik-gnf-toyz-goddes-of-victory-nikke-x-kakao-friends-3d-sticker-8efa9e01.jpg.webp",
-      "price": 160000,
+      "series_id": "915",
+      "image_url": "https://kyoucdn.id/items/pvc-figure-16-livian-succubus-academy-swimming-club-regular-edition-ver-illustration-by-ulrich-f299d86a.jpg.webp",
+      "price": 1750000,
       "status": "PO",
-      "manufacturer": "GNFTOYZ",
-      "series_name": "Goddess of Victory: Nikke",
-      "po_deadline": "2026-08-01T00:00:00Z",
-      "po_release_at": "2026-11-01T00:00:00Z"
+      "manufacturer": "Poi² Anime",
+      "series_name": "Original Character",
+      "po_deadline": "2026-10-29T00:00:00Z",
+      "po_release_at": "2027-06-01T00:00:00Z"
     },
     {
-      "id": "228217",
-      "name": "[Set of 4] DORO \u0026 Choonsik GNF TOYZ Goddes of Victory: Nikke x Kakao Friends 3D Sticker",
+      "id": "228636",
+      "name": "[with Bonus] PVC Figure 1/6 Shitori - Deluxe Edition Illustration by Chochomi",
       "kind": "character",
-      "series_id": "5564",
-      "image_url": "https://kyoucdn.id/items/set-of-4-doro-choonsik-gnf-toyz-goddes-of-victory-nikke-x-kakao-friends-3d-sticker-8efa9e01.jpg.webp",
-      "price": 470000,
+      "series_id": "915",
+      "image_url": "https://kyoucdn.id/items/with-bonus-pvc-figure-16-shitori-deluxe-edition-illustration-by-chochomi-894e6484.jpg.webp",
+      "price": 1350000,
       "status": "PO",
-      "manufacturer": "GNFTOYZ",
-      "series_name": "Goddess of Victory: Nikke",
-      "po_deadline": "2026-08-01T00:00:00Z",
-      "po_release_at": "2026-11-01T00:00:00Z"
+      "manufacturer": "Hobby Realm",
+      "series_name": "Original Character",
+      "po_deadline": "2026-10-15T00:00:00Z",
+      "po_release_at": "2027-03-01T00:00:00Z"
     }
   ],
   "attempt": 1

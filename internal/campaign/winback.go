@@ -181,9 +181,15 @@ func winbackPastRow(item domain.HistoricalItem) string {
 	// a caption wider than the photo makes the frame grow and misaligns them).
 	polaroid := fmt.Sprintf(`<div style="width:170px;background:#ffffff;padding:9px 9px 6px;border:1px solid #e6dcc6;box-shadow:2px 3px 8px rgba(74,59,42,0.22);">%s%s</div>`, photo, handDate)
 
+	// Right column: item name on top, series name underneath (kalau ada).
+	nameBlock := fmt.Sprintf(`<div style="font-family:'Nunito',Arial,Helvetica,sans-serif;font-weight:800;font-size:18px;color:#4a3b2a;line-height:1.35;">%s</div>`, safeName)
+	if series := strings.TrimSpace(item.SeriesName); series != "" {
+		nameBlock += fmt.Sprintf(`<div style="font-family:'Nunito',Arial,Helvetica,sans-serif;font-weight:600;font-size:13.5px;color:#9a866a;margin-top:5px;">%s</div>`, html.EscapeString(series))
+	}
+
 	row := fmt.Sprintf(
-		`<table role="presentation" width="100%%" cellspacing="0" cellpadding="0" style="border-collapse:separate;border-radius:16px;background:#fffdf6;border:1px solid #ece3d0;box-shadow:1px 2px 6px rgba(74,59,42,0.12);overflow:hidden;"><tr><td width="220" valign="middle" style="width:220px;padding:20px 8px 20px 20px;">%s</td><td valign="middle" style="padding:16px 22px;"><div style="font-family:'Nunito',Arial,Helvetica,sans-serif;font-weight:800;font-size:18px;color:#4a3b2a;line-height:1.4;">%s</div></td></tr></table>`,
-		polaroid, safeName,
+		`<table role="presentation" width="100%%" cellspacing="0" cellpadding="0" style="border-collapse:separate;border-radius:16px;background:#fffdf6;border:1px solid #ece3d0;box-shadow:1px 2px 6px rgba(74,59,42,0.12);overflow:hidden;"><tr><td width="220" valign="middle" style="width:220px;padding:20px 8px 20px 20px;">%s</td><td valign="middle" style="padding:16px 22px;">%s</td></tr></table>`,
+		polaroid, nameBlock,
 	)
 	// Each row links to the item so the reader can jump straight to its page.
 	if strings.TrimSpace(item.URL) == "" {
