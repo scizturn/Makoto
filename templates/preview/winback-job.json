@@ -1,7 +1,7 @@
 {
-  "job_id": "preview-winback-2026-07-02-172247-user-31877",
+  "job_id": "preview-winback-2026-07-02-174908-user-31877",
   "user_id": "31877",
-  "date": "2026-07-02T17:22:47.831971+07:00",
+  "date": "2026-07-02T17:49:08.14313+07:00",
   "user": {
     "id": "31877",
     "name": "Abimanyu Nugroho",
@@ -21,6 +21,40 @@
       "manufacturer": "Bandai Spirits",
       "series_name": "Uma Musume",
       "po_release_at": "2025-08-08T00:00:00Z",
+      "is_wishlisted": true
+    },
+    {
+      "id": "165913",
+      "name": "Espresto Figure Fujita Kotone - Charming Pose Ver. Gakuen iDOLM@STER (18cm)",
+      "url": "https://kyou.id/items/165913/",
+      "image_url": "https://kyoucdn.id/items/390842-espresto-figure-fujita-kotone-charming-pose-ver-gakuen-idolm-at-ster-size-tba.jpg.webp",
+      "price": 420000,
+      "status": "ready",
+      "manufacturer": "Bandai Spirits",
+      "series_name": "Gakuen iDOLM@STER",
+      "po_release_at": "2025-04-23T00:00:00Z",
+      "is_wishlisted": true
+    },
+    {
+      "id": "184714",
+      "name": "[Set of 2] Pop Up Parade Figure L Size Panty \u0026 Stocking Anarchy - Repent Ver. Panty \u0026 Stocking with Garterbelt (21cm)",
+      "url": "https://kyou.id/items/184714/",
+      "image_url": "https://kyoucdn.id/items/418851-set-of-2-pop-up-parade-figure-l-size-panty-stocking-anarchy-repent-ver-panty-stocking-with-garterbelt-21cm.jpg.webp",
+      "price": 2450000,
+      "status": "ready",
+      "manufacturer": "Good Smile Company",
+      "series_name": "Panty \u0026 Stocking with Garterbelt",
+      "is_wishlisted": true
+    },
+    {
+      "id": "67858",
+      "name": "Nendoroid Nishinoya Yu / Yuu - Haikyuu!! (Re-Release)",
+      "url": "https://kyou.id/items/67858/",
+      "image_url": "https://kyoucdn.id/items/66985-nendoroid-yu-nishinoya-haikyuu-re-release.jpg.webp",
+      "price": 680000,
+      "status": "ready",
+      "manufacturer": "Orange Rouge",
+      "series_name": "Haikyu!!",
       "is_wishlisted": true
     },
     {
@@ -74,6 +108,16 @@
       "series_name": "Original Character"
     },
     {
+      "id": "221560",
+      "name": "[Box Contains 15 Packs, Containing 5 Cards per Packs] Pokemon Scarlet \u0026 Violet Gem Pack Vol. 9 Stellar Crystal CSV9C Slim Standard Booster Box Simplified Chinese",
+      "url": "https://kyou.id/items/221560/",
+      "image_url": "https://kyoucdn.id/items/box-of-15-packs-containing-5-cards-per-packs-pokemon-scarlet-violet-gem-pack-vol-9-stellar-crystal-csv9c-slim-standard-booster-box-simplified-chinese-e9c5b8ea.jpg.webp",
+      "price": 750000,
+      "status": "ready",
+      "manufacturer": "Pokemon China",
+      "series_name": "Pokemon"
+    },
+    {
       "id": "196627",
       "name": "[Random] BN Figure Q Kamen Rider x Honda Blind Box (11cm)",
       "url": "https://kyou.id/items/196627/",
@@ -85,16 +129,6 @@
       "po_release_at": "2026-01-24T00:00:00Z"
     },
     {
-      "id": "221560",
-      "name": "[Box Contains 15 Packs, Containing 5 Cards per Packs] Pokemon Scarlet \u0026 Violet Gem Pack Vol. 9 Stellar Crystal CSV9C Slim Standard Booster Box Simplified Chinese",
-      "url": "https://kyou.id/items/221560/",
-      "image_url": "https://kyoucdn.id/items/box-of-15-packs-containing-5-cards-per-packs-pokemon-scarlet-violet-gem-pack-vol-9-stellar-crystal-csv9c-slim-standard-booster-box-simplified-chinese-e9c5b8ea.jpg.webp",
-      "price": 750000,
-      "status": "ready",
-      "manufacturer": "Pokemon China",
-      "series_name": "Pokemon"
-    },
-    {
       "id": "183219",
       "name": "[Exclusive Sale] Nendoroid Kafka - Honkai: Star Rail",
       "url": "https://kyou.id/items/183219/",
@@ -103,36 +137,6 @@
       "status": "ready",
       "manufacturer": "Good Smile Company",
       "series_name": "Honkai: Star Rail"
-    },
-    {
-      "id": "221561",
-      "name": "[Box Contains 6 Packs, Containing 20 Cards per pack] Pokemon Scarlet \u0026 Violet Gem Pack Vol. 9 Stellar Crystal CSV9C Jumbo Booster Box Simplified Chinese",
-      "url": "https://kyou.id/items/221561/",
-      "image_url": "https://kyoucdn.id/items/box-of-6-packs-containing-20-cards-per-pack-pokemon-scarlet-violet-gem-pack-vol-9-stellar-crystal-csv9c-jumbo-booster-box-simplified-chinese-0eb32c8e.jpg.webp",
-      "price": 1150000,
-      "status": "ready",
-      "manufacturer": "Pokemon China",
-      "series_name": "Pokemon"
-    },
-    {
-      "id": "196516",
-      "name": "Limbus Company Plushie Don Quixote (17cm)",
-      "url": "https://kyou.id/items/196516/",
-      "image_url": "https://kyoucdn.id/items/limbus-company-plushie-don-quixote-17cm-02805088.jpg.webp",
-      "price": 1050000,
-      "status": "ready",
-      "manufacturer": "Good Smile Company",
-      "series_name": "Limbus Company"
-    },
-    {
-      "id": "212770",
-      "name": "[Random] Naruto Shippuden Cute Beast Sitting Party Series Vinyl Plush Mascot (13cm)",
-      "url": "https://kyou.id/items/212770/",
-      "image_url": "https://kyoucdn.id/items/535097-random-naruto-shippuuden-cute-beast-sitting-party-series-vinyl-plush-mascot-13cm.jpg.webp",
-      "price": 300000,
-      "status": "ready",
-      "manufacturer": "Eaki",
-      "series_name": "Naruto"
     }
   ],
   "historical_item": {
@@ -171,43 +175,43 @@
   ],
   "popular_items": [
     {
-      "id": "228637",
-      "name": "PVC Figure 1/6 Livian - Succubus Academy Swimming Club Deluxe Edition Ver. Illustration by Ulrich",
+      "id": "228644",
+      "name": "PVC Figure 1/6 Natalia - Illustration by Ohisashiburi",
       "kind": "character",
       "series_id": "915",
-      "image_url": "https://kyoucdn.id/items/pvc-figure-16-livian-succubus-academy-swimming-club-deluxe-edition-ver-illustration-by-ulrich-fe6aaf57.jpg.webp",
-      "price": 2150000,
+      "image_url": "https://kyoucdn.id/items/pvc-figure-16-natalia-illustration-by-ohisashiburi-440f6a75.jpg.webp",
+      "price": 1150000,
       "status": "PO",
-      "manufacturer": "Poi² Anime",
+      "manufacturer": "Kawa Design",
       "series_name": "Original Character",
-      "po_deadline": "2026-10-29T00:00:00Z",
-      "po_release_at": "2027-06-01T00:00:00Z"
+      "po_deadline": "2026-12-28T00:00:00Z",
+      "po_release_at": "2027-05-01T00:00:00Z"
     },
     {
-      "id": "228629",
-      "name": "PVC Figure 1/6 Livian - Succubus Academy Swimming Club Regular Edition Ver. Illustration by Ulrich",
+      "id": "228642",
+      "name": "NEEDY STREAMER OVERLOAD x China T-Union Ame-chan Plush Special-Shaped Transportation Card (15cm)",
       "kind": "character",
-      "series_id": "915",
-      "image_url": "https://kyoucdn.id/items/pvc-figure-16-livian-succubus-academy-swimming-club-regular-edition-ver-illustration-by-ulrich-f299d86a.jpg.webp",
-      "price": 1750000,
+      "series_id": "5261",
+      "image_url": "https://kyoucdn.id/items/needy-streamer-overload-x-china-t-union-ame-chan-plush-special-shaped-transportation-card-15cm-1ca0ac4d.jpg.webp",
+      "price": 400000,
       "status": "PO",
-      "manufacturer": "Poi² Anime",
-      "series_name": "Original Character",
-      "po_deadline": "2026-10-29T00:00:00Z",
-      "po_release_at": "2027-06-01T00:00:00Z"
+      "manufacturer": "Shanghai Public Transportation",
+      "series_name": "Needy Streamer Overload",
+      "po_deadline": "2026-07-07T00:00:00Z",
+      "po_release_at": "2026-11-01T00:00:00Z"
     },
     {
-      "id": "228636",
-      "name": "[with Bonus] PVC Figure 1/6 Shitori - Deluxe Edition Illustration by Chochomi",
+      "id": "228641",
+      "name": "NEEDY STREAMER OVERLOAD x China T-Union OMG KawaiiAngel / KAngel Plush Special-Shaped Transportation Card (15cm)",
       "kind": "character",
-      "series_id": "915",
-      "image_url": "https://kyoucdn.id/items/with-bonus-pvc-figure-16-shitori-deluxe-edition-illustration-by-chochomi-894e6484.jpg.webp",
-      "price": 1350000,
+      "series_id": "5261",
+      "image_url": "https://kyoucdn.id/items/needy-streamer-overload-x-china-t-union-omg-kawaiiangel-kangel-plush-special-shaped-transportation-card-15cm-61d9f69d.jpg.webp",
+      "price": 400000,
       "status": "PO",
-      "manufacturer": "Hobby Realm",
-      "series_name": "Original Character",
-      "po_deadline": "2026-10-15T00:00:00Z",
-      "po_release_at": "2027-03-01T00:00:00Z"
+      "manufacturer": "Shanghai Public Transportation",
+      "series_name": "Needy Streamer Overload",
+      "po_deadline": "2026-07-07T00:00:00Z",
+      "po_release_at": "2026-11-01T00:00:00Z"
     }
   ],
   "attempt": 1
