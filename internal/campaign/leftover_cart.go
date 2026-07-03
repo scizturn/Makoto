@@ -112,23 +112,6 @@ func RenderMemberversaryFooterHTMLWithCTA(closing, ctaURL, ctaLabel string) stri
 	return footer
 }
 
-// RenderMemberversaryFooterHTMLWithUnsubscribe renders the shared footer and, when
-// unsubscribeURL is non-empty, appends an unsubscribe/preference-center link below
-// the closing "Teman Kyou" line. Campaigns that must honor an opt-out (e.g. po-ready
-// pelunasan reminders) use this so every send carries a working unsubscribe link.
-func RenderMemberversaryFooterHTMLWithUnsubscribe(closing, unsubscribeURL string) string {
-	footer := RenderMemberversaryFooterHTMLWithCTA(closing, "", "")
-	unsubscribeURL = strings.TrimSpace(unsubscribeURL)
-	if unsubscribeURL == "" {
-		return footer
-	}
-	link := fmt.Sprintf(`
-                <p style="margin:8px 0 0;color:rgba(255,255,255,0.4);font-size:13px;font-weight:500;line-height:1.55;">Nggak mau nerima email seperti ini lagi? <a href="%s" style="color:rgba(255,255,255,0.7);text-decoration:underline;">Berhenti berlangganan</a>.</p>`,
-		html.EscapeString(unsubscribeURL))
-	const anchor = "Kamu menerima email ini karena terdaftar sebagai Teman Kyou.\n                </p>"
-	return strings.Replace(footer, anchor, anchor+link, 1)
-}
-
 const memberversaryFooterHTML = `
             <!-- ── ABOUT KYOU IMAGE ── -->
             <table role="presentation" width="720" cellspacing="0" cellpadding="0"

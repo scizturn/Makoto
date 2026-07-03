@@ -16,13 +16,12 @@ import (
 // It is a personalized, per-order conversion nudge, so the messaging centers on
 // the outstanding balance and a single CTA back to the user's order history.
 type PoReadyCampaign struct {
-	TemplateIDs    []string
-	Subjects       []string
-	Greetings      []string
-	HistoryURL     string
-	UnsubscribeURL string
-	Closing        string
-	RandomIntn     func(n int) int
+	TemplateIDs []string
+	Subjects    []string
+	Greetings   []string
+	HistoryURL  string
+	Closing     string
+	RandomIntn  func(n int) int
 }
 
 const poReadyItemLimit = 6
@@ -105,7 +104,7 @@ func (c PoReadyCampaign) BuildMergeData(user domain.User, orderID string, items 
 		"eta":               strings.TrimSpace(eta),
 		"action_url":        historyURL,
 		"closing":           c.Closing,
-		"footer_html":       RenderMemberversaryFooterHTMLWithUnsubscribe(c.Closing, c.UnsubscribeURL),
+		"footer_html":       RenderMemberversaryFooterHTMLWithCTA(c.Closing, "https://kyou.id/", "Explore kyou yuk!"),
 	}
 }
 

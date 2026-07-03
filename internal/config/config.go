@@ -88,7 +88,6 @@ type Config struct {
 	PoReadyEmailSubjects               []string
 	PoReadyGreetings                   []string
 	PoReadyURL                         string
-	PoReadyUnsubscribeURL              string
 }
 
 func Load() Config {
@@ -213,8 +212,7 @@ func Load() Config {
 			"{{ .FirstName }}, penantianmu selesai — pesanan PO kamu udah tiba!",
 			"Hei {{ .FirstName }}, PO incaranmu udah ready nih di gudang Kyou!",
 		}),
-		PoReadyURL:            env("MAKOTO_PO_READY_URL", "https://kyou.id/user/history"),
-		PoReadyUnsubscribeURL: os.Getenv("MAKOTO_PO_READY_UNSUBSCRIBE_URL"),
+		PoReadyURL: env("MAKOTO_PO_READY_URL", "https://kyou.id/user/history"),
 	}
 }
 

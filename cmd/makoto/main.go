@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"net/url"
 	"strings"
 	"sync"
 	"time"
@@ -23,36 +22,9 @@ import (
 	"github.com/kyou-id/makoto/internal/worker"
 	"github.com/redis/go-redis/v9"
 )
-
-// validateHTTPURL ensures raw is a non-empty absolute http(s) URL. Used to
-// guard required unsubscribe/preference-center links before a campaign that
-// depends on them is allowed to start.
-func validateHTTPURL(raw string) error {
-	trimmed := strings.TrimSpace(raw)
-	if trimmed == "" {
-		return errors.New("URL is empty")
-	}
-	u, err := url.Parse(trimmed)
-	if err != nil {
-		return err
-	}
-	if u.Scheme != "http" && u.Scheme != "https" {
-		return fmt.Errorf("must be an http(s) URL, got %q", raw)
-	}
-	if u.Host == "" {
-		return fmt.Errorf("missing host in URL %q", raw)
-	}
-	return nil
-}
-
 func main() {
 	ctx := context.Background()
 	cfg := config.Load()
-	if cfg.PoReadyEnabled {
-		if err := validateHTTPURL(cfg.PoReadyUnsubscribeURL); err != nil {
-			log.Fatalf("MAKOTO_PO_READY_UNSUBSCRIBE_URL is required when po ready is enabled: %v", err)
-		}
-	}
 
 	// --- Birthday ---
 	birthdayCampaign := campaign.BirthdayCampaign{
@@ -112,12 +84,11 @@ func main() {
 
 	// --- PO Ready ---
 	poReadyCampaign := campaign.PoReadyCampaign{
-		TemplateIDs:    cfg.PoReadyTemplateIDs,
-		Subjects:       cfg.PoReadyEmailSubjects,
-		Greetings:      cfg.PoReadyGreetings,
-		HistoryURL:     cfg.PoReadyURL,
-		UnsubscribeURL: cfg.PoReadyUnsubscribeURL,
-		Closing:        "Barang udah di tangan Kyou — tinggal selesaikan pembayaran biar bisa segera dikirim!",
+		TemplateIDs: cfg.PoReadyTemplateIDs,
+		Subjects:    cfg.PoReadyEmailSubjects,
+		Greetings:   cfg.PoReadyGreetings,
+		HistoryURL:  cfg.PoReadyURL,
+		Closing:     "Barang udah di tangan Kyou — tinggal selesaikan pembayaran biar bisa segera dikirim!",
 	}
 	poReadyProcessor := worker.NewPoReadyProcessor(sender, validator, poReadyCampaign)
 	poReadyProcessor.Domain = cfg.KirimEmailDomain

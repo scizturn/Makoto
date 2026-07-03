@@ -21,7 +21,6 @@ func main() {
 	templateDir := env("MAKOTO_PO_READY_EMAIL_TEMPLATE_DIR", "templates/po_ready")
 	subject := env("MAKOTO_PO_READY_EMAIL_SUBJECT", "{{ .FirstName }}, PO kamu udah sampai — yuk lunasin!")
 	historyURL := env("MAKOTO_PO_READY_URL", "https://kyou.id/user/history")
-	unsubscribeURL := env("MAKOTO_PO_READY_UNSUBSCRIBE_URL", "https://example.test/email-preferences")
 
 	job := sampleJob()
 	if payload, err := os.ReadFile(jobPath); err == nil {
@@ -33,10 +32,9 @@ func main() {
 	}
 
 	pr := campaign.PoReadyCampaign{
-		HistoryURL:     historyURL,
-		UnsubscribeURL: unsubscribeURL,
-		Closing:        "Barang udah di tangan Kyou — tinggal selesaikan pembayaran biar bisa segera dikirim!",
-		RandomIntn:     func(n int) int { return 0 },
+		HistoryURL: historyURL,
+		Closing:    "Barang udah di tangan Kyou — tinggal selesaikan pembayaran biar bisa segera dikirim!",
+		RandomIntn: func(n int) int { return 0 },
 	}
 
 	greeting := pr.RenderGreeting("Omatase, {{ .FirstName }}! Barang PO kamu akhirnya sampai di Kyou.", job.User)
