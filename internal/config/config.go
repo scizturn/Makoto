@@ -79,6 +79,16 @@ type Config struct {
 	WishlistBackInEmailSubject         string
 	WishlistBackInGreetings            []string
 	WishlistBackInActionURL            string
+	PoReadyEnabled                     bool
+	PoReadyQueueName                   string
+	PoReadyDeadLetterQueue             string
+	PoReadyTemplateIDs                 []string
+	PoReadyEmailTemplateDir            string
+	PoReadyEmailSubject                string
+	PoReadyEmailSubjects               []string
+	PoReadyGreetings                   []string
+	PoReadyURL                         string
+	PoReadyUnsubscribeURL              string
 }
 
 func Load() Config {
@@ -186,6 +196,25 @@ func Load() Config {
 			"Kabar baik, {{ .FirstName }}. Item incaranmu sudah kembali!",
 		}),
 		WishlistBackInActionURL: env("MAKOTO_WISHLIST_BACK_IN_ACTION_URL", "https://kyou.id/user/my-voucher"),
+		PoReadyEnabled:          envBool("MAKOTO_PO_READY_ENABLED", false),
+		PoReadyQueueName:        env("MAKOTO_PO_READY_QUEUE_NAME", "po_ready_email_jobs"),
+		PoReadyDeadLetterQueue:  env("MAKOTO_PO_READY_DEAD_LETTER_QUEUE", "po_ready_email_jobs_dead"),
+		PoReadyTemplateIDs:      envList("MAKOTO_PO_READY_TEMPLATE_IDS", []string{"po_ready1.html", "po_ready2.html", "po_ready3.html"}),
+		PoReadyEmailTemplateDir: os.Getenv("MAKOTO_PO_READY_EMAIL_TEMPLATE_DIR"),
+		PoReadyEmailSubject:     env("MAKOTO_PO_READY_EMAIL_SUBJECT", "{{ .FirstName }}, PO kamu udah sampai — yuk lunasin!"),
+		PoReadyEmailSubjects: envListPipe("MAKOTO_PO_READY_EMAIL_SUBJECTS", []string{
+			"Kabar baik {{ .FirstName }}! PO kamu udah ready, tinggal dilunasin~",
+			"Omatase {{ .FirstName }}! Pesanan PO kamu udah nyampe di Kyou.",
+			"{{ .FirstName }}, barang PO incaranmu udah ready — selesaikan pembayarannya yuk!",
+		}),
+		PoReadyGreetings: envListPipe("MAKOTO_PO_READY_GREETINGS", []string{
+			"Omatase, {{ .FirstName }}! Barang PO kamu akhirnya sampai di Kyou.",
+			"Kabar baik, {{ .FirstName }}! PO yang kamu tunggu udah ready.",
+			"{{ .FirstName }}, penantianmu selesai — pesanan PO kamu udah tiba!",
+			"Hei {{ .FirstName }}, PO incaranmu udah ready nih di gudang Kyou!",
+		}),
+		PoReadyURL:            env("MAKOTO_PO_READY_URL", "https://kyou.id/user/history"),
+		PoReadyUnsubscribeURL: os.Getenv("MAKOTO_PO_READY_UNSUBSCRIBE_URL"),
 	}
 }
 

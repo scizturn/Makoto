@@ -87,6 +87,13 @@ type viewData struct {
 	CompanionName        string
 	HasCompanion         bool
 	HasVoucher           bool
+	// PO Ready fields
+	OrderID         string
+	ItemsHTML       template.HTML
+	ItemCount       string
+	RemainingText   string
+	DownPaymentText string
+	ETA             string
 }
 
 func viewDataFromMergeData(data map[string]any) viewData {
@@ -122,6 +129,12 @@ func viewDataFromMergeData(data map[string]any) viewData {
 		CompanionName:        stringValue(data["companion_name"]),
 		HasCompanion:         boolValue(data["has_companion"]),
 		HasVoucher:           boolValue(data["has_voucher"]),
+		OrderID:              stringValue(data["order_id"]),
+		ItemsHTML:            template.HTML(stringValue(data["items_html"])),
+		ItemCount:            stringValue(data["item_count"]),
+		RemainingText:        stringValue(data["remaining_text"]),
+		DownPaymentText:      stringValue(data["down_payment_text"]),
+		ETA:                  stringValue(data["eta"]),
 	}
 }
 
