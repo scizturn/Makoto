@@ -169,11 +169,11 @@ func Load() Config {
 		WinbackDeadLetterQueue:           env("MAKOTO_WINBACK_DEAD_LETTER_QUEUE", "winback_email_jobs_dead"),
 		WinbackTemplateIDs:               envList("MAKOTO_WINBACK_TEMPLATE_IDS", []string{"winback1.html", "winback2.html", "winback3.html"}),
 		WinbackEmailTemplateDir:          os.Getenv("MAKOTO_WINBACK_EMAIL_TEMPLATE_DIR"),
-		WinbackEmailSubject:              env("MAKOTO_WINBACK_EMAIL_SUBJECT", "{{ .FirstName }}, kita kangen kamu nih!"),
+		WinbackEmailSubject:              env("MAKOTO_WINBACK_EMAIL_SUBJECT", "Akhirnya kamu kembali! Kyou udah siapin hadiah spesial untuk {{ .FirstName }}"),
 		WinbackEmailSubjects: envListPipe("MAKOTO_WINBACK_EMAIL_SUBJECTS", []string{
-			"{{ .FirstName }}, kita kangen kamu nih!",
-			"Ada voucher spesial buat kamu, {{ .FirstName }}!",
-			"{{ .FirstName }}, udah lama nggak belanja di Kyou nih...",
+			"Akhirnya kamu kembali! Kyou udah siapin hadiah spesial untuk {{ .FirstName }}",
+			"Okaeri, {{ .FirstName }}! Kyou kangen. Ini hadiah spesial karena kamu sudah kembali!",
+			"Yeay, {{ .FirstName }} pulang! Ada Kejutan Spesial dari Kyou!",
 		}),
 		WinbackGreetings: envListPipe("MAKOTO_WINBACK_GREETINGS", []string{
 			"Hei {{ .FirstName }}, udah lama banget nih nggak ketemu!",

@@ -2,6 +2,7 @@ package campaign
 
 import (
 	"fmt"
+	"hash/fnv"
 	"html"
 	"math/rand"
 	"strings"
@@ -96,6 +97,9 @@ func (c WinbackCampaign) BuildMergeData(user domain.User, voucherCode string, wi
 		"greeting":     greeting,
 		"voucher_code": voucherCode,
 		"has_voucher":  strings.TrimSpace(voucherCode) != "",
+		// "sejak <tahun>" in the scrapbook cover — the year the user joined Kyou.
+		// Falls back to Kyou's founding year when the account date is unknown.
+		"join_date": winbackMemberSinceYear(user.CreatedAt),
 		// "Album Kenangan" scrapbook from real data. Reuse the existing
 		// historical_html/wishlist_html merge keys so no new viewData field is
 		// needed — winback templates render their own scrapbook style. The past
@@ -171,15 +175,18 @@ func winbackPastRow(item domain.HistoricalItem) string {
 	if safeImage != "" {
 		photoInner = fmt.Sprintf(`<img src="%s" alt="" width="170" height="170" style="display:block;width:170px;height:170px;object-fit:cover;border:0;">`, safeImage)
 	}
-	photo := fmt.Sprintf(`<div style="width:170px;height:170px;overflow:hidden;background:#efe7d3;font-size:0;line-height:0;">%s</div>`, photoInner)
+	photo := fmt.Sprintf(`<div style="width:170px;height:170px;overflow:hidden;background:#efe7d3;font-size:0;line-height:0;margin:0 auto;">%s</div>`, photoInner)
 	handDate := ""
 	if dateText := winbackOrderDateText(item.OrderDate); dateText != "" {
-		handDate = fmt.Sprintf(`<div style="width:170px;font-family:'Caveat','Segoe Print','Bradley Hand',cursive;font-weight:700;font-size:17px;color:#9a6f45;text-align:center;line-height:1.15;padding:8px 0 1px;">&hearts; %s</div>`, html.EscapeString(dateText))
+		// white-space:nowrap keeps the caption on a single line; the polaroid frame
+		// below grows to fit it, so the (randomized, longer) phrases never wrap.
+		handDate = fmt.Sprintf(`<div style="font-family:'Caveat','Segoe Print','Bradley Hand',cursive;font-weight:700;font-size:13px;color:#9a6f45;text-align:center;line-height:1.15;white-space:nowrap;padding:8px 4px 1px;">&hearts; %s</div>`, html.EscapeString(winbackPastCaption(item.Name, dateText)))
 	}
-	// The polaroid is pinned to the photo's 170px width so the photo and the
-	// handwritten caption share one column and stay centered together (otherwise
-	// a caption wider than the photo makes the frame grow and misaligns them).
-	polaroid := fmt.Sprintf(`<div style="width:170px;background:#ffffff;padding:9px 9px 6px;border:1px solid #e6dcc6;box-shadow:2px 3px 8px rgba(74,59,42,0.22);">%s%s</div>`, photo, handDate)
+	// The polaroid grows to the wider of the 170px photo and the handwritten
+	// caption (display:inline-block); the photo is centered via margin:0 auto and
+	// the caption via text-align:center, so both stay aligned when the frame grows.
+	// The parent <td> is text-align:center so the whole card centers in its column.
+	polaroid := fmt.Sprintf(`<div style="display:inline-block;background:#ffffff;padding:9px 9px 6px;border:1px solid #e6dcc6;box-shadow:2px 3px 8px rgba(74,59,42,0.22);">%s%s</div>`, photo, handDate)
 
 	// Right column: item name on top, series name underneath (kalau ada).
 	nameBlock := fmt.Sprintf(`<div style="font-family:'Nunito',Arial,Helvetica,sans-serif;font-weight:800;font-size:18px;color:#4a3b2a;line-height:1.35;">%s</div>`, safeName)
@@ -188,7 +195,7 @@ func winbackPastRow(item domain.HistoricalItem) string {
 	}
 
 	row := fmt.Sprintf(
-		`<table role="presentation" width="100%%" cellspacing="0" cellpadding="0" style="border-collapse:separate;border-radius:16px;background:#fffdf6;border:1px solid #ece3d0;box-shadow:1px 2px 6px rgba(74,59,42,0.12);overflow:hidden;"><tr><td width="220" valign="middle" style="width:220px;padding:20px 8px 20px 20px;">%s</td><td valign="middle" style="padding:16px 22px;">%s</td></tr></table>`,
+		`<table role="presentation" width="100%%" cellspacing="0" cellpadding="0" style="border-collapse:separate;border-radius:16px;background:#fffdf6;border:1px solid #ece3d0;box-shadow:1px 2px 6px rgba(74,59,42,0.12);overflow:hidden;"><tr><td width="220" valign="middle" style="width:220px;padding:20px 8px 20px 14px;text-align:center;">%s</td><td valign="middle" style="padding:16px 22px;">%s</td></tr></table>`,
 		polaroid, nameBlock,
 	)
 	// Each row links to the item so the reader can jump straight to its page.
@@ -225,13 +232,46 @@ func stripBracketPrefixes(name string) string {
 	return name
 }
 
-// winbackOrderDateText formats a purchase date in Indonesian, e.g.
-// "Dibeli 1 Mei 2026". Returns "" for a zero date.
+// winbackFoundingYear is Kyou's founding year, used as the "sejak <year>"
+// fallback when a user's account creation date is unknown (zero time).
+const winbackFoundingYear = "2014"
+
+// winbackMemberSinceYear returns the four-digit year the user joined Kyou for
+// the scrapbook cover's "sejak <year>" line. A zero createdAt (missing on jobs
+// enqueued before the created_at field existed) falls back to the founding year.
+func winbackMemberSinceYear(createdAt time.Time) string {
+	if createdAt.IsZero() {
+		return winbackFoundingYear
+	}
+	return fmt.Sprintf("%d", createdAt.Year())
+}
+
+// winbackOrderDateText formats a purchase date in Indonesian day-month-year,
+// e.g. "1 Mei 2026". Returns "" for a zero date. The surrounding caption phrase
+// is added by winbackPastCaption.
 func winbackOrderDateText(t time.Time) string {
 	if t.IsZero() {
 		return ""
 	}
-	return fmt.Sprintf("Dibeli %d %s %d", t.Day(), idMonths[t.Month()], t.Year())
+	return fmt.Sprintf("%d %s %d", t.Day(), idMonths[t.Month()], t.Year())
+}
+
+// winbackPastCaptionPhrases are the handwritten caption variants shown under
+// each past-purchase polaroid; %s is the formatted purchase date. One is picked
+// per item (hashed on the item name) so captions vary down the list yet a retry
+// of the same job renders identically.
+var winbackPastCaptionPhrases = []string{
+	"Menemani sejak %s",
+	"Kyoulected! %s",
+}
+
+// winbackPastCaption builds one item's handwritten caption, choosing a phrase
+// deterministically from the item name so retries stay identical.
+func winbackPastCaption(name, dateText string) string {
+	h := fnv.New32a()
+	_, _ = h.Write([]byte(name))
+	phrase := winbackPastCaptionPhrases[h.Sum32()%uint32(len(winbackPastCaptionPhrases))]
+	return fmt.Sprintf(phrase, dateText)
 }
 
 // RenderWinbackReadyStampsHTML renders the ready wishlist/fill items as a

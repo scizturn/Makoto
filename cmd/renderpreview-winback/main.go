@@ -18,7 +18,7 @@ func main() {
 	jobPath := env("MAKOTO_PREVIEW_JOB_PATH", "templates/preview/winback-job.json")
 	outputPath := env("MAKOTO_PREVIEW_HTML_PATH", "templates/preview/winback-preview.html")
 	templateDir := env("MAKOTO_WINBACK_EMAIL_TEMPLATE_DIR", "templates/winback")
-	subject := env("MAKOTO_WINBACK_EMAIL_SUBJECT", "{{ .FirstName }}, kita kangen kamu nih!")
+	subject := env("MAKOTO_WINBACK_EMAIL_SUBJECT", "Akhirnya kamu kembali! Kyou udah siapin hadiah spesial untuk {{ .FirstName }}")
 	actionURL := env("MAKOTO_WINBACK_ACTION_URL", "https://kyou.id/user/my-voucher")
 
 	payload, err := os.ReadFile(jobPath)
