@@ -258,11 +258,10 @@ func winbackOrderDateText(t time.Time) string {
 
 // winbackPastCaptionPhrases are the handwritten caption variants shown under
 // each past-purchase polaroid; %s is the formatted purchase date. One is picked
-// per item (hashed on the item name) so captions vary down the list yet a retry
-// of the same job renders identically.
+// per item (hashed on the item name) so a retry of the same job renders
+// identically.
 var winbackPastCaptionPhrases = []string{
 	"Menemani sejak %s",
-	"Kyoulected! %s",
 }
 
 // winbackPastCaption builds one item's handwritten caption, choosing a phrase
