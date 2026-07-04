@@ -67,37 +67,91 @@ func (c WishlistBackInCampaign) BuildMergeData(user domain.User, voucherCode str
 		"companion_name":    companion.Name,
 		"has_companion":     companion.ID != "",
 		"closing":           c.Closing,
+		"footer_html":       RenderMemberversaryFooterHTML(c.Closing),
 	}
 }
 
+// renderWishlistBackInItem renders one item for the "Editorial Index" layout.
+// featured=true -> a slim numbered index row (the restocked wishlist item).
+// featured=false -> a compact cross-sell card (a companion to complete the set).
 func renderWishlistBackInItem(item domain.WishlistBackInItem, featured bool) string {
 	if item.ID == "" {
 		return ""
 	}
+	if featured {
+		return renderWishlistBackInRow(item)
+	}
+	return renderWishlistBackInCard(item)
+}
+
+// renderWishlistBackInRow is the editorial "INDEX" row: 01 · thumbnail · status/name · price.
+func renderWishlistBackInRow(item domain.WishlistBackInItem) string {
 	name := html.EscapeString(item.Name)
-	series := html.EscapeString(item.SeriesName)
-	if series == "" {
-		series = html.EscapeString(item.CategoryName)
-	}
-	imageURL := html.EscapeString(item.ImageURL)
 	itemURL := html.EscapeString(item.URL)
-	image := `<div style="width:190px;height:190px;background:#f3f4f6;border-radius:8px;"></div>`
+	imageURL := html.EscapeString(item.ImageURL)
+
+	thumb := `<div style="width:62px;height:62px;border-radius:8px;background:#f7f7f7;"></div>`
 	if imageURL != "" {
-		image = fmt.Sprintf(`<img src="%s" alt="%s" width="190" height="190" style="display:block;width:190px;height:190px;object-fit:cover;border:0;border-radius:8px;background:#f3f4f6;">`, imageURL, name)
+		thumb = fmt.Sprintf(`<img src="%s" alt="%s" width="62" height="62" style="display:block;width:62px;height:62px;object-fit:cover;border:0;border-radius:8px;background:#f7f7f7;">`, imageURL, name)
 	}
+
+	badgeText, badgeColor := "Ready Stock", "#2e9c5f"
+	if isPreorderStatus(item.Status) {
+		badgeText, badgeColor = "PO Dibuka Lagi", "#bf3901"
+	}
+
 	price := formatIDR(item.Price)
 	if price == "" {
-		price = "Cek harga terbaru"
+		price = "Cek harga"
 	}
-	badge := "Sudah kamu beli"
-	if featured {
-		badge = "Ready lagi"
-	}
-	content := fmt.Sprintf(`<table role="presentation" width="100%%" cellspacing="0" cellpadding="0" style="width:100%%;border-collapse:collapse;background:#ffffff;border:1px solid #e5e7eb;border-radius:8px;"><tr><td width="220" valign="top" style="width:220px;padding:15px;">%s</td><td valign="middle" style="padding:20px 24px 20px 4px;"><span style="display:inline-block;margin:0 0 10px;padding:6px 9px;border-radius:4px;background:#fc4c02;color:#ffffff;font-size:11px;font-weight:900;line-height:1;">%s</span><p style="margin:0 0 6px;color:#8b8b8b;font-size:11px;font-weight:800;line-height:1.3;text-transform:uppercase;">%s</p><h2 style="margin:0 0 10px;color:#2d2d2d;font-size:21px;font-weight:900;line-height:1.25;">%s</h2><p style="margin:0;color:#fc4c02;font-size:17px;font-weight:900;line-height:1.3;">%s</p></td></tr></table>`, image, badge, series, name, price)
+
+	content := fmt.Sprintf(`<table role="presentation" width="100%%" cellspacing="0" cellpadding="0" style="width:100%%;border-collapse:collapse;border-bottom:1px solid #f0efec;"><tr>`+
+		`<td width="26" valign="middle" style="width:26px;padding:16px 0;font-size:13px;font-weight:900;color:#d1d3d4;">01</td>`+
+		`<td width="62" valign="middle" style="width:62px;padding:16px 0;">%s</td>`+
+		`<td valign="middle" style="padding:16px 14px;">`+
+		`<span style="display:block;margin:0 0 3px;font-size:9.5px;font-weight:800;letter-spacing:0.5px;color:%s;text-transform:uppercase;">&#9679; %s</span>`+
+		`<span style="display:block;font-size:14.5px;font-weight:800;color:#2a2a2a;line-height:1.25;">%s</span>`+
+		`</td>`+
+		`<td valign="middle" align="right" style="padding:16px 0;font-size:15px;font-weight:900;color:#fc4c02;white-space:nowrap;">%s</td>`+
+		`</tr></table>`, thumb, badgeColor, badgeText, name, price)
+
 	if itemURL == "" {
 		return content
 	}
 	return fmt.Sprintf(`<a href="%s" style="display:block;color:inherit;text-decoration:none;">%s</a>`, itemURL, content)
+}
+
+// renderWishlistBackInCard is the editorial "CROSS-SELL" card: square image, name, price.
+func renderWishlistBackInCard(item domain.WishlistBackInItem) string {
+	name := html.EscapeString(item.Name)
+	itemURL := html.EscapeString(item.URL)
+	imageURL := html.EscapeString(item.ImageURL)
+
+	image := `<div style="width:150px;height:150px;border-radius:8px;background:#f7f7f7;"></div>`
+	if imageURL != "" {
+		image = fmt.Sprintf(`<img src="%s" alt="%s" width="150" height="150" style="display:block;width:150px;height:150px;object-fit:contain;border:0;border-radius:8px;background:#f7f7f7;">`, imageURL, name)
+	}
+
+	price := formatIDR(item.Price)
+	if price == "" {
+		price = "Cek harga"
+	}
+
+	content := fmt.Sprintf(`<table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;"><tr><td width="150" valign="top" style="width:150px;">`+
+		`%s`+
+		`<div style="margin:9px 0 0;font-size:12px;font-weight:700;color:#2a2a2a;line-height:1.3;">%s</div>`+
+		`<div style="margin:3px 0 0;font-size:12.5px;font-weight:900;color:#fc4c02;">%s</div>`+
+		`</td></tr></table>`, image, name, price)
+
+	if itemURL == "" {
+		return content
+	}
+	return fmt.Sprintf(`<a href="%s" style="display:inline-block;color:inherit;text-decoration:none;">%s</a>`, itemURL, content)
+}
+
+func isPreorderStatus(status string) bool {
+	status = strings.ToLower(strings.TrimSpace(status))
+	return strings.Contains(status, "po") || strings.Contains(status, "pre") || strings.Contains(status, "order")
 }
 
 func firstName(name string) string {
