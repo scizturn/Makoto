@@ -132,7 +132,7 @@ func renderWishlistBackInRow(item domain.WishlistBackInItem, index int) string {
 
 	imgCell := `&nbsp;`
 	if imageURL != "" {
-		imgCell = fmt.Sprintf(`<img src="%s" alt="" width="50" height="50" style="display:block;width:50px;height:50px;object-fit:contain;border:0;margin:0 auto;">`, imageURL)
+		imgCell = fmt.Sprintf(`<img src="%s" alt="" width="96" height="96" style="display:block;width:96px;height:96px;object-fit:contain;border:0;margin:0 auto;">`, imageURL)
 	}
 
 	badge := renderStatusBadge(item)
@@ -154,8 +154,8 @@ func renderWishlistBackInRow(item domain.WishlistBackInItem, index int) string {
 	row := fmt.Sprintf(`<table role="presentation" width="100%%" cellpadding="0" cellspacing="0" border="0" style="width:100%%;border-collapse:collapse;border-bottom:1px solid #f2e7df;">`+
 		`<tr>`+
 		`<td width="24" valign="middle" align="center" style="width:24px;padding:16px 0;font-size:13px;font-weight:900;color:#e0c7ba;">%02d</td>`+
-		`<td width="76" valign="middle" style="width:76px;padding:16px 14px 16px 12px;">`+
-		`<table role="presentation" width="62" cellpadding="0" cellspacing="0" border="0"><tr><td width="62" height="62" align="center" valign="middle" style="width:62px;height:62px;background:#ffffff;border-radius:10px;border:1px solid #f1e7df;border-bottom:3px solid #ead7ca;">%s</td></tr></table>`+
+		`<td width="128" valign="middle" style="width:128px;padding:16px 18px 16px 12px;">`+
+		`<table role="presentation" width="112" cellpadding="0" cellspacing="0" border="0"><tr><td width="112" height="112" align="center" valign="middle" style="width:112px;height:112px;background:#ffffff;border-radius:14px;border:1px solid #f1e7df;border-bottom:3px solid #ead7ca;">%s</td></tr></table>`+
 		`</td>`+
 		`<td valign="middle" style="padding:16px 12px 16px 0;">`+
 		`<div style="margin-bottom:6px;">%s%s</div>`+
