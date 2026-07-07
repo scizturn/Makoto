@@ -53,40 +53,39 @@ func TestWishlistBackInMergeDataEscapesItemsAndHandlesCompanion(t *testing.T) {
 	}
 }
 
-func TestWishlistBackInStatusBadgeMatchesHanamaru(t *testing.T) {
-	cases := []struct{ status, name, wantColor, wantLabel string }{
-		{"ready", "Figure X", "#41b774", "Ready Stock"},
-		{"PO", "Figure Y", "#657996", "Pre-Order"},
-		{"LPO", "Figure Z", "#d3647a", "Late Pre-Order"},
-		{"BO", "Figure W", "#996291", "Back Order"},
+func TestWishlistBackInStatusLabelAndColor(t *testing.T) {
+	cases := []struct{ status, name, wantLabel, wantColor string }{
+		{"ready", "Figure X", "Ready Stock", "#2e9c5f"},
+		{"PO", "Figure Y", "Pre-Order", "#657996"},
+		{"LPO", "Figure Z", "Late Pre-Order", "#d3647a"},
+		{"BO", "Figure W", "Back Order", "#996291"},
 	}
 	for _, c := range cases {
-		got := renderStatusBadge(domain.WishlistBackInItem{Status: c.status, Name: c.name})
-		if !strings.Contains(got, c.wantColor) || !strings.Contains(got, c.wantLabel) {
-			t.Fatalf("status %q: want color %s + label %q, got %s", c.status, c.wantColor, c.wantLabel, got)
+		label, color := wishlistBackInStatus(domain.WishlistBackInItem{Status: c.status, Name: c.name})
+		if label != c.wantLabel || color != c.wantColor {
+			t.Fatalf("status %q: got (%q,%q) want (%q,%q)", c.status, label, color, c.wantLabel, c.wantColor)
 		}
 	}
-	// Revive is a name tag; it wins over status and renders the shared image tag.
-	revive := renderStatusBadge(domain.WishlistBackInItem{Status: "PO", Name: "[Revive] Figure"})
-	if !strings.Contains(revive, "revive.png") {
-		t.Fatalf("expected revive image badge, got %s", revive)
+	// Revive is a name tag; it wins over status.
+	if label, _ := wishlistBackInStatus(domain.WishlistBackInItem{Status: "PO", Name: "[Revive] Figure"}); label != "Revive" {
+		t.Fatalf("expected Revive label, got %q", label)
 	}
 }
 
-func TestWishlistBackInPriceHTMLMatchesHanamaru(t *testing.T) {
-	// Discount: brand price + original struck through.
-	d := wishlistBackInPriceHTML(domain.WishlistBackInItem{Price: 665000, DiscountPrice: 585000}, "15px", "11px")
-	if !strings.Contains(d, "IDR 585.000") || !strings.Contains(d, "line-through") || !strings.Contains(d, ">665.000<") {
-		t.Fatalf("discount render wrong: %s", d)
+func TestWishlistBackInPrice(t *testing.T) {
+	// Discount: discounted price (brand color) + original as struck sub.
+	main, color, sub, struck := wishlistBackInPrice(domain.WishlistBackInItem{Price: 665000, DiscountPrice: 585000})
+	if main != "IDR 585.000" || color != "#fc4c02" || sub != "665.000" || !struck {
+		t.Fatalf("discount: main=%q color=%q sub=%q struck=%v", main, color, sub, struck)
 	}
-	// DP (PO): "DP IDR <dp>" over "/ <full>".
-	p := wishlistBackInPriceHTML(domain.WishlistBackInItem{Price: 2100000, DownPayment: 450000, Status: "PO"}, "15px", "11px")
-	if !strings.Contains(p, "DP IDR 450.000") || !strings.Contains(p, "/ 2.100.000") {
-		t.Fatalf("dp render wrong: %s", p)
+	// DP (PO): "DP IDR <dp>" + "/ <full>".
+	main, _, sub, struck = wishlistBackInPrice(domain.WishlistBackInItem{Price: 2100000, DownPayment: 450000, Status: "PO"})
+	if main != "DP IDR 450.000" || sub != "/ 2.100.000" || struck {
+		t.Fatalf("dp: main=%q sub=%q struck=%v", main, sub, struck)
 	}
-	// Plain: no strikethrough, no DP.
-	pl := wishlistBackInPriceHTML(domain.WishlistBackInItem{Price: 300000}, "15px", "11px")
-	if !strings.Contains(pl, "IDR 300.000") || strings.Contains(pl, "line-through") || strings.Contains(pl, "DP ") {
-		t.Fatalf("plain render wrong: %s", pl)
+	// Plain.
+	main, color, sub, _ = wishlistBackInPrice(domain.WishlistBackInItem{Price: 300000})
+	if main != "IDR 300.000" || color != "#2a2a2a" || sub != "" {
+		t.Fatalf("plain: main=%q color=%q sub=%q", main, color, sub)
 	}
 }

@@ -55,9 +55,13 @@ func (c WishlistBackInCampaign) RenderGreeting(tpl string, user domain.User) str
 }
 
 func (c WishlistBackInCampaign) BuildMergeData(user domain.User, voucherCode string, items []domain.WishlistBackInItem, companion domain.WishlistBackInItem, recos []domain.WishlistBackInItem, greeting string) map[string]any {
-	// The "Gas, nemenin..." section renders only with an anchor (a purchased
+	// The "Lengkapin koleksi" cross-sell renders only with an anchor (a purchased
 	// item) AND a full set of popular recommendations in its series/category.
 	hasReco := companion.ID != "" && len(recos) > 0
+	recoSeries := ""
+	if hasReco {
+		recoSeries = wishlistBackInRecoSeries(companion, recos)
+	}
 	return map[string]any{
 		"name":              user.Name,
 		"first_name":        firstName(user.Name),
@@ -68,6 +72,7 @@ func (c WishlistBackInCampaign) BuildMergeData(user domain.User, voucherCode str
 		"back_in_item_html": renderWishlistBackInItems(items),
 		"item_count":        len(items),
 		"reco_html":         renderWishlistBackInRecoGrid(recos),
+		"reco_series":       recoSeries,
 		"companion_name":    companion.Name,
 		"has_companion":     hasReco,
 		"closing":           c.Closing,
@@ -75,36 +80,21 @@ func (c WishlistBackInCampaign) BuildMergeData(user domain.User, voucherCode str
 	}
 }
 
-// renderWishlistBackInRecoGrid renders the 6 cross-sell recommendations as a
-// 3-column grid (2 rows) of compact cards.
-func renderWishlistBackInRecoGrid(items []domain.WishlistBackInItem) string {
-	if len(items) == 0 {
-		return ""
+// wishlistBackInRecoSeries picks the series label shown in "Lengkapin koleksi <x>".
+func wishlistBackInRecoSeries(companion domain.WishlistBackInItem, recos []domain.WishlistBackInItem) string {
+	if s := strings.TrimSpace(companion.SeriesName); s != "" {
+		return s
 	}
-	var b strings.Builder
-	b.WriteString(`<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse;">`)
-	for row := 0; row*3 < len(items); row++ {
-		if row > 0 {
-			b.WriteString(`<tr><td colspan="3" style="height:18px;line-height:18px;font-size:18px;">&nbsp;</td></tr>`)
+	for _, r := range recos {
+		if s := strings.TrimSpace(r.SeriesName); s != "" {
+			return s
 		}
-		b.WriteString(`<tr>`)
-		for col := 0; col < 3; col++ {
-			b.WriteString(`<td width="33%" valign="top" align="center" style="width:33.33%;padding:0 6px;">`)
-			if idx := row*3 + col; idx < len(items) {
-				b.WriteString(renderWishlistBackInCard(items[idx]))
-			} else {
-				b.WriteString(`&nbsp;`)
-			}
-			b.WriteString(`</td>`)
-		}
-		b.WriteString(`</tr>`)
 	}
-	b.WriteString(`</table>`)
-	return b.String()
+	return "koleksimu"
 }
 
-// renderWishlistBackInItems renders the user's restocked wishlist items as the
-// editorial "INDEX" list: one numbered row per item (01, 02, …), newest first.
+// renderWishlistBackInItems renders the restocked wishlist items as the "Soft
+// Cream" numbered index rows (01, 02, …), newest first.
 func renderWishlistBackInItems(items []domain.WishlistBackInItem) string {
 	var builder strings.Builder
 	index := 0
@@ -118,110 +108,136 @@ func renderWishlistBackInItems(items []domain.WishlistBackInItem) string {
 	return builder.String()
 }
 
-// renderWishlistBackInRow is the editorial "INDEX" row: NN · thumbnail · status/name · price.
+// renderWishlistBackInRow — "Soft Cream" index row: NN · thumb · status/disc/name · price/sub.
 func renderWishlistBackInRow(item domain.WishlistBackInItem, index int) string {
 	name := html.EscapeString(item.Name)
 	itemURL := html.EscapeString(item.URL)
 	imageURL := html.EscapeString(item.ImageURL)
 
-	thumb := `<div style="width:62px;height:62px;border-radius:8px;background:#f7f7f7;"></div>`
+	imgTag := `<div style="width:80%;height:80%;"></div>`
 	if imageURL != "" {
-		thumb = fmt.Sprintf(`<img src="%s" alt="%s" width="62" height="62" style="display:block;width:62px;height:62px;object-fit:cover;border:0;border-radius:8px;background:#f7f7f7;">`, imageURL, name)
+		imgTag = fmt.Sprintf(`<img src="%s" alt="" style="width:80%%;height:80%%;object-fit:contain;">`, imageURL)
 	}
 
-	badge := renderStatusBadge(item)
-	priceHTML := wishlistBackInPriceHTML(item, "15px", "11px")
-
-	content := fmt.Sprintf(`<table role="presentation" width="100%%" cellspacing="0" cellpadding="0" style="width:100%%;border-collapse:collapse;border-bottom:1px solid #f0efec;"><tr>`+
-		`<td width="26" valign="middle" style="width:26px;padding:16px 0;font-size:13px;font-weight:900;color:#d1d3d4;">%02d</td>`+
-		`<td width="62" valign="middle" style="width:62px;padding:16px 0;">%s</td>`+
-		`<td valign="middle" style="padding:16px 14px;">`+
-		`<span style="display:block;margin:0 0 5px;">%s</span>`+
-		`<span style="display:block;font-size:14.5px;font-weight:800;color:#2a2a2a;line-height:1.25;">%s</span>`+
-		`</td>`+
-		`<td valign="middle" align="right" style="padding:16px 0;white-space:nowrap;">%s</td>`+
-		`</tr></table>`, index, thumb, badge, name, priceHTML)
-
-	if itemURL == "" {
-		return content
+	label, color := wishlistBackInStatus(item)
+	discTag := ""
+	if item.DiscountPrice > 0 && item.DiscountPrice < item.Price {
+		discTag = fmt.Sprintf(`<span style="font-size:9.5px;font-weight:800;color:#fc4c02;">&minus;%d%%</span>`, (item.Price-item.DiscountPrice)*100/item.Price)
 	}
-	return fmt.Sprintf(`<a href="%s" style="display:block;color:inherit;text-decoration:none;">%s</a>`, itemURL, content)
-}
-
-// renderWishlistBackInCard is the editorial "CROSS-SELL" card: square image, name, price.
-func renderWishlistBackInCard(item domain.WishlistBackInItem) string {
-	name := html.EscapeString(item.Name)
-	itemURL := html.EscapeString(item.URL)
-	imageURL := html.EscapeString(item.ImageURL)
-
-	image := `<div style="width:150px;height:150px;border-radius:8px;background:#f7f7f7;"></div>`
-	if imageURL != "" {
-		image = fmt.Sprintf(`<img src="%s" alt="%s" width="150" height="150" style="display:block;width:150px;height:150px;object-fit:contain;border:0;border-radius:8px;background:#f7f7f7;">`, imageURL, name)
-	}
-
-	priceHTML := wishlistBackInPriceHTML(item, "12.5px", "10.5px")
-
-	content := fmt.Sprintf(`<table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;"><tr><td width="150" valign="top" style="width:150px;">`+
-		`%s`+
-		`<div style="margin:9px 0 0;font-size:12px;font-weight:700;color:#2a2a2a;line-height:1.3;">%s</div>`+
-		`<div style="margin:3px 0 0;">%s</div>`+
-		`</td></tr></table>`, image, name, priceHTML)
-
-	if itemURL == "" {
-		return content
-	}
-	return fmt.Sprintf(`<a href="%s" style="display:inline-block;color:inherit;text-decoration:none;">%s</a>`, itemURL, content)
-}
-
-// renderStatusBadge mirrors hanamaru's ProductStatus badge (StatusChip / the
-// ProductThumbnail status tags): same labels and colors per status. Revive uses
-// the shared image tag, matching the site's `[revive]` name-tag handling.
-func renderStatusBadge(item domain.WishlistBackInItem) string {
-	if strings.Contains(strings.ToLower(item.Name), "[revive]") {
-		return `<img src="https://kyoucdn.id/static/img/status-tags/revive.png" alt="Revive" width="68" height="20" style="display:inline-block;height:20px;width:auto;border:0;vertical-align:middle;">`
-	}
-	label, bg := "Ready Stock", "#41b774"
-	switch strings.ToUpper(strings.TrimSpace(item.Status)) {
-	case "PO":
-		label, bg = "Pre-Order", "#657996"
-	case "LPO":
-		label, bg = "Late Pre-Order", "#d3647a"
-	case "BO", "BPO":
-		label, bg = "Back Order", "#996291"
-	}
-	return fmt.Sprintf(`<span style="display:inline-block;padding:3px 7px;border-radius:4px;background:%s;color:#ffffff;font-size:10px;font-weight:800;line-height:1.4;white-space:nowrap;">%s</span>`, bg, html.EscapeString(label))
-}
-
-// wishlistBackInPriceHTML renders the price block matching hanamaru: a DP line
-// ("DP IDR <dp>" over "/ <full>") for PO items with a down payment, a discounted
-// price (brand color) with the original struck through, or a plain price.
-// mainSize/subSize let the row and reco card size it differently.
-func wishlistBackInPriceHTML(item domain.WishlistBackInItem, mainSize, subSize string) string {
-	var main, sub string
-	var struck bool
-	switch {
-	case item.DownPayment > 0:
-		main, sub = "DP "+formatIDR(item.DownPayment), "/ "+formatIDRNumber(item.Price)
-	case item.DiscountPrice > 0 && item.DiscountPrice < item.Price:
-		main, sub, struck = formatIDR(item.DiscountPrice), formatIDRNumber(item.Price), true
-	default:
-		if main = formatIDR(item.Price); main == "" {
-			main = "Cek harga"
-		}
-	}
-	out := fmt.Sprintf(`<span style="display:block;font-size:%s;font-weight:900;color:#fc4c02;line-height:1.2;">%s</span>`, mainSize, main)
+	priceMain, priceColor, sub, struck := wishlistBackInPrice(item)
+	subHTML := ""
 	if sub != "" {
 		deco := ""
 		if struck {
 			deco = "text-decoration:line-through;"
 		}
-		out += fmt.Sprintf(`<span style="display:block;margin-top:2px;font-size:%s;font-weight:700;color:#9a9a9a;%s">%s</span>`, subSize, deco, sub)
+		subHTML = fmt.Sprintf(`<div style="font-size:11px;color:#a2a2a2;white-space:nowrap;%s">%s</div>`, deco, sub)
 	}
-	return out
+
+	row := fmt.Sprintf(`<div style="display:flex;align-items:flex-start;gap:15px;padding:16px 0;border-bottom:1px solid #f2e7df;">`+
+		`<span style="font-size:13px;font-weight:900;color:#e0c7ba;width:22px;flex:none;padding-top:2px;">%02d</span>`+
+		`<div style="width:62px;height:62px;border-radius:10px;background:#ffffff;display:flex;align-items:center;justify-content:center;flex:none;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.05);">%s</div>`+
+		`<div style="flex:1;min-width:0;padding-top:1px;">`+
+		`<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">`+
+		`<span style="font-size:9.5px;font-weight:800;color:%s;letter-spacing:0.5px;text-transform:uppercase;white-space:nowrap;">&#9679; %s</span>%s`+
+		`</div>`+
+		`<div style="font-size:14px;font-weight:800;color:#2a2a2a;line-height:1.3;">%s</div>`+
+		`</div>`+
+		`<div style="text-align:right;flex:none;padding-top:1px;">`+
+		`<div style="font-size:15px;font-weight:900;color:%s;white-space:nowrap;">%s</div>%s`+
+		`</div>`+
+		`</div>`, index, imgTag, color, label, discTag, name, priceColor, priceMain, subHTML)
+
+	if itemURL == "" {
+		return row
+	}
+	return fmt.Sprintf(`<a href="%s" style="display:block;color:inherit;text-decoration:none;">%s</a>`, itemURL, row)
+}
+
+// renderWishlistBackInRecoGrid — "Soft Cream" cross-sell: rows of 3 flex cards.
+func renderWishlistBackInRecoGrid(items []domain.WishlistBackInItem) string {
+	if len(items) == 0 {
+		return ""
+	}
+	var b strings.Builder
+	for row := 0; row*3 < len(items); row++ {
+		if row > 0 {
+			b.WriteString(`<div style="height:12px;line-height:12px;font-size:12px;">&nbsp;</div>`)
+		}
+		b.WriteString(`<div style="display:flex;gap:12px;">`)
+		for col := 0; col < 3; col++ {
+			if idx := row*3 + col; idx < len(items) {
+				b.WriteString(renderWishlistBackInCard(items[idx]))
+			} else {
+				b.WriteString(`<div style="flex:1;"></div>`)
+			}
+		}
+		b.WriteString(`</div>`)
+	}
+	return b.String()
+}
+
+// renderWishlistBackInCard — "Soft Cream" cross-sell card (flex:1): image, name, price.
+func renderWishlistBackInCard(item domain.WishlistBackInItem) string {
+	name := html.EscapeString(item.Name)
+	itemURL := html.EscapeString(item.URL)
+	imageURL := html.EscapeString(item.ImageURL)
+
+	imgTag := `<div style="width:76%;height:76%;"></div>`
+	if imageURL != "" {
+		imgTag = fmt.Sprintf(`<img src="%s" alt="" style="width:76%%;height:76%%;object-fit:contain;">`, imageURL)
+	}
+	priceMain, priceColor, _, _ := wishlistBackInPrice(item)
+
+	inner := fmt.Sprintf(`<div style="background:#ffffff;border-radius:14px;overflow:hidden;box-shadow:0 3px 12px rgba(0,0,0,0.04);">`+
+		`<div style="aspect-ratio:1;background:#fff7f3;display:flex;align-items:center;justify-content:center;">%s</div>`+
+		`<div style="padding:9px 11px 12px;">`+
+		`<div style="font-size:11.5px;font-weight:700;color:#2a2a2a;line-height:1.25;max-height:29px;overflow:hidden;">%s</div>`+
+		`<div style="font-size:12px;font-weight:900;color:%s;margin-top:4px;">%s</div>`+
+		`</div></div>`, imgTag, name, priceColor, priceMain)
+
+	if itemURL == "" {
+		return fmt.Sprintf(`<div style="flex:1;">%s</div>`, inner)
+	}
+	return fmt.Sprintf(`<a href="%s" style="flex:1;display:block;color:inherit;text-decoration:none;">%s</a>`, itemURL, inner)
+}
+
+// wishlistBackInStatus returns the "● <label>" status text + color for the row.
+// Colors follow the site; Revive is detected from the `[revive]` name tag.
+func wishlistBackInStatus(item domain.WishlistBackInItem) (string, string) {
+	if strings.Contains(strings.ToLower(item.Name), "[revive]") {
+		return "Revive", "#fc4c02"
+	}
+	switch strings.ToUpper(strings.TrimSpace(item.Status)) {
+	case "PO":
+		return "Pre-Order", "#657996"
+	case "LPO":
+		return "Late Pre-Order", "#d3647a"
+	case "BO", "BPO":
+		return "Back Order", "#996291"
+	}
+	return "Ready Stock", "#2e9c5f"
+}
+
+// wishlistBackInPrice returns the main price text + color, and an optional sub
+// line (struck original for a discount, or "/ <full>" for a PO down payment).
+func wishlistBackInPrice(item domain.WishlistBackInItem) (main, color, sub string, struck bool) {
+	switch {
+	case item.DownPayment > 0:
+		return "DP " + formatIDR(item.DownPayment), "#fc4c02", "/ " + formatIDRNumber(item.Price), false
+	case item.DiscountPrice > 0 && item.DiscountPrice < item.Price:
+		return formatIDR(item.DiscountPrice), "#fc4c02", formatIDRNumber(item.Price), true
+	default:
+		main = formatIDR(item.Price)
+		if main == "" {
+			main = "Cek harga"
+		}
+		return main, "#2a2a2a", "", false
+	}
 }
 
 // formatIDRNumber is formatIDR without the "IDR " prefix (for the struck /
-// "/ full" sub-line, mirroring hanamaru).
+// "/ full" sub-line).
 func formatIDRNumber(price int) string {
 	return strings.TrimPrefix(formatIDR(price), "IDR ")
 }

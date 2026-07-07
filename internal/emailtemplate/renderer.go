@@ -85,6 +85,7 @@ type viewData struct {
 	BackInItemHTML       template.HTML
 	CompanionHTML        template.HTML
 	CompanionName        string
+	RecoSeries           string
 	HasCompanion         bool
 	HasVoucher           bool
 	// PO Ready fields
@@ -127,6 +128,7 @@ func viewDataFromMergeData(data map[string]any) viewData {
 		BackInItemHTML:       template.HTML(stringValue(data["back_in_item_html"])),
 		CompanionHTML:        template.HTML(stringValue(data["companion_html"])),
 		CompanionName:        stringValue(data["companion_name"]),
+		RecoSeries:           stringValue(data["reco_series"]),
 		HasCompanion:         boolValue(data["has_companion"]),
 		HasVoucher:           boolValue(data["has_voucher"]),
 		OrderID:              stringValue(data["order_id"]),
