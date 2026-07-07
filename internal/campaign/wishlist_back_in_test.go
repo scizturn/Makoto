@@ -72,3 +72,21 @@ func TestWishlistBackInStatusBadgeMatchesHanamaru(t *testing.T) {
 		t.Fatalf("expected revive image badge, got %s", revive)
 	}
 }
+
+func TestWishlistBackInPriceHTMLMatchesHanamaru(t *testing.T) {
+	// Discount: brand price + original struck through.
+	d := wishlistBackInPriceHTML(domain.WishlistBackInItem{Price: 665000, DiscountPrice: 585000}, "15px", "11px")
+	if !strings.Contains(d, "IDR 585.000") || !strings.Contains(d, "line-through") || !strings.Contains(d, ">665.000<") {
+		t.Fatalf("discount render wrong: %s", d)
+	}
+	// DP (PO): "DP IDR <dp>" over "/ <full>".
+	p := wishlistBackInPriceHTML(domain.WishlistBackInItem{Price: 2100000, DownPayment: 450000, Status: "PO"}, "15px", "11px")
+	if !strings.Contains(p, "DP IDR 450.000") || !strings.Contains(p, "/ 2.100.000") {
+		t.Fatalf("dp render wrong: %s", p)
+	}
+	// Plain: no strikethrough, no DP.
+	pl := wishlistBackInPriceHTML(domain.WishlistBackInItem{Price: 300000}, "15px", "11px")
+	if !strings.Contains(pl, "IDR 300.000") || strings.Contains(pl, "line-through") || strings.Contains(pl, "DP ") {
+		t.Fatalf("plain render wrong: %s", pl)
+	}
+}

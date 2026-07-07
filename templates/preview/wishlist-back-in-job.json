@@ -13,6 +13,32 @@
   "voucher_code": "WBI-PREVIEW-14D",
   "items": [
     {
+      "id": "demo-dp",
+      "name": "Nendoroid Firefly - Honkai: Star Rail (PO)",
+      "url": "https://kyou.id/",
+      "image_url": "",
+      "price": 2100000,
+      "status": "PO",
+      "manufacturer": "",
+      "series_name": "",
+      "category_name": "",
+      "restocked_at": "2026-07-10T00:00:00Z",
+      "down_payment": 450000
+    },
+    {
+      "id": "demo-disc",
+      "name": "PVC Figure 1/7 Robin - Honkai: Star Rail",
+      "url": "https://kyou.id/",
+      "image_url": "",
+      "price": 665000,
+      "status": "ready",
+      "manufacturer": "",
+      "series_name": "",
+      "category_name": "",
+      "restocked_at": "2026-07-10T00:00:00Z",
+      "discount_price": 585000
+    },
+    {
       "id": "166586",
       "name": "[Limited Edition] Honkai: Star Rail x MOONDROP Wireless Earphone MD-TWS-040 Special Collaboration Robin Model with Voice",
       "url": "https://kyou.id/items/166586/",
@@ -72,7 +98,8 @@
       "manufacturer": "Good Smile Company",
       "series_name": "Honkai: Star Rail",
       "category_name": "Nendoroid",
-      "restocked_at": "2026-07-06T14:13:32Z"
+      "restocked_at": "2026-07-06T14:13:32Z",
+      "discount_price": 1249000
     },
     {
       "id": "179093",
@@ -96,7 +123,8 @@
       "manufacturer": "Myethos",
       "series_name": "Honkai: Star Rail",
       "category_name": "",
-      "restocked_at": "2026-07-01T11:58:37Z"
+      "restocked_at": "2026-07-01T11:58:37Z",
+      "discount_price": 999000
     },
     {
       "id": "183218",
@@ -108,7 +136,8 @@
       "manufacturer": "Good Smile Company",
       "series_name": "Honkai: Star Rail",
       "category_name": "Nendoroid",
-      "restocked_at": "2026-07-05T12:52:14Z"
+      "restocked_at": "2026-07-05T12:52:14Z",
+      "discount_price": 859000
     },
     {
       "id": "179094",
@@ -120,7 +149,8 @@
       "manufacturer": "Myethos",
       "series_name": "Honkai: Star Rail",
       "category_name": "",
-      "restocked_at": "2026-06-30T17:02:23Z"
+      "restocked_at": "2026-06-30T17:02:23Z",
+      "discount_price": 1249000
     }
   ],
   "attempt": 1

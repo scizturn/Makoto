@@ -130,11 +130,7 @@ func renderWishlistBackInRow(item domain.WishlistBackInItem, index int) string {
 	}
 
 	badge := renderStatusBadge(item)
-
-	price := formatIDR(item.Price)
-	if price == "" {
-		price = "Cek harga"
-	}
+	priceHTML := wishlistBackInPriceHTML(item, "15px", "11px")
 
 	content := fmt.Sprintf(`<table role="presentation" width="100%%" cellspacing="0" cellpadding="0" style="width:100%%;border-collapse:collapse;border-bottom:1px solid #f0efec;"><tr>`+
 		`<td width="26" valign="middle" style="width:26px;padding:16px 0;font-size:13px;font-weight:900;color:#d1d3d4;">%02d</td>`+
@@ -143,8 +139,8 @@ func renderWishlistBackInRow(item domain.WishlistBackInItem, index int) string {
 		`<span style="display:block;margin:0 0 5px;">%s</span>`+
 		`<span style="display:block;font-size:14.5px;font-weight:800;color:#2a2a2a;line-height:1.25;">%s</span>`+
 		`</td>`+
-		`<td valign="middle" align="right" style="padding:16px 0;font-size:15px;font-weight:900;color:#fc4c02;white-space:nowrap;">%s</td>`+
-		`</tr></table>`, index, thumb, badge, name, price)
+		`<td valign="middle" align="right" style="padding:16px 0;white-space:nowrap;">%s</td>`+
+		`</tr></table>`, index, thumb, badge, name, priceHTML)
 
 	if itemURL == "" {
 		return content
@@ -163,16 +159,13 @@ func renderWishlistBackInCard(item domain.WishlistBackInItem) string {
 		image = fmt.Sprintf(`<img src="%s" alt="%s" width="150" height="150" style="display:block;width:150px;height:150px;object-fit:contain;border:0;border-radius:8px;background:#f7f7f7;">`, imageURL, name)
 	}
 
-	price := formatIDR(item.Price)
-	if price == "" {
-		price = "Cek harga"
-	}
+	priceHTML := wishlistBackInPriceHTML(item, "12.5px", "10.5px")
 
 	content := fmt.Sprintf(`<table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;"><tr><td width="150" valign="top" style="width:150px;">`+
 		`%s`+
 		`<div style="margin:9px 0 0;font-size:12px;font-weight:700;color:#2a2a2a;line-height:1.3;">%s</div>`+
-		`<div style="margin:3px 0 0;font-size:12.5px;font-weight:900;color:#fc4c02;">%s</div>`+
-		`</td></tr></table>`, image, name, price)
+		`<div style="margin:3px 0 0;">%s</div>`+
+		`</td></tr></table>`, image, name, priceHTML)
 
 	if itemURL == "" {
 		return content
@@ -197,6 +190,40 @@ func renderStatusBadge(item domain.WishlistBackInItem) string {
 		label, bg = "Back Order", "#996291"
 	}
 	return fmt.Sprintf(`<span style="display:inline-block;padding:3px 7px;border-radius:4px;background:%s;color:#ffffff;font-size:10px;font-weight:800;line-height:1.4;white-space:nowrap;">%s</span>`, bg, html.EscapeString(label))
+}
+
+// wishlistBackInPriceHTML renders the price block matching hanamaru: a DP line
+// ("DP IDR <dp>" over "/ <full>") for PO items with a down payment, a discounted
+// price (brand color) with the original struck through, or a plain price.
+// mainSize/subSize let the row and reco card size it differently.
+func wishlistBackInPriceHTML(item domain.WishlistBackInItem, mainSize, subSize string) string {
+	var main, sub string
+	var struck bool
+	switch {
+	case item.DownPayment > 0:
+		main, sub = "DP "+formatIDR(item.DownPayment), "/ "+formatIDRNumber(item.Price)
+	case item.DiscountPrice > 0 && item.DiscountPrice < item.Price:
+		main, sub, struck = formatIDR(item.DiscountPrice), formatIDRNumber(item.Price), true
+	default:
+		if main = formatIDR(item.Price); main == "" {
+			main = "Cek harga"
+		}
+	}
+	out := fmt.Sprintf(`<span style="display:block;font-size:%s;font-weight:900;color:#fc4c02;line-height:1.2;">%s</span>`, mainSize, main)
+	if sub != "" {
+		deco := ""
+		if struck {
+			deco = "text-decoration:line-through;"
+		}
+		out += fmt.Sprintf(`<span style="display:block;margin-top:2px;font-size:%s;font-weight:700;color:#9a9a9a;%s">%s</span>`, subSize, deco, sub)
+	}
+	return out
+}
+
+// formatIDRNumber is formatIDR without the "IDR " prefix (for the struck /
+// "/ full" sub-line, mirroring hanamaru).
+func formatIDRNumber(price int) string {
+	return strings.TrimPrefix(formatIDR(price), "IDR ")
 }
 
 func firstName(name string) string {

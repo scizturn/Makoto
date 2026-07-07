@@ -166,6 +166,12 @@ type WishlistBackInItem struct {
 	SeriesName   string    `json:"series_name"`
 	CategoryName string    `json:"category_name"`
 	RestockedAt  time.Time `json:"restocked_at"`
+	// DiscountPrice is the active discounted price (0 if not discounted); Price
+	// stays the original and is struck through when this is set.
+	DiscountPrice int `json:"discount_price,omitempty"`
+	// DownPayment is the PO down payment (0 for ready items); when set the
+	// template shows "DP IDR <dp> / <Price>".
+	DownPayment int `json:"down_payment,omitempty"`
 }
 
 // WishlistBackInJob is user-centric: one email per user listing up to 5 of the
