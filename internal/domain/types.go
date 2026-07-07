@@ -179,8 +179,13 @@ type WishlistBackInJob struct {
 	VoucherCode   string               `json:"voucher_code,omitempty"`
 	VoucherID     int64                `json:"voucher_id,omitempty"`
 	Items         []WishlistBackInItem `json:"items"`
-	CompanionItem WishlistBackInItem   `json:"companion_item"`
-	Attempt       int                  `json:"attempt"`
+	// CompanionItem is the item the user already bought that anchors the
+	// "Gas, nemenin yang udah kamu beli" section (shown as the header reference).
+	CompanionItem WishlistBackInItem `json:"companion_item"`
+	// RecoItems are the 6 most-popular Kyou items in the companion's
+	// series/category (cross-sell to drive sales).
+	RecoItems []WishlistBackInItem `json:"reco_items,omitempty"`
+	Attempt   int                  `json:"attempt"`
 }
 
 type EmailMessage struct {

@@ -54,7 +54,10 @@ func (c WishlistBackInCampaign) RenderGreeting(tpl string, user domain.User) str
 	return output.String()
 }
 
-func (c WishlistBackInCampaign) BuildMergeData(user domain.User, voucherCode string, items []domain.WishlistBackInItem, companion domain.WishlistBackInItem, greeting string) map[string]any {
+func (c WishlistBackInCampaign) BuildMergeData(user domain.User, voucherCode string, items []domain.WishlistBackInItem, companion domain.WishlistBackInItem, recos []domain.WishlistBackInItem, greeting string) map[string]any {
+	// The "Gas, nemenin..." section renders only with an anchor (a purchased
+	// item) AND a full set of popular recommendations in its series/category.
+	hasReco := companion.ID != "" && len(recos) > 0
 	return map[string]any{
 		"name":              user.Name,
 		"first_name":        firstName(user.Name),
@@ -64,12 +67,40 @@ func (c WishlistBackInCampaign) BuildMergeData(user domain.User, voucherCode str
 		"action_url":        actionURLWithClaim(c.ActionURL, voucherCode),
 		"back_in_item_html": renderWishlistBackInItems(items),
 		"item_count":        len(items),
-		"companion_html":    renderWishlistBackInCard(companion),
+		"reco_html":         renderWishlistBackInRecoGrid(recos),
 		"companion_name":    companion.Name,
-		"has_companion":     companion.ID != "",
+		"has_companion":     hasReco,
 		"closing":           c.Closing,
 		"footer_html":       RenderMemberversaryFooterHTML(c.Closing),
 	}
+}
+
+// renderWishlistBackInRecoGrid renders the 6 cross-sell recommendations as a
+// 3-column grid (2 rows) of compact cards.
+func renderWishlistBackInRecoGrid(items []domain.WishlistBackInItem) string {
+	if len(items) == 0 {
+		return ""
+	}
+	var b strings.Builder
+	b.WriteString(`<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse;">`)
+	for row := 0; row*3 < len(items); row++ {
+		if row > 0 {
+			b.WriteString(`<tr><td colspan="3" style="height:18px;line-height:18px;font-size:18px;">&nbsp;</td></tr>`)
+		}
+		b.WriteString(`<tr>`)
+		for col := 0; col < 3; col++ {
+			b.WriteString(`<td width="33%" valign="top" align="center" style="width:33.33%;padding:0 6px;">`)
+			if idx := row*3 + col; idx < len(items) {
+				b.WriteString(renderWishlistBackInCard(items[idx]))
+			} else {
+				b.WriteString(`&nbsp;`)
+			}
+			b.WriteString(`</td>`)
+		}
+		b.WriteString(`</tr>`)
+	}
+	b.WriteString(`</table>`)
+	return b.String()
 }
 
 // renderWishlistBackInItems renders the user's restocked wishlist items as the

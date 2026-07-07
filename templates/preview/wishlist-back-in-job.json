@@ -22,7 +22,6 @@
       "manufacturer": "Moondrop Limited",
       "series_name": "Honkai: Star Rail",
       "category_name": "Merchandise - Earphone",
-      "popular_score": 0,
       "restocked_at": "2026-07-07T09:48:22Z"
     },
     {
@@ -35,7 +34,6 @@
       "manufacturer": "SEGA",
       "series_name": "Vocaloid",
       "category_name": "",
-      "popular_score": 0,
       "restocked_at": "2026-07-03T17:51:35Z"
     }
   ],
@@ -49,8 +47,81 @@
     "manufacturer": "Mihoyo",
     "series_name": "Honkai: Star Rail",
     "category_name": "Merchandise - Keyboard",
-    "popular_score": 0,
     "restocked_at": "2026-01-26T17:05:51Z"
   },
+  "reco_items": [
+    {
+      "id": "183219",
+      "name": "[Exclusive Sale] Nendoroid Kafka - Honkai: Star Rail",
+      "url": "https://kyou.id/items/183219/",
+      "image_url": "https://kyoucdn.id/items/470520-exclusive-sale-nendoroid-kafka-honkai-star-rail.jpg.webp",
+      "price": 950000,
+      "status": "ready",
+      "manufacturer": "Good Smile Company",
+      "series_name": "Honkai: Star Rail",
+      "category_name": "Nendoroid",
+      "restocked_at": "2026-07-07T12:31:21Z"
+    },
+    {
+      "id": "183220",
+      "name": "[Exclusive Sale] Nendoroid Phainon - Honkai: Star Rail",
+      "url": "https://kyou.id/items/183220/",
+      "image_url": "https://kyoucdn.id/items/423180-exclusive-sale-nendoroid-phainon-honkai-star-rail-665440330.jpg.webp",
+      "price": 1450000,
+      "status": "ready",
+      "manufacturer": "Good Smile Company",
+      "series_name": "Honkai: Star Rail",
+      "category_name": "Nendoroid",
+      "restocked_at": "2026-07-06T14:13:32Z"
+    },
+    {
+      "id": "179093",
+      "name": "PVC Figure Gift+ 1/8 The Herta - Star Rail Live Ver. Honkai: Star Rail",
+      "url": "https://kyou.id/items/179093/",
+      "image_url": "https://kyoucdn.id/items/391163-pvc-figure-gift-18-the-herta-star-rail-live-ver-honkai-star-rail-1790815528.jpg.webp",
+      "price": 1450000,
+      "status": "ready",
+      "manufacturer": "Myethos",
+      "series_name": "Honkai: Star Rail",
+      "category_name": "",
+      "restocked_at": "2026-07-07T12:26:56Z"
+    },
+    {
+      "id": "167580",
+      "name": "PVC Figure Gift+ 1/8 Kafka - Star Rail LIVE Ver. Honkai: Star Rail",
+      "url": "https://kyou.id/items/167580/",
+      "image_url": "https://kyoucdn.id/items/349096-pvc-figure-gift-18-kafka-star-rail-live-ver-honkai-star-rail.jpg.webp",
+      "price": 1250000,
+      "status": "ready",
+      "manufacturer": "Myethos",
+      "series_name": "Honkai: Star Rail",
+      "category_name": "",
+      "restocked_at": "2026-07-01T11:58:37Z"
+    },
+    {
+      "id": "183218",
+      "name": "[Exclusive Sale] Nendoroid The Herta - Honkai: Star Rail",
+      "url": "https://kyou.id/items/183218/",
+      "image_url": "https://kyoucdn.id/items/411877-nendoroid-the-herta-honkai-star-rail-663847976.jpg.webp",
+      "price": 950000,
+      "status": "ready",
+      "manufacturer": "Good Smile Company",
+      "series_name": "Honkai: Star Rail",
+      "category_name": "Nendoroid",
+      "restocked_at": "2026-07-05T12:52:14Z"
+    },
+    {
+      "id": "179094",
+      "name": "PVC Figure Gift+ 1/8 Castorice - Star Rail LIVE Ver. Honkai: Star Rail",
+      "url": "https://kyou.id/items/179094/",
+      "image_url": "https://kyoucdn.id/items/426032-pvc-figure-gift-18-castorice-star-rail-live-ver-honkai-star-rail-1440276621.jpg.webp",
+      "price": 1450000,
+      "status": "ready",
+      "manufacturer": "Myethos",
+      "series_name": "Honkai: Star Rail",
+      "category_name": "",
+      "restocked_at": "2026-06-30T17:02:23Z"
+    }
+  ],
   "attempt": 1
 }
