@@ -54,7 +54,7 @@ func (c WishlistBackInCampaign) RenderGreeting(tpl string, user domain.User) str
 	return output.String()
 }
 
-func (c WishlistBackInCampaign) BuildMergeData(user domain.User, voucherCode string, item, companion domain.WishlistBackInItem, greeting string) map[string]any {
+func (c WishlistBackInCampaign) BuildMergeData(user domain.User, voucherCode string, items []domain.WishlistBackInItem, companion domain.WishlistBackInItem, greeting string) map[string]any {
 	return map[string]any{
 		"name":              user.Name,
 		"first_name":        firstName(user.Name),
@@ -62,8 +62,9 @@ func (c WishlistBackInCampaign) BuildMergeData(user domain.User, voucherCode str
 		"voucher_code":      voucherCode,
 		"has_voucher":       strings.TrimSpace(voucherCode) != "",
 		"action_url":        actionURLWithClaim(c.ActionURL, voucherCode),
-		"back_in_item_html": renderWishlistBackInItem(item, true),
-		"companion_html":    renderWishlistBackInItem(companion, false),
+		"back_in_item_html": renderWishlistBackInItems(items),
+		"item_count":        len(items),
+		"companion_html":    renderWishlistBackInCard(companion),
 		"companion_name":    companion.Name,
 		"has_companion":     companion.ID != "",
 		"closing":           c.Closing,
@@ -71,21 +72,23 @@ func (c WishlistBackInCampaign) BuildMergeData(user domain.User, voucherCode str
 	}
 }
 
-// renderWishlistBackInItem renders one item for the "Editorial Index" layout.
-// featured=true -> a slim numbered index row (the restocked wishlist item).
-// featured=false -> a compact cross-sell card (a companion to complete the set).
-func renderWishlistBackInItem(item domain.WishlistBackInItem, featured bool) string {
-	if item.ID == "" {
-		return ""
+// renderWishlistBackInItems renders the user's restocked wishlist items as the
+// editorial "INDEX" list: one numbered row per item (01, 02, …), newest first.
+func renderWishlistBackInItems(items []domain.WishlistBackInItem) string {
+	var builder strings.Builder
+	index := 0
+	for _, item := range items {
+		if item.ID == "" {
+			continue
+		}
+		index++
+		builder.WriteString(renderWishlistBackInRow(item, index))
 	}
-	if featured {
-		return renderWishlistBackInRow(item)
-	}
-	return renderWishlistBackInCard(item)
+	return builder.String()
 }
 
-// renderWishlistBackInRow is the editorial "INDEX" row: 01 · thumbnail · status/name · price.
-func renderWishlistBackInRow(item domain.WishlistBackInItem) string {
+// renderWishlistBackInRow is the editorial "INDEX" row: NN · thumbnail · status/name · price.
+func renderWishlistBackInRow(item domain.WishlistBackInItem, index int) string {
 	name := html.EscapeString(item.Name)
 	itemURL := html.EscapeString(item.URL)
 	imageURL := html.EscapeString(item.ImageURL)
@@ -106,14 +109,14 @@ func renderWishlistBackInRow(item domain.WishlistBackInItem) string {
 	}
 
 	content := fmt.Sprintf(`<table role="presentation" width="100%%" cellspacing="0" cellpadding="0" style="width:100%%;border-collapse:collapse;border-bottom:1px solid #f0efec;"><tr>`+
-		`<td width="26" valign="middle" style="width:26px;padding:16px 0;font-size:13px;font-weight:900;color:#d1d3d4;">01</td>`+
+		`<td width="26" valign="middle" style="width:26px;padding:16px 0;font-size:13px;font-weight:900;color:#d1d3d4;">%02d</td>`+
 		`<td width="62" valign="middle" style="width:62px;padding:16px 0;">%s</td>`+
 		`<td valign="middle" style="padding:16px 14px;">`+
 		`<span style="display:block;margin:0 0 3px;font-size:9.5px;font-weight:800;letter-spacing:0.5px;color:%s;text-transform:uppercase;">&#9679; %s</span>`+
 		`<span style="display:block;font-size:14.5px;font-weight:800;color:#2a2a2a;line-height:1.25;">%s</span>`+
 		`</td>`+
 		`<td valign="middle" align="right" style="padding:16px 0;font-size:15px;font-weight:900;color:#fc4c02;white-space:nowrap;">%s</td>`+
-		`</tr></table>`, thumb, badgeColor, badgeText, name, price)
+		`</tr></table>`, index, thumb, badgeColor, badgeText, name, price)
 
 	if itemURL == "" {
 		return content

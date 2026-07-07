@@ -40,7 +40,7 @@ func (p *WishlistBackInProcessor) Process(ctx context.Context, job domain.Wishli
 
 	greeting := p.campaign.RenderGreeting(p.campaign.SelectGreeting(job.Date, job.ID), user)
 	templateID := p.campaign.SelectTemplate(job.Date, job.ID)
-	mergeData := p.campaign.BuildMergeData(user, job.VoucherCode, job.Item, job.CompanionItem, greeting)
+	mergeData := p.campaign.BuildMergeData(user, job.VoucherCode, job.Items, job.CompanionItem, greeting)
 	result := ProcessResult{TemplateID: templateID, ActionURL: mergeString(mergeData, "action_url")}
 	message := domain.EmailMessage{
 		Domain: p.Domain, FromEmail: p.FromEmail, FromName: p.FromName,

@@ -1,40 +1,56 @@
 {
-  "job_id": "preview-wishlist-back-in-2026-06-19-user-147044",
-  "user_id": "147044",
-  "date": "2026-06-19T10:41:20.991498+07:00",
+  "job_id": "preview-wishlist-back-in-user-63",
+  "user_id": "63",
+  "date": "2026-07-10T00:00:00Z",
   "user": {
-    "id": "147044",
-    "name": "Tegar",
-    "email": "tegaramir327@gmail.com",
+    "id": "63",
+    "name": "Yusuf Akbar K",
+    "email": "yucapakbar@gmail.com",
     "birthday": "0001-01-01T00:00:00Z",
+    "created_at": "0001-01-01T00:00:00Z",
     "is_active": true
   },
   "voucher_code": "WBI-PREVIEW-14D",
-  "item": {
-    "id": "184002",
-    "name": "Banpresto Evolve Figure Tamamo Cross - Uma Musume: Cinderella Gray (20cm)",
-    "url": "https://kyou.id/items/184002/",
-    "image_url": "https://kyoucdn.id/items/revive-banpresto-evolve-figure-tamamo-cross-uma-musume-cinderella-gray-20cm-f33a226841f097d06cddf4c54972bc30a053f058f814c255bb2cb964a7a41dd9.jpg.webp",
-    "price": 660000,
-    "status": "ready",
-    "manufacturer": "Bandai Spirits",
-    "series_name": "Uma Musume",
-    "category_name": "Prize Figure",
-    "popular_score": 107,
-    "restocked_at": "2026-04-29T17:39:07Z"
-  },
+  "items": [
+    {
+      "id": "166586",
+      "name": "[Limited Edition] Honkai: Star Rail x MOONDROP Wireless Earphone MD-TWS-040 Special Collaboration Robin Model with Voice",
+      "url": "https://kyou.id/items/166586/",
+      "image_url": "https://kyoucdn.id/items/344744-honkai-star-rail-x-moondrop-special-collaboration-with-robin-model-815140237.jpg.webp",
+      "price": 2750000,
+      "status": "ready",
+      "manufacturer": "Moondrop Limited",
+      "series_name": "Honkai: Star Rail",
+      "category_name": "Merchandise - Earphone",
+      "popular_score": 0,
+      "restocked_at": "2026-07-07T09:48:22Z"
+    },
+    {
+      "id": "125277",
+      "name": "Luminasta Figure Hatsune Miku - 16th Anniversary Booota Ver. (18cm)",
+      "url": "https://kyou.id/items/125277/",
+      "image_url": "https://kyoucdn.id/items/200034-luminasta-figure-hatsune-miku-16th-anniversary-booota-ver-18cm.jpg.webp",
+      "price": 350000,
+      "status": "ready",
+      "manufacturer": "SEGA",
+      "series_name": "Vocaloid",
+      "category_name": "",
+      "popular_score": 0,
+      "restocked_at": "2026-07-03T17:51:35Z"
+    }
+  ],
   "companion_item": {
-    "id": "",
-    "name": "",
-    "url": "",
-    "image_url": "",
-    "price": 0,
-    "status": "",
-    "manufacturer": "",
-    "series_name": "",
-    "category_name": "",
+    "id": "182645",
+    "name": "[Set of 6] [With Bonus] Honkai: Star Rail Character Artisan Keycap Vol. 2 (24-27mm)",
+    "url": "https://kyou.id/items/182645/",
+    "image_url": "https://kyoucdn.id/items/409496-set-of-6-honkai-star-rail-character-artisan-keycap-vol-2-24-27mm.jpg.webp",
+    "price": 850000,
+    "status": "PO",
+    "manufacturer": "Mihoyo",
+    "series_name": "Honkai: Star Rail",
+    "category_name": "Merchandise - Keyboard",
     "popular_score": 0,
-    "restocked_at": "0001-01-01T00:00:00Z"
+    "restocked_at": "2026-01-26T17:05:51Z"
   },
   "attempt": 1
 }
