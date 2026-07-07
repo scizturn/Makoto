@@ -52,3 +52,23 @@ func TestWishlistBackInMergeDataEscapesItemsAndHandlesCompanion(t *testing.T) {
 		t.Fatalf("unexpected action URL: %v", data["action_url"])
 	}
 }
+
+func TestWishlistBackInStatusBadgeMatchesHanamaru(t *testing.T) {
+	cases := []struct{ status, name, wantColor, wantLabel string }{
+		{"ready", "Figure X", "#41b774", "Ready Stock"},
+		{"PO", "Figure Y", "#657996", "Pre-Order"},
+		{"LPO", "Figure Z", "#d3647a", "Late Pre-Order"},
+		{"BO", "Figure W", "#996291", "Back Order"},
+	}
+	for _, c := range cases {
+		got := renderStatusBadge(domain.WishlistBackInItem{Status: c.status, Name: c.name})
+		if !strings.Contains(got, c.wantColor) || !strings.Contains(got, c.wantLabel) {
+			t.Fatalf("status %q: want color %s + label %q, got %s", c.status, c.wantColor, c.wantLabel, got)
+		}
+	}
+	// Revive is a name tag; it wins over status and renders the shared image tag.
+	revive := renderStatusBadge(domain.WishlistBackInItem{Status: "PO", Name: "[Revive] Figure"})
+	if !strings.Contains(revive, "revive.png") {
+		t.Fatalf("expected revive image badge, got %s", revive)
+	}
+}

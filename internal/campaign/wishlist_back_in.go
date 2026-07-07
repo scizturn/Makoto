@@ -129,10 +129,7 @@ func renderWishlistBackInRow(item domain.WishlistBackInItem, index int) string {
 		thumb = fmt.Sprintf(`<img src="%s" alt="%s" width="62" height="62" style="display:block;width:62px;height:62px;object-fit:cover;border:0;border-radius:8px;background:#f7f7f7;">`, imageURL, name)
 	}
 
-	badgeText, badgeColor := "Ready Stock", "#2e9c5f"
-	if isPreorderStatus(item.Status) {
-		badgeText, badgeColor = "PO Dibuka Lagi", "#bf3901"
-	}
+	badge := renderStatusBadge(item)
 
 	price := formatIDR(item.Price)
 	if price == "" {
@@ -143,11 +140,11 @@ func renderWishlistBackInRow(item domain.WishlistBackInItem, index int) string {
 		`<td width="26" valign="middle" style="width:26px;padding:16px 0;font-size:13px;font-weight:900;color:#d1d3d4;">%02d</td>`+
 		`<td width="62" valign="middle" style="width:62px;padding:16px 0;">%s</td>`+
 		`<td valign="middle" style="padding:16px 14px;">`+
-		`<span style="display:block;margin:0 0 3px;font-size:9.5px;font-weight:800;letter-spacing:0.5px;color:%s;text-transform:uppercase;">&#9679; %s</span>`+
+		`<span style="display:block;margin:0 0 5px;">%s</span>`+
 		`<span style="display:block;font-size:14.5px;font-weight:800;color:#2a2a2a;line-height:1.25;">%s</span>`+
 		`</td>`+
 		`<td valign="middle" align="right" style="padding:16px 0;font-size:15px;font-weight:900;color:#fc4c02;white-space:nowrap;">%s</td>`+
-		`</tr></table>`, index, thumb, badgeColor, badgeText, name, price)
+		`</tr></table>`, index, thumb, badge, name, price)
 
 	if itemURL == "" {
 		return content
@@ -183,9 +180,23 @@ func renderWishlistBackInCard(item domain.WishlistBackInItem) string {
 	return fmt.Sprintf(`<a href="%s" style="display:inline-block;color:inherit;text-decoration:none;">%s</a>`, itemURL, content)
 }
 
-func isPreorderStatus(status string) bool {
-	status = strings.ToLower(strings.TrimSpace(status))
-	return strings.Contains(status, "po") || strings.Contains(status, "pre") || strings.Contains(status, "order")
+// renderStatusBadge mirrors hanamaru's ProductStatus badge (StatusChip / the
+// ProductThumbnail status tags): same labels and colors per status. Revive uses
+// the shared image tag, matching the site's `[revive]` name-tag handling.
+func renderStatusBadge(item domain.WishlistBackInItem) string {
+	if strings.Contains(strings.ToLower(item.Name), "[revive]") {
+		return `<img src="https://kyoucdn.id/static/img/status-tags/revive.png" alt="Revive" width="68" height="20" style="display:inline-block;height:20px;width:auto;border:0;vertical-align:middle;">`
+	}
+	label, bg := "Ready Stock", "#41b774"
+	switch strings.ToUpper(strings.TrimSpace(item.Status)) {
+	case "PO":
+		label, bg = "Pre-Order", "#657996"
+	case "LPO":
+		label, bg = "Late Pre-Order", "#d3647a"
+	case "BO", "BPO":
+		label, bg = "Back Order", "#996291"
+	}
+	return fmt.Sprintf(`<span style="display:inline-block;padding:3px 7px;border-radius:4px;background:%s;color:#ffffff;font-size:10px;font-weight:800;line-height:1.4;white-space:nowrap;">%s</span>`, bg, html.EscapeString(label))
 }
 
 func firstName(name string) string {
