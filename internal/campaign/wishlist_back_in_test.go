@@ -34,8 +34,9 @@ func TestWishlistBackInMergeDataEscapesItemsAndHandlesCompanion(t *testing.T) {
 	if !strings.Contains(backInHTML, "Second Item") {
 		t.Fatalf("expected all items rendered as rows: %s", backInHTML)
 	}
-	if !strings.Contains(backInHTML, ">01<") || !strings.Contains(backInHTML, ">02<") {
-		t.Fatalf("expected numbered index rows 01 and 02: %s", backInHTML)
+	// Each item is a card with a hanamaru-style "selected" radio marker (orange ring).
+	if got := strings.Count(backInHTML, "border:2px solid #fc4c02;border-radius:50%"); got != 2 {
+		t.Fatalf("expected 2 radio markers (one per item), got %d: %s", got, backInHTML)
 	}
 	recoHTML := data["reco_html"].(string)
 	if !strings.Contains(recoHTML, "Reco &lt;A&gt;") || !strings.Contains(recoHTML, "Reco B") {

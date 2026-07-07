@@ -109,8 +109,8 @@ func wishlistBackInRecoSeries(companion domain.WishlistBackInItem, recos []domai
 	return "koleksimu"
 }
 
-// renderWishlistBackInItems renders the restocked wishlist items as the "Soft
-// Cream" numbered index rows (01, 02, …), newest first.
+// renderWishlistBackInItems renders each restocked wishlist item as its own
+// "Soft Cream" card, newest first, separated by a small spacer.
 func renderWishlistBackInItems(items []domain.WishlistBackInItem) string {
 	var builder strings.Builder
 	index := 0
@@ -119,9 +119,22 @@ func renderWishlistBackInItems(items []domain.WishlistBackInItem) string {
 			continue
 		}
 		index++
+		if index > 1 {
+			builder.WriteString(`<div style="height:10px;line-height:10px;font-size:10px;">&nbsp;</div>`)
+		}
 		builder.WriteString(renderWishlistBackInRow(item, index))
 	}
 	return builder.String()
+}
+
+// wishlistBackInRadio is hanamaru's "selected" radio marker: an orange ring with
+// a filled inner dot (table-nested so it survives Gmail).
+func wishlistBackInRadio() string {
+	// A <div> (not a table cell) — border-radius on <td> is dropped under
+	// border-collapse:collapse, which rendered the ring as a square.
+	return `<div style="width:18px;height:18px;border:2px solid #fc4c02;border-radius:50%;background:#ffffff;text-align:center;line-height:18px;font-size:0;margin:0 auto;">` +
+		`<span style="display:inline-block;width:8px;height:8px;background:#fc4c02;border-radius:50%;vertical-align:middle;"></span>` +
+		`</div>`
 }
 
 // renderWishlistBackInRow — "Soft Cream" index row: NN · thumb · status/disc/name · price/sub.
@@ -150,26 +163,30 @@ func renderWishlistBackInRow(item domain.WishlistBackInItem, index int) string {
 		subHTML = fmt.Sprintf(`<div style="font-size:11px;color:#a2a2a2;white-space:nowrap;margin-top:2px;%s">%s</div>`, deco, sub)
 	}
 
-	// Table layout (Gmail/Outlook safe — no flexbox).
-	row := fmt.Sprintf(`<table role="presentation" width="100%%" cellpadding="0" cellspacing="0" border="0" style="width:100%%;border-collapse:collapse;border-bottom:1px solid #f2e7df;">`+
+	// Each item is its own white card (Gmail/Outlook safe — no flexbox); the index
+	// marker is a hanamaru-style "selected" radio circle, not a number.
+	_ = index
+	inner := fmt.Sprintf(`<table role="presentation" width="100%%" cellpadding="0" cellspacing="0" border="0" style="width:100%%;border-collapse:collapse;">`+
 		`<tr>`+
-		`<td width="24" valign="middle" align="center" style="width:24px;padding:16px 0;font-size:13px;font-weight:900;color:#e0c7ba;">%02d</td>`+
-		`<td width="128" valign="middle" style="width:128px;padding:16px 18px 16px 12px;">`+
-		`<table role="presentation" width="112" cellpadding="0" cellspacing="0" border="0"><tr><td width="112" height="112" align="center" valign="middle" style="width:112px;height:112px;background:#ffffff;border-radius:14px;border:1px solid #f1e7df;border-bottom:3px solid #ead7ca;">%s</td></tr></table>`+
+		`<td width="22" valign="middle" align="center" style="width:22px;">%s</td>`+
+		`<td width="128" valign="middle" style="width:128px;padding:0 16px 0 12px;">`+
+		`<table role="presentation" width="112" cellpadding="0" cellspacing="0" border="0"><tr><td width="112" height="112" align="center" valign="middle" style="width:112px;height:112px;background:#fff7f3;border-radius:12px;border:1px solid #f0e6de;">%s</td></tr></table>`+
 		`</td>`+
-		`<td valign="middle" style="padding:16px 12px 16px 0;">`+
+		`<td valign="middle" style="padding:0 12px 0 0;">`+
 		`<div style="margin-bottom:6px;">%s%s</div>`+
 		`<div style="font-size:14px;font-weight:800;color:#2a2a2a;line-height:1.3;">%s</div>`+
 		`</td>`+
-		`<td valign="middle" align="right" style="padding:16px 0;white-space:nowrap;">`+
+		`<td valign="middle" align="right" style="white-space:nowrap;">`+
 		`<div style="font-size:15px;font-weight:900;color:%s;">%s</div>%s`+
 		`</td>`+
-		`</tr></table>`, index, imgCell, badge, discTag, name, priceColor, priceMain, subHTML)
+		`</tr></table>`, wishlistBackInRadio(), imgCell, badge, discTag, name, priceColor, priceMain, subHTML)
+
+	card := fmt.Sprintf(`<table role="presentation" width="100%%" cellpadding="0" cellspacing="0" border="0" style="width:100%%;border-collapse:separate;background:#ffffff;border-radius:16px;border:1px solid #f1e7df;border-bottom:4px solid #ead7ca;"><tr><td style="padding:16px 18px;">%s</td></tr></table>`, inner)
 
 	if itemURL == "" {
-		return row
+		return card
 	}
-	return fmt.Sprintf(`<a href="%s" style="display:block;color:inherit;text-decoration:none;">%s</a>`, itemURL, row)
+	return fmt.Sprintf(`<a href="%s" style="display:block;color:inherit;text-decoration:none;">%s</a>`, itemURL, card)
 }
 
 // renderWishlistBackInRecoGrid — cross-sell grid: rows of 3 cards as a table.
