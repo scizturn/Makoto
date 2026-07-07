@@ -92,24 +92,8 @@ func (c WishlistBackInCampaign) BuildMergeData(user domain.User, voucherCode str
 		"companion_name":    cleanItemName(companion.Name),
 		"has_companion":     hasReco,
 		"closing":           c.Closing,
-		"footer_html":       renderWishlistBackInFooter(c.Closing),
+		"footer_html":       RenderMemberversaryFooterHTML(c.Closing),
 	}
-}
-
-// renderWishlistBackInFooter reuses the shared footer but makes it fluid so it
-// fits this email's 600px shell (the shared version is a fixed 720px and would
-// overflow / clip the WA button on the right). Fixed pixel widths become 100%.
-func renderWishlistBackInFooter(closing string) string {
-	f := RenderMemberversaryFooterHTML(closing)
-	return strings.NewReplacer(
-		`width="720"`, `width="100%"`, `width:720px`, `width:100%`,
-		`width="646"`, `width="100%"`, `width:646px`, `width:100%`,
-		`width="648"`, `width="100%"`, `width:648px`, `width:100%`,
-		`width="616"`, `width="100%"`, `width:616px;`, `width:100%;max-width:616px;`,
-		`width="145"`, `width="100%"`, `width:145px;`, `width:100%;`,
-		`font-size:40px`, `font-size:30px`, `font-size:34px`, `font-size:26px`,
-		`font-size:16px`, `font-size:14px`,
-	).Replace(f)
 }
 
 // wishlistBackInRecoSeries picks the series label shown in "Lengkapin koleksi <x>".
