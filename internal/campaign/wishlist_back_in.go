@@ -119,7 +119,7 @@ func renderWishlistBackInRow(item domain.WishlistBackInItem, index int) string {
 		imgTag = fmt.Sprintf(`<img src="%s" alt="" style="width:80%%;height:80%%;object-fit:contain;">`, imageURL)
 	}
 
-	label, color := wishlistBackInStatus(item)
+	badge := renderStatusBadge(item)
 	discTag := ""
 	if item.DiscountPrice > 0 && item.DiscountPrice < item.Price {
 		discTag = fmt.Sprintf(`<span style="font-size:9.5px;font-weight:800;color:#fc4c02;">&minus;%d%%</span>`, (item.Price-item.DiscountPrice)*100/item.Price)
@@ -138,15 +138,15 @@ func renderWishlistBackInRow(item domain.WishlistBackInItem, index int) string {
 		`<span style="font-size:13px;font-weight:900;color:#e0c7ba;width:22px;flex:none;padding-top:2px;">%02d</span>`+
 		`<div style="width:62px;height:62px;border-radius:10px;background:#ffffff;display:flex;align-items:center;justify-content:center;flex:none;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.05);">%s</div>`+
 		`<div style="flex:1;min-width:0;padding-top:1px;">`+
-		`<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">`+
-		`<span style="font-size:9.5px;font-weight:800;color:%s;letter-spacing:0.5px;text-transform:uppercase;white-space:nowrap;">&#9679; %s</span>%s`+
+		`<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">`+
+		`%s%s`+
 		`</div>`+
 		`<div style="font-size:14px;font-weight:800;color:#2a2a2a;line-height:1.3;">%s</div>`+
 		`</div>`+
 		`<div style="text-align:right;flex:none;padding-top:1px;">`+
 		`<div style="font-size:15px;font-weight:900;color:%s;white-space:nowrap;">%s</div>%s`+
 		`</div>`+
-		`</div>`, index, imgTag, color, label, discTag, name, priceColor, priceMain, subHTML)
+		`</div>`, index, imgTag, badge, discTag, name, priceColor, priceMain, subHTML)
 
 	if itemURL == "" {
 		return row
@@ -202,21 +202,23 @@ func renderWishlistBackInCard(item domain.WishlistBackInItem) string {
 	return fmt.Sprintf(`<a href="%s" style="flex:1;display:block;color:inherit;text-decoration:none;">%s</a>`, itemURL, inner)
 }
 
-// wishlistBackInStatus returns the "● <label>" status text + color for the row.
-// Colors follow the site; Revive is detected from the `[revive]` name tag.
-func wishlistBackInStatus(item domain.WishlistBackInItem) (string, string) {
+// renderStatusBadge is hanamaru's ProductStatus pill: a solid rounded chip with
+// white bold text. Colors and labels mirror the site (StatusChip); Revive uses
+// the shared image tag from the `[revive]` name tag.
+func renderStatusBadge(item domain.WishlistBackInItem) string {
 	if strings.Contains(strings.ToLower(item.Name), "[revive]") {
-		return "Revive", "#fc4c02"
+		return `<img src="https://kyoucdn.id/static/img/status-tags/revive.png" alt="Revive" style="height:18px;width:auto;border:0;vertical-align:middle;">`
 	}
+	label, bg := "Ready Stock", "#41b774"
 	switch strings.ToUpper(strings.TrimSpace(item.Status)) {
 	case "PO":
-		return "Pre-Order", "#657996"
+		label, bg = "Pre-Order", "#657996"
 	case "LPO":
-		return "Late Pre-Order", "#d3647a"
+		label, bg = "Late Pre-Order", "#d3647a"
 	case "BO", "BPO":
-		return "Back Order", "#996291"
+		label, bg = "Back Order", "#996291"
 	}
-	return "Ready Stock", "#2e9c5f"
+	return fmt.Sprintf(`<span style="display:inline-block;padding:4px 7px;border-radius:4px;background:%s;color:#ffffff;font-size:9.5px;font-weight:800;line-height:1;white-space:nowrap;">%s</span>`, bg, html.EscapeString(label))
 }
 
 // wishlistBackInPrice returns the main price text + color, and an optional sub

@@ -53,22 +53,22 @@ func TestWishlistBackInMergeDataEscapesItemsAndHandlesCompanion(t *testing.T) {
 	}
 }
 
-func TestWishlistBackInStatusLabelAndColor(t *testing.T) {
-	cases := []struct{ status, name, wantLabel, wantColor string }{
-		{"ready", "Figure X", "Ready Stock", "#2e9c5f"},
-		{"PO", "Figure Y", "Pre-Order", "#657996"},
-		{"LPO", "Figure Z", "Late Pre-Order", "#d3647a"},
-		{"BO", "Figure W", "Back Order", "#996291"},
+func TestWishlistBackInStatusBadgeMatchesHanamaru(t *testing.T) {
+	cases := []struct{ status, name, wantColor, wantLabel string }{
+		{"ready", "Figure X", "#41b774", "Ready Stock"},
+		{"PO", "Figure Y", "#657996", "Pre-Order"},
+		{"LPO", "Figure Z", "#d3647a", "Late Pre-Order"},
+		{"BO", "Figure W", "#996291", "Back Order"},
 	}
 	for _, c := range cases {
-		label, color := wishlistBackInStatus(domain.WishlistBackInItem{Status: c.status, Name: c.name})
-		if label != c.wantLabel || color != c.wantColor {
-			t.Fatalf("status %q: got (%q,%q) want (%q,%q)", c.status, label, color, c.wantLabel, c.wantColor)
+		got := renderStatusBadge(domain.WishlistBackInItem{Status: c.status, Name: c.name})
+		if !strings.Contains(got, "background:"+c.wantColor) || !strings.Contains(got, c.wantLabel) {
+			t.Fatalf("status %q: want bg %s + label %q, got %s", c.status, c.wantColor, c.wantLabel, got)
 		}
 	}
-	// Revive is a name tag; it wins over status.
-	if label, _ := wishlistBackInStatus(domain.WishlistBackInItem{Status: "PO", Name: "[Revive] Figure"}); label != "Revive" {
-		t.Fatalf("expected Revive label, got %q", label)
+	// Revive is a name tag; it wins over status and renders the shared image.
+	if got := renderStatusBadge(domain.WishlistBackInItem{Status: "PO", Name: "[Revive] Figure"}); !strings.Contains(got, "revive.png") {
+		t.Fatalf("expected revive image badge, got %s", got)
 	}
 }
 
