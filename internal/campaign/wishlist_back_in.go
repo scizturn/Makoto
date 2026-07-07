@@ -155,7 +155,7 @@ func renderWishlistBackInRow(item domain.WishlistBackInItem, index int) string {
 		`<tr>`+
 		`<td width="24" valign="middle" align="center" style="width:24px;padding:16px 0;font-size:13px;font-weight:900;color:#e0c7ba;">%02d</td>`+
 		`<td width="76" valign="middle" style="width:76px;padding:16px 14px 16px 12px;">`+
-		`<table role="presentation" width="62" cellpadding="0" cellspacing="0" border="0"><tr><td width="62" height="62" align="center" valign="middle" style="width:62px;height:62px;background:#ffffff;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.05);">%s</td></tr></table>`+
+		`<table role="presentation" width="62" cellpadding="0" cellspacing="0" border="0"><tr><td width="62" height="62" align="center" valign="middle" style="width:62px;height:62px;background:#ffffff;border-radius:10px;border:1px solid #f1e7df;border-bottom:3px solid #ead7ca;">%s</td></tr></table>`+
 		`</td>`+
 		`<td valign="middle" style="padding:16px 12px 16px 0;">`+
 		`<div style="margin-bottom:6px;">%s%s</div>`+
@@ -217,7 +217,7 @@ func renderWishlistBackInCard(item domain.WishlistBackInItem) string {
 	}
 	priceMain, priceColor, _, _ := wishlistBackInPrice(item)
 
-	inner := fmt.Sprintf(`<table role="presentation" width="100%%" cellpadding="0" cellspacing="0" border="0" style="width:100%%;border-collapse:collapse;background:#ffffff;border-radius:14px;overflow:hidden;box-shadow:0 3px 12px rgba(0,0,0,0.04);">`+
+	inner := fmt.Sprintf(`<table role="presentation" width="100%%" cellpadding="0" cellspacing="0" border="0" style="width:100%%;border-collapse:separate;background:#ffffff;border-radius:14px;overflow:hidden;border:1px solid #f1e7df;border-bottom:4px solid #ead7ca;">`+
 		`<tr><td style="padding:0;line-height:0;font-size:0;">%s</td></tr>`+
 		`<tr><td style="padding:9px 11px 12px;">`+
 		`<div style="font-size:11.5px;font-weight:700;color:#2a2a2a;line-height:1.25;">%s</div>`+
