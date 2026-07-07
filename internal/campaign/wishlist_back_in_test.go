@@ -72,6 +72,26 @@ func TestWishlistBackInStatusBadgeMatchesHanamaru(t *testing.T) {
 	}
 }
 
+func TestCleanItemNameStripsLeadingTags(t *testing.T) {
+	cases := map[string]string{
+		"[Set of 6] [With Bonus] Honkai: Star Rail Keycap": "Honkai: Star Rail Keycap",
+		"[Limited Edition] HSR x MOONDROP Earphone":        "HSR x MOONDROP Earphone",
+		"[REVIVE] Figure-rise Standard":                    "Figure-rise Standard",
+		"[] Nendoroid Kafka":                               "Nendoroid Kafka",
+		"Luminasta Hatsune Miku (18cm)":                    "Luminasta Hatsune Miku (18cm)", // no leading tag, parens kept
+		"[Set of 6]":                                       "[Set of 6]",                     // all-tag -> keep original
+	}
+	for in, want := range cases {
+		if got := cleanItemName(in); got != want {
+			t.Fatalf("cleanItemName(%q) = %q, want %q", in, got, want)
+		}
+	}
+	// The [revive] badge still keys off the RAW name, not the cleaned one.
+	if got := renderStatusBadge(domain.WishlistBackInItem{Name: "[Revive] Figure", Status: "PO"}); !strings.Contains(got, "revive.png") {
+		t.Fatalf("revive detection must use raw name, got %s", got)
+	}
+}
+
 func TestWishlistBackInPrice(t *testing.T) {
 	// Discount: discounted price (brand color) + original as struck sub.
 	main, color, sub, struck := wishlistBackInPrice(domain.WishlistBackInItem{Price: 665000, DiscountPrice: 585000})

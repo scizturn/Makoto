@@ -4,12 +4,28 @@ import (
 	"fmt"
 	"html"
 	"math/rand"
+	"regexp"
 	"strings"
 	texttemplate "text/template"
 	"time"
 
 	"github.com/kyou-id/makoto/internal/domain"
 )
+
+// wishlistBackInLeadingTags matches one or more leading bracketed tags such as
+// "[Set of 6] [With Bonus] " or an empty "[]" so they can be stripped from the
+// display name. The raw name is still used for logic (e.g. the [revive] tag).
+var wishlistBackInLeadingTags = regexp.MustCompile(`^\s*(?:\[[^\]]*\]\s*)+`)
+
+// cleanItemName strips leading promotional/bracket tags for display, keeping the
+// real product title. Falls back to the original if stripping empties it.
+func cleanItemName(name string) string {
+	out := strings.TrimSpace(wishlistBackInLeadingTags.ReplaceAllString(name, ""))
+	if out == "" {
+		return strings.TrimSpace(name)
+	}
+	return out
+}
 
 type WishlistBackInCampaign struct {
 	TemplateIDs []string
@@ -73,7 +89,7 @@ func (c WishlistBackInCampaign) BuildMergeData(user domain.User, voucherCode str
 		"item_count":        len(items),
 		"reco_html":         renderWishlistBackInRecoGrid(recos),
 		"reco_series":       recoSeries,
-		"companion_name":    companion.Name,
+		"companion_name":    cleanItemName(companion.Name),
 		"has_companion":     hasReco,
 		"closing":           c.Closing,
 		"footer_html":       renderWishlistBackInFooter(c.Closing),
@@ -126,7 +142,7 @@ func renderWishlistBackInItems(items []domain.WishlistBackInItem) string {
 
 // renderWishlistBackInRow — "Soft Cream" index row: NN · thumb · status/disc/name · price/sub.
 func renderWishlistBackInRow(item domain.WishlistBackInItem, index int) string {
-	name := html.EscapeString(item.Name)
+	name := html.EscapeString(cleanItemName(item.Name))
 	itemURL := html.EscapeString(item.URL)
 	imageURL := html.EscapeString(item.ImageURL)
 
@@ -195,7 +211,7 @@ func renderWishlistBackInRecoGrid(items []domain.WishlistBackInItem) string {
 
 // renderWishlistBackInCard — "Soft Cream" cross-sell card (flex:1): image, name, price.
 func renderWishlistBackInCard(item domain.WishlistBackInItem) string {
-	name := html.EscapeString(item.Name)
+	name := html.EscapeString(cleanItemName(item.Name))
 	itemURL := html.EscapeString(item.URL)
 	imageURL := html.EscapeString(item.ImageURL)
 
