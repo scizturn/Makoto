@@ -127,14 +127,13 @@ func renderWishlistBackInItems(items []domain.WishlistBackInItem) string {
 	return builder.String()
 }
 
-// wishlistBackInRadio is hanamaru's "selected" radio marker: an orange ring with
-// a filled inner dot (table-nested so it survives Gmail).
-func wishlistBackInRadio() string {
-	// A <div> (not a table cell) — border-radius on <td> is dropped under
-	// border-collapse:collapse, which rendered the ring as a square.
-	return `<div style="width:18px;height:18px;border:2px solid #fc4c02;border-radius:50%;background:#ffffff;text-align:center;line-height:18px;font-size:0;margin:0 auto;">` +
-		`<span style="display:inline-block;width:8px;height:8px;background:#fc4c02;border-radius:50%;vertical-align:middle;"></span>` +
-		`</div>`
+// wishlistBackInGrip is the list marker: a 2×3 dot grid (drag-handle / "six on a
+// dice" grip). Table-based with per-cell padding for spacing (Gmail-safe); dots
+// are <div>s so border-radius holds as circles.
+func wishlistBackInGrip() string {
+	dot := `<td style="padding:2px;"><div style="width:5px;height:5px;border-radius:50%;background:#c9bcb0;font-size:0;line-height:0;">&nbsp;</div></td>`
+	row := `<tr>` + dot + dot + `</tr>`
+	return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:0 auto;border-collapse:collapse;">` + row + row + row + `</table>`
 }
 
 // renderWishlistBackInRow — "Soft Cream" index row: NN · thumb · status/disc/name · price/sub.
@@ -163,9 +162,8 @@ func renderWishlistBackInRow(item domain.WishlistBackInItem, index int) string {
 		subHTML = fmt.Sprintf(`<div style="font-size:11px;color:#a2a2a2;white-space:nowrap;margin-top:2px;%s">%s</div>`, deco, sub)
 	}
 
-	// Each item is its own white card (Gmail/Outlook safe — no flexbox); the index
-	// marker is a hanamaru-style "selected" radio circle, not a number.
-	_ = index
+	// Each item is its own white card (Gmail/Outlook safe — no flexbox); the marker
+	// is a solid dot. The first (newest) item is highlighted with an orange border.
 	inner := fmt.Sprintf(`<table role="presentation" width="100%%" cellpadding="0" cellspacing="0" border="0" style="width:100%%;border-collapse:collapse;">`+
 		`<tr>`+
 		`<td width="22" valign="middle" align="center" style="width:22px;">%s</td>`+
@@ -179,9 +177,13 @@ func renderWishlistBackInRow(item domain.WishlistBackInItem, index int) string {
 		`<td valign="middle" align="right" style="white-space:nowrap;">`+
 		`<div style="font-size:15px;font-weight:900;color:%s;">%s</div>%s`+
 		`</td>`+
-		`</tr></table>`, wishlistBackInRadio(), imgCell, badge, discTag, name, priceColor, priceMain, subHTML)
+		`</tr></table>`, wishlistBackInGrip(), imgCell, badge, discTag, name, priceColor, priceMain, subHTML)
 
-	card := fmt.Sprintf(`<table role="presentation" width="100%%" cellpadding="0" cellspacing="0" border="0" style="width:100%%;border-collapse:separate;background:#ffffff;border-radius:16px;border:1px solid #f1e7df;border-bottom:4px solid #ead7ca;"><tr><td style="padding:16px 18px;">%s</td></tr></table>`, inner)
+	cardBorder := "border:1px solid #f1e7df;border-bottom:4px solid #ead7ca;"
+	if index == 1 {
+		cardBorder = "border:2px solid #fc4c02;border-bottom:4px solid #fc4c02;" // highlight the newest item
+	}
+	card := fmt.Sprintf(`<table role="presentation" width="100%%" cellpadding="0" cellspacing="0" border="0" style="width:100%%;border-collapse:separate;background:#ffffff;border-radius:16px;%s"><tr><td style="padding:16px 18px;">%s</td></tr></table>`, cardBorder, inner)
 
 	if itemURL == "" {
 		return card
