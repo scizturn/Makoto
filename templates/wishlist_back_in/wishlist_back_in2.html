@@ -12,9 +12,6 @@
 
   <div style="width:600px;max-width:100%;margin:0 auto;background:#fff7f3;font-family:'Nunito',Arial,Helvetica,sans-serif;letter-spacing:-0.5px;color:#2d2d2d;border-radius:10px;overflow:hidden;box-shadow:0px 0px 10px 0px rgba(170,169,169,0.35);">
 
-    <!-- preheader -->
-    <div style="padding:11px 30px;font-size:11px;color:#bf3901;text-align:center;">Ada {{ .ItemCount }} kabar manis dari wishlist kamu &mdash; semua balik stok minggu ini.</div>
-
     <!-- header -->
     <div style="padding:20px 30px 10px;display:flex;align-items:center;justify-content:space-between;">
       <img src="https://kyoucdn.id/static/assets/brand_logo.png" alt="Kyou.id" style="height:24px;width:auto;border:0;">
@@ -36,7 +33,6 @@
     <!-- SECTION LABEL -->
     <div style="padding:26px 30px 0;display:flex;align-items:center;justify-content:space-between;">
       <div style="display:flex;align-items:center;gap:9px;">
-        <span style="width:9px;height:9px;border-radius:50%;background:#41b774;box-shadow:0 0 0 3px rgba(65,183,116,0.2);flex:none;"></span>
         <h2 style="margin:0;font-size:18px;font-weight:900;color:#2d2d2d;letter-spacing:-0.5px;">Wishlist kamu, tersedia lagi</h2>
       </div>
       <span style="font-size:11px;font-weight:800;color:#fc4c02;background:#fff0e9;padding:4px 10px;border-radius:999px;white-space:nowrap;">{{ .ItemCount }} item</span>
@@ -78,10 +74,6 @@
     <!-- CLOSING -->
     <div style="padding:28px 22px 30px;">
       <div style="background:#ffffff;border-radius:22px;padding:28px 26px;text-align:center;box-shadow:0 6px 22px rgba(252,76,2,0.08);">
-        <div style="display:inline-flex;align-items:center;gap:7px;background:#fff0e9;border-radius:999px;padding:6px 13px;margin-bottom:14px;">
-          <span style="width:8px;height:8px;border-radius:50%;background:#fc4c02;box-shadow:0 0 0 3px rgba(252,76,2,0.18);"></span>
-          <span style="font-size:10.5px;font-weight:800;letter-spacing:1px;color:#bf3901;text-transform:uppercase;">Stok Terbatas &middot; Bisa Abis Lagi</span>
-        </div>
         <h2 style="margin:0 0 10px;font-family:'M PLUS Rounded 1c','Nunito',Arial,sans-serif;font-size:24px;font-weight:800;line-height:1.15;color:#2d2d2d;letter-spacing:-0.5px;">Mumpung balik &amp; voucher masih anget</h2>
         <p style="font-size:13.5px;color:#565252;line-height:1.65;margin:0 auto 20px;max-width:400px;">{{ .Closing }}</p>
         <a href="{{ .ActionURL }}" style="display:inline-block;background:#fc4c02;color:#ffffff;font-size:15px;font-weight:900;text-decoration:none;padding:14px 32px;border-radius:10px;box-shadow:0 6px 16px rgba(252,76,2,0.28);">Amankan Sekarang &rarr;</a>

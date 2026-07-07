@@ -76,8 +76,24 @@ func (c WishlistBackInCampaign) BuildMergeData(user domain.User, voucherCode str
 		"companion_name":    companion.Name,
 		"has_companion":     hasReco,
 		"closing":           c.Closing,
-		"footer_html":       RenderMemberversaryFooterHTML(c.Closing),
+		"footer_html":       renderWishlistBackInFooter(c.Closing),
 	}
+}
+
+// renderWishlistBackInFooter reuses the shared footer but makes it fluid so it
+// fits this email's 600px shell (the shared version is a fixed 720px and would
+// overflow / clip the WA button on the right). Fixed pixel widths become 100%.
+func renderWishlistBackInFooter(closing string) string {
+	f := RenderMemberversaryFooterHTML(closing)
+	return strings.NewReplacer(
+		`width="720"`, `width="100%"`, `width:720px`, `width:100%`,
+		`width="646"`, `width="100%"`, `width:646px`, `width:100%`,
+		`width="648"`, `width="100%"`, `width:648px`, `width:100%`,
+		`width="616"`, `width="100%"`, `width:616px;`, `width:100%;max-width:616px;`,
+		`width="145"`, `width="100%"`, `width:145px;`, `width:100%;`,
+		`font-size:40px`, `font-size:30px`, `font-size:34px`, `font-size:26px`,
+		`font-size:16px`, `font-size:14px`,
+	).Replace(f)
 }
 
 // wishlistBackInRecoSeries picks the series label shown in "Lengkapin koleksi <x>".
@@ -135,7 +151,7 @@ func renderWishlistBackInRow(item domain.WishlistBackInItem, index int) string {
 	}
 
 	row := fmt.Sprintf(`<div style="display:flex;align-items:flex-start;gap:15px;padding:16px 0;border-bottom:1px solid #f2e7df;">`+
-		`<span style="font-size:13px;font-weight:900;color:#e0c7ba;width:22px;flex:none;padding-top:2px;">%02d</span>`+
+		`<span style="font-size:13px;font-weight:900;color:#e0c7ba;width:22px;flex:none;align-self:center;text-align:center;">%02d</span>`+
 		`<div style="width:62px;height:62px;border-radius:10px;background:#ffffff;display:flex;align-items:center;justify-content:center;flex:none;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.05);">%s</div>`+
 		`<div style="flex:1;min-width:0;padding-top:1px;">`+
 		`<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">`+
@@ -183,14 +199,14 @@ func renderWishlistBackInCard(item domain.WishlistBackInItem) string {
 	itemURL := html.EscapeString(item.URL)
 	imageURL := html.EscapeString(item.ImageURL)
 
-	imgTag := `<div style="width:76%;height:76%;"></div>`
+	imgTag := `<div style="width:100%;height:100%;background:#ffffff;"></div>`
 	if imageURL != "" {
-		imgTag = fmt.Sprintf(`<img src="%s" alt="" style="width:76%%;height:76%%;object-fit:contain;">`, imageURL)
+		imgTag = fmt.Sprintf(`<img src="%s" alt="" style="display:block;width:100%%;height:100%%;object-fit:cover;">`, imageURL)
 	}
 	priceMain, priceColor, _, _ := wishlistBackInPrice(item)
 
 	inner := fmt.Sprintf(`<div style="background:#ffffff;border-radius:14px;overflow:hidden;box-shadow:0 3px 12px rgba(0,0,0,0.04);">`+
-		`<div style="aspect-ratio:1;background:#fff7f3;display:flex;align-items:center;justify-content:center;">%s</div>`+
+		`<div style="aspect-ratio:1;background:#ffffff;overflow:hidden;">%s</div>`+
 		`<div style="padding:9px 11px 12px;">`+
 		`<div style="font-size:11.5px;font-weight:700;color:#2a2a2a;line-height:1.25;max-height:29px;overflow:hidden;">%s</div>`+
 		`<div style="font-size:12px;font-weight:900;color:%s;margin-top:4px;">%s</div>`+
