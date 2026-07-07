@@ -99,6 +99,17 @@ MAKOTO_DISCOUNTED_WISHLIST_EMAIL_TEMPLATE_DIR=templates/discounted_wishlist
 MAKOTO_DISCOUNTED_WISHLIST_URL=https://kyou.id/user/wishlist
 # Required when the worker is enabled. Point this at the real preference center.
 MAKOTO_DISCOUNTED_WISHLIST_UNSUBSCRIBE_URL=
+
+# Wishlist back-in (queue HARUS sama dgn YUKARI_WISHLIST_BACK_IN_QUEUE_NAME)
+MAKOTO_WISHLIST_BACK_IN_ENABLED=false
+MAKOTO_WISHLIST_BACK_IN_QUEUE_NAME=wishlist_back_in_email_jobs
+MAKOTO_WISHLIST_BACK_IN_DEAD_LETTER_QUEUE=wishlist_back_in_email_jobs_dead
+MAKOTO_WISHLIST_BACK_IN_TEMPLATE_IDS=wishlist_back_in1.html,wishlist_back_in2.html,wishlist_back_in3.html
+MAKOTO_WISHLIST_BACK_IN_EMAIL_TEMPLATE_DIR=templates/wishlist_back_in
+MAKOTO_WISHLIST_BACK_IN_EMAIL_SUBJECT='{{ .FirstName }}, wishlist kamu tersedia lagi!'
+# 3 greeting berotasi, separator pipe:
+MAKOTO_WISHLIST_BACK_IN_GREETINGS='Omatase, {{ .FirstName }}! Yang kamu tunggu akhirnya balik.|{{ .FirstName }}, penantiannya selesai. Wishlist kamu ready lagi!|Kabar baik, {{ .FirstName }}. Item incaranmu sudah kembali!'
+MAKOTO_WISHLIST_BACK_IN_ACTION_URL=https://kyou.id/user/my-voucher
 ```
 
 ## Template Variables
@@ -139,6 +150,25 @@ MAKOTO_DISCOUNTED_WISHLIST_UNSUBSCRIBE_URL=
 {{ .WishlistURL }}          — CTA ke wishlist
 {{ .FooterHTML }}           — footer campaign
 ```
+
+### Wishlist Back-In
+
+```text
+{{ .FirstName }}         — nama depan user
+{{ .Greeting }}          — greeting omatase (berotasi 3 varian)
+{{ .BackInItemHTML }}    — list item restock bernomor (01, 02, …) + badge status & harga
+{{ .ItemCount }}         — jumlah item di list
+{{ .HasVoucher }}        — bool; blok voucher tampil kalau true
+{{ .VoucherCode }}       — kode voucher
+{{ .ActionURL }}         — URL klaim voucher
+{{ .HasCompanion }}      — bool; section "Gas, Nemenin…" tampil kalau true
+{{ .CompanionName }}     — nama item yang sudah dibeli (referensi header)
+{{ .RecoHTML }}          — grid 6 item cross-sell most-popular (HTML)
+{{ .Closing }}           — kalimat penutup
+{{ .FooterHTML }}        — footer campaign
+```
+
+Badge status (`ready`/`PO`/`LPO`/`BO`/Revive) + harga (diskon dengan coret asli, atau `DP IDR <dp> / <full>` untuk PO, else polos) dirender di dalam `{{ .BackInItemHTML }}` & `{{ .RecoHTML }}` — persis mengikuti hanamaru. Preview tiga template: `go run ./cmd/renderpreview-wishlist-back-in`.
 
 Template, subject, dan greeting dipilih deterministik dari tanggal + job ID, sehingga retry job yang sama tetap konsisten. Makoto hanya mengirim jika `user.is_active=true`, email tidak kosong, dan validator email menerima alamat tersebut.
 
