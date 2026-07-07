@@ -130,15 +130,15 @@ func renderWishlistBackInRow(item domain.WishlistBackInItem, index int) string {
 	itemURL := html.EscapeString(item.URL)
 	imageURL := html.EscapeString(item.ImageURL)
 
-	imgTag := `<div style="width:80%;height:80%;"></div>`
+	imgCell := `&nbsp;`
 	if imageURL != "" {
-		imgTag = fmt.Sprintf(`<img src="%s" alt="" style="width:80%%;height:80%%;object-fit:contain;">`, imageURL)
+		imgCell = fmt.Sprintf(`<img src="%s" alt="" width="50" height="50" style="display:block;width:50px;height:50px;object-fit:contain;border:0;margin:0 auto;">`, imageURL)
 	}
 
 	badge := renderStatusBadge(item)
 	discTag := ""
 	if item.DiscountPrice > 0 && item.DiscountPrice < item.Price {
-		discTag = fmt.Sprintf(`<span style="font-size:9.5px;font-weight:800;color:#fc4c02;">&minus;%d%%</span>`, (item.Price-item.DiscountPrice)*100/item.Price)
+		discTag = fmt.Sprintf(`&nbsp;<span style="font-size:9.5px;font-weight:800;color:#fc4c02;vertical-align:middle;">&minus;%d%%</span>`, (item.Price-item.DiscountPrice)*100/item.Price)
 	}
 	priceMain, priceColor, sub, struck := wishlistBackInPrice(item)
 	subHTML := ""
@@ -147,22 +147,24 @@ func renderWishlistBackInRow(item domain.WishlistBackInItem, index int) string {
 		if struck {
 			deco = "text-decoration:line-through;"
 		}
-		subHTML = fmt.Sprintf(`<div style="font-size:11px;color:#a2a2a2;white-space:nowrap;%s">%s</div>`, deco, sub)
+		subHTML = fmt.Sprintf(`<div style="font-size:11px;color:#a2a2a2;white-space:nowrap;margin-top:2px;%s">%s</div>`, deco, sub)
 	}
 
-	row := fmt.Sprintf(`<div style="display:flex;align-items:flex-start;gap:15px;padding:16px 0;border-bottom:1px solid #f2e7df;">`+
-		`<span style="font-size:13px;font-weight:900;color:#e0c7ba;width:22px;flex:none;align-self:center;text-align:center;">%02d</span>`+
-		`<div style="width:62px;height:62px;border-radius:10px;background:#ffffff;display:flex;align-items:center;justify-content:center;flex:none;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.05);">%s</div>`+
-		`<div style="flex:1;min-width:0;padding-top:1px;">`+
-		`<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">`+
-		`%s%s`+
-		`</div>`+
+	// Table layout (Gmail/Outlook safe — no flexbox).
+	row := fmt.Sprintf(`<table role="presentation" width="100%%" cellpadding="0" cellspacing="0" border="0" style="width:100%%;border-collapse:collapse;border-bottom:1px solid #f2e7df;">`+
+		`<tr>`+
+		`<td width="24" valign="middle" align="center" style="width:24px;padding:16px 0;font-size:13px;font-weight:900;color:#e0c7ba;">%02d</td>`+
+		`<td width="76" valign="middle" style="width:76px;padding:16px 14px 16px 12px;">`+
+		`<table role="presentation" width="62" cellpadding="0" cellspacing="0" border="0"><tr><td width="62" height="62" align="center" valign="middle" style="width:62px;height:62px;background:#ffffff;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.05);">%s</td></tr></table>`+
+		`</td>`+
+		`<td valign="middle" style="padding:16px 12px 16px 0;">`+
+		`<div style="margin-bottom:6px;">%s%s</div>`+
 		`<div style="font-size:14px;font-weight:800;color:#2a2a2a;line-height:1.3;">%s</div>`+
-		`</div>`+
-		`<div style="text-align:right;flex:none;padding-top:1px;">`+
-		`<div style="font-size:15px;font-weight:900;color:%s;white-space:nowrap;">%s</div>%s`+
-		`</div>`+
-		`</div>`, index, imgTag, badge, discTag, name, priceColor, priceMain, subHTML)
+		`</td>`+
+		`<td valign="middle" align="right" style="padding:16px 0;white-space:nowrap;">`+
+		`<div style="font-size:15px;font-weight:900;color:%s;">%s</div>%s`+
+		`</td>`+
+		`</tr></table>`, index, imgCell, badge, discTag, name, priceColor, priceMain, subHTML)
 
 	if itemURL == "" {
 		return row
@@ -170,52 +172,62 @@ func renderWishlistBackInRow(item domain.WishlistBackInItem, index int) string {
 	return fmt.Sprintf(`<a href="%s" style="display:block;color:inherit;text-decoration:none;">%s</a>`, itemURL, row)
 }
 
-// renderWishlistBackInRecoGrid — "Soft Cream" cross-sell: rows of 3 flex cards.
+// renderWishlistBackInRecoGrid — cross-sell grid: rows of 3 cards as a table.
 func renderWishlistBackInRecoGrid(items []domain.WishlistBackInItem) string {
 	if len(items) == 0 {
 		return ""
 	}
 	var b strings.Builder
+	b.WriteString(`<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:collapse;">`)
 	for row := 0; row*3 < len(items); row++ {
 		if row > 0 {
-			b.WriteString(`<div style="height:12px;line-height:12px;font-size:12px;">&nbsp;</div>`)
+			b.WriteString(`<tr><td colspan="3" style="height:12px;line-height:12px;font-size:12px;">&nbsp;</td></tr>`)
 		}
-		b.WriteString(`<div style="display:flex;gap:12px;">`)
+		b.WriteString(`<tr>`)
 		for col := 0; col < 3; col++ {
+			pad := "0 6px 0 0"
+			if col == 1 {
+				pad = "0 3px"
+			} else if col == 2 {
+				pad = "0 0 0 6px"
+			}
+			b.WriteString(fmt.Sprintf(`<td width="33%%" valign="top" style="width:33.33%%;padding:%s;">`, pad))
 			if idx := row*3 + col; idx < len(items) {
 				b.WriteString(renderWishlistBackInCard(items[idx]))
 			} else {
-				b.WriteString(`<div style="flex:1;"></div>`)
+				b.WriteString(`&nbsp;`)
 			}
+			b.WriteString(`</td>`)
 		}
-		b.WriteString(`</div>`)
+		b.WriteString(`</tr>`)
 	}
+	b.WriteString(`</table>`)
 	return b.String()
 }
 
-// renderWishlistBackInCard — "Soft Cream" cross-sell card (flex:1): image, name, price.
+// renderWishlistBackInCard — cross-sell card as a table cell: square image, name, price.
 func renderWishlistBackInCard(item domain.WishlistBackInItem) string {
 	name := html.EscapeString(cleanItemName(item.Name))
 	itemURL := html.EscapeString(item.URL)
 	imageURL := html.EscapeString(item.ImageURL)
 
-	imgTag := `<div style="width:100%;height:100%;background:#ffffff;"></div>`
+	imgCell := `&nbsp;`
 	if imageURL != "" {
-		imgTag = fmt.Sprintf(`<img src="%s" alt="" style="display:block;width:100%%;height:100%%;object-fit:cover;">`, imageURL)
+		imgCell = fmt.Sprintf(`<img src="%s" alt="" width="150" height="150" style="display:block;width:100%%;height:auto;border:0;">`, imageURL)
 	}
 	priceMain, priceColor, _, _ := wishlistBackInPrice(item)
 
-	inner := fmt.Sprintf(`<div style="background:#ffffff;border-radius:14px;overflow:hidden;box-shadow:0 3px 12px rgba(0,0,0,0.04);">`+
-		`<div style="aspect-ratio:1;background:#ffffff;overflow:hidden;">%s</div>`+
-		`<div style="padding:9px 11px 12px;">`+
-		`<div style="font-size:11.5px;font-weight:700;color:#2a2a2a;line-height:1.25;max-height:29px;overflow:hidden;">%s</div>`+
+	inner := fmt.Sprintf(`<table role="presentation" width="100%%" cellpadding="0" cellspacing="0" border="0" style="width:100%%;border-collapse:collapse;background:#ffffff;border-radius:14px;overflow:hidden;box-shadow:0 3px 12px rgba(0,0,0,0.04);">`+
+		`<tr><td style="padding:0;line-height:0;font-size:0;">%s</td></tr>`+
+		`<tr><td style="padding:9px 11px 12px;">`+
+		`<div style="font-size:11.5px;font-weight:700;color:#2a2a2a;line-height:1.25;">%s</div>`+
 		`<div style="font-size:12px;font-weight:900;color:%s;margin-top:4px;">%s</div>`+
-		`</div></div>`, imgTag, name, priceColor, priceMain)
+		`</td></tr></table>`, imgCell, name, priceColor, priceMain)
 
 	if itemURL == "" {
-		return fmt.Sprintf(`<div style="flex:1;">%s</div>`, inner)
+		return inner
 	}
-	return fmt.Sprintf(`<a href="%s" style="flex:1;display:block;color:inherit;text-decoration:none;">%s</a>`, itemURL, inner)
+	return fmt.Sprintf(`<a href="%s" style="display:block;color:inherit;text-decoration:none;">%s</a>`, itemURL, inner)
 }
 
 // renderStatusBadge is hanamaru's ProductStatus pill: a solid rounded chip with

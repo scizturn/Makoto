@@ -10,79 +10,99 @@
 <body style="margin:0;padding:0;background:#faf9f5;font-family:'Nunito',Arial,Helvetica,sans-serif;color:#2d2d2d;-webkit-text-size-adjust:none;text-size-adjust:none;">
   <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:#faf9f5;font-size:1px;line-height:1px;">Ada {{ .ItemCount }} kabar manis dari wishlist kamu &mdash; semua balik stok minggu ini.</div>
 
-  <div style="width:720px;max-width:100%;margin:0 auto;background:#fff7f3;font-family:'Nunito',Arial,Helvetica,sans-serif;letter-spacing:-0.5px;color:#2d2d2d;border-radius:10px;overflow:hidden;box-shadow:0px 0px 10px 0px rgba(170,169,169,0.35);">
+  <table role="presentation" width="720" align="center" cellpadding="0" cellspacing="0" border="0" style="width:720px;max-width:720px;margin:0 auto;background:#fff7f3;border-radius:10px;border-collapse:separate;">
+  <tr><td style="padding:0;">
 
     <!-- header -->
-    <div style="padding:20px 30px 10px;display:flex;align-items:center;justify-content:space-between;">
-      <img src="https://kyoucdn.id/static/assets/brand_logo.png" alt="Kyou.id" style="height:24px;width:auto;border:0;">
-      <span style="font-size:10.5px;font-weight:800;letter-spacing:1.5px;color:#fc4c02;text-transform:uppercase;">Wishlist Restock</span>
-    </div>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:collapse;">
+    <tr>
+      <td style="padding:22px 34px 12px;"><img src="https://kyoucdn.id/static/assets/brand_logo.png" alt="Kyou.id" height="24" style="display:block;height:24px;width:auto;border:0;"></td>
+      <td align="right" style="padding:22px 34px 12px;font-size:11px;font-weight:800;letter-spacing:1.5px;color:#fc4c02;text-transform:uppercase;white-space:nowrap;">Wishlist Restock</td>
+    </tr>
+    </table>
 
     <!-- HERO -->
-    <div style="padding:12px 22px 0;">
-      <div style="background:#ffffff;border-radius:22px;padding:28px 26px 24px;position:relative;overflow:hidden;box-shadow:0 6px 22px rgba(252,76,2,0.08);">
-        <div style="max-width:400px;">
-          <span style="display:inline-block;background:#fff0e9;color:#bf3901;font-size:10.5px;font-weight:800;letter-spacing:0.5px;padding:5px 12px;border-radius:999px;margin-bottom:14px;">Haii, {{ .FirstName }}!</span>
-          <h1 style="margin:0;font-family:'M PLUS Rounded 1c','Nunito',Arial,sans-serif;font-size:34px;font-weight:800;line-height:1.06;color:#2d2d2d;letter-spacing:-1px;">Yang kamu tunggu,<br>akhirnya <span style="color:#fc4c02;">nongol!</span></h1>
-          <p style="margin:14px 0 0;font-size:14px;line-height:1.65;color:#565252;">Kousei hafal kamu bolak-balik ngecek stok. Tenang — {{ .ItemCount }} incaranmu di wishlist udah balik lagi.</p>
-        </div>
-        <img src="https://kyou.id/static/img/icon/kouka_chibi.png.webp" alt="" style="position:absolute;bottom:-14px;right:-6px;width:88px;height:auto;opacity:0.95;border:0;">
-      </div>
-    </div>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:collapse;">
+    <tr><td style="padding:12px 26px 0;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:separate;background:#ffffff;border-radius:22px;box-shadow:0 6px 22px rgba(252,76,2,0.08);">
+      <tr>
+        <td valign="top" style="padding:30px 8px 28px 30px;">
+          <span style="display:inline-block;background:#fff0e9;color:#bf3901;font-size:11px;font-weight:800;padding:6px 13px;border-radius:999px;margin-bottom:16px;">Haii, {{ .FirstName }}!</span>
+          <h1 style="margin:0;font-family:'M PLUS Rounded 1c','Nunito',Arial,sans-serif;font-size:38px;font-weight:800;line-height:1.06;color:#2d2d2d;letter-spacing:-1px;">Yang kamu tunggu,<br>akhirnya <span style="color:#fc4c02;">nongol!</span></h1>
+          <p style="margin:16px 0 0;font-size:15px;line-height:1.65;color:#565252;">Kousei hafal kamu bolak-balik ngecek stok. Tenang — {{ .ItemCount }} incaranmu di wishlist udah balik lagi.</p>
+        </td>
+        <td width="130" valign="bottom" align="right" style="width:130px;padding:0 18px 0 0;"><img src="https://kyou.id/static/img/icon/kouka_chibi.png.webp" alt="" width="110" style="display:block;width:110px;height:auto;border:0;"></td>
+      </tr>
+      </table>
+    </td></tr>
+    </table>
 
     <!-- SECTION LABEL -->
-    <div style="padding:26px 30px 0;display:flex;align-items:center;justify-content:space-between;">
-      <div style="display:flex;align-items:center;gap:9px;">
-        <h2 style="margin:0;font-size:18px;font-weight:900;color:#2d2d2d;letter-spacing:-0.5px;">Wishlist kamu, tersedia lagi</h2>
-      </div>
-      <span style="font-size:11px;font-weight:800;color:#fc4c02;background:#fff0e9;padding:4px 10px;border-radius:999px;white-space:nowrap;">{{ .ItemCount }} item</span>
-    </div>
-    <p style="margin:4px 0 0;padding:0 30px;font-size:13px;color:#808080;">Inget nggak, dulu kamu sempet naksir ini?</p>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:collapse;">
+    <tr>
+      <td style="padding:28px 34px 0;font-size:19px;font-weight:900;color:#2d2d2d;letter-spacing:-0.5px;">Wishlist kamu, tersedia lagi</td>
+      <td align="right" style="padding:28px 34px 0;white-space:nowrap;"><span style="display:inline-block;font-size:11px;font-weight:800;color:#fc4c02;background:#fff0e9;padding:4px 11px;border-radius:999px;">{{ .ItemCount }} item</span></td>
+    </tr>
+    <tr><td colspan="2" style="padding:5px 34px 0;font-size:13px;color:#808080;">Inget nggak, dulu kamu sempet naksir ini?</td></tr>
+    </table>
 
     <!-- PRODUCT LIST -->
-    <div style="padding:12px 30px 0;">{{ .BackInItemHTML }}</div>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:collapse;">
+    <tr><td style="padding:12px 34px 0;">{{ .BackInItemHTML }}</td></tr>
+    </table>
 
     {{ if .HasVoucher }}
     <!-- VOUCHER — coupon ticket -->
-    <div style="padding:22px 22px 0;">
-      <a href="{{ .ActionURL }}" style="text-decoration:none;color:inherit;display:block;">
-      <div style="position:relative;display:flex;align-items:stretch;background:#fc4c02;border-radius:16px;overflow:hidden;">
-        <div style="flex:none;width:132px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:22px 10px;border-right:2px dashed rgba(255,255,255,0.45);">
-          <div style="font-size:40px;font-weight:900;line-height:1;color:#ffffff;">10%</div>
-          <div style="font-size:13px;font-weight:800;letter-spacing:1px;color:rgba(255,255,255,0.85);margin-top:2px;">OFF</div>
-        </div>
-        <div style="flex:1;padding:20px 22px;">
-          <div style="font-size:10.5px;font-weight:800;letter-spacing:1px;color:rgba(255,255,255,0.8);text-transform:uppercase;margin-bottom:5px;">Voucher Sambutan &middot; pakai dalam 14 hari</div>
-          <div style="font-size:13px;color:rgba(255,255,255,0.92);margin-bottom:11px;">Diskon buat nyambut incaranmu yang balik.</div>
-          <div style="display:inline-block;background:#ffffff;border-radius:8px;padding:8px 18px;font-size:15px;font-weight:900;letter-spacing:2px;color:#bf3901;">{{ .VoucherCode }}</div>
-        </div>
-      </div>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:collapse;">
+    <tr><td style="padding:24px 26px 0;">
+      <a href="{{ .ActionURL }}" style="text-decoration:none;color:inherit;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:separate;background:#fc4c02;border-radius:16px;">
+      <tr>
+        <td width="140" valign="middle" align="center" style="width:140px;padding:22px 10px;border-right:2px dashed rgba(255,255,255,0.45);">
+          <div style="font-size:42px;font-weight:900;line-height:1;color:#ffffff;">10%</div>
+          <div style="font-size:13px;font-weight:800;letter-spacing:1px;color:rgba(255,255,255,0.85);margin-top:3px;">OFF</div>
+        </td>
+        <td valign="middle" style="padding:20px 24px;">
+          <div style="font-size:10.5px;font-weight:800;letter-spacing:1px;color:rgba(255,255,255,0.8);text-transform:uppercase;margin-bottom:6px;">Voucher Sambutan &middot; pakai dalam 14 hari</div>
+          <div style="font-size:13px;color:rgba(255,255,255,0.92);margin-bottom:12px;">Diskon buat nyambut incaranmu yang balik.</div>
+          <span style="display:inline-block;background:#ffffff;border-radius:8px;padding:9px 20px;font-size:15px;font-weight:900;letter-spacing:2px;color:#bf3901;">{{ .VoucherCode }}</span>
+        </td>
+      </tr>
+      </table>
       </a>
-    </div>
+    </td></tr>
+    </table>
     {{ end }}
 
     {{ if .HasCompanion }}
     <!-- CROSS-SELL -->
-    <div style="padding:28px 30px 0;">
-      <h2 style="margin:0 0 3px;font-size:17px;font-weight:900;color:#2d2d2d;letter-spacing:-0.5px;">Lengkapin koleksi <span style="color:#fc4c02;">{{ .RecoSeries }}</span></h2>
-      <p style="margin:0 0 15px;font-size:13px;color:#808080;">Biar nemenin {{ .CompanionName }} yang udah nyampe di rak kamu:</p>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:collapse;">
+    <tr><td style="padding:30px 34px 0;">
+      <div style="font-size:18px;font-weight:900;color:#2d2d2d;letter-spacing:-0.5px;margin-bottom:3px;">Lengkapin koleksi <span style="color:#fc4c02;">{{ .RecoSeries }}</span></div>
+      <div style="font-size:13px;color:#808080;margin-bottom:15px;">Biar nemenin {{ .CompanionName }} yang udah nyampe di rak kamu:</div>
       {{ .RecoHTML }}
-      <p style="margin:13px 0 0;font-size:11px;color:#a2a2a2;font-style:italic;line-height:1.5;">*Item populer yang lagi paling diburu Teman Kyou minggu ini.</p>
-    </div>
+      <div style="font-size:11px;color:#a2a2a2;font-style:italic;line-height:1.5;margin-top:14px;">*Item populer yang lagi paling diburu Teman Kyou minggu ini.</div>
+    </td></tr>
+    </table>
     {{ end }}
 
     <!-- CLOSING -->
-    <div style="padding:28px 22px 30px;">
-      <div style="background:#ffffff;border-radius:22px;padding:28px 26px;text-align:center;box-shadow:0 6px 22px rgba(252,76,2,0.08);">
-        <h2 style="margin:0 0 10px;font-family:'M PLUS Rounded 1c','Nunito',Arial,sans-serif;font-size:24px;font-weight:800;line-height:1.15;color:#2d2d2d;letter-spacing:-0.5px;">Mumpung balik &amp; voucher masih anget</h2>
-        <p style="font-size:13.5px;color:#565252;line-height:1.65;margin:0 auto 20px;max-width:400px;">{{ .Closing }}</p>
-        <a href="{{ .ActionURL }}" style="display:inline-block;background:#fc4c02;color:#ffffff;font-size:15px;font-weight:900;text-decoration:none;padding:14px 32px;border-radius:10px;box-shadow:0 6px 16px rgba(252,76,2,0.28);">Amankan Sekarang &rarr;</a>
-        <p style="font-size:13px;color:#fc4c02;font-weight:800;margin:18px 0 0;">Ayo cintai hobimu bareng Kyou!</p>
-      </div>
-    </div>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:collapse;">
+    <tr><td style="padding:30px 26px 32px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:separate;background:#ffffff;border-radius:22px;box-shadow:0 6px 22px rgba(252,76,2,0.08);">
+      <tr><td align="center" style="padding:30px 28px;">
+        <h2 style="margin:0 0 10px;font-family:'M PLUS Rounded 1c','Nunito',Arial,sans-serif;font-size:26px;font-weight:800;line-height:1.15;color:#2d2d2d;letter-spacing:-0.5px;">Mumpung balik &amp; voucher masih anget</h2>
+        <p style="font-size:14px;color:#565252;line-height:1.65;margin:0 auto 22px;max-width:440px;">{{ .Closing }}</p>
+        <a href="{{ .ActionURL }}" style="display:inline-block;background:#fc4c02;color:#ffffff;font-size:15px;font-weight:900;text-decoration:none;padding:15px 34px;border-radius:10px;">Amankan Sekarang &rarr;</a>
+        <p style="font-size:13px;color:#fc4c02;font-weight:800;margin:20px 0 0;">Ayo cintai hobimu bareng Kyou!</p>
+      </td></tr>
+      </table>
+    </td></tr>
+    </table>
 
     {{ .FooterHTML }}
 
-  </div>
+  </td></tr>
+  </table>
 </body>
 </html>
