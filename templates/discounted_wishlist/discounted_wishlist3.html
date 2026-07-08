@@ -5,33 +5,50 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="viewport" content="width=720" />
         <title>{{ .DiscountName }} wishlist kamu lagi turun</title>
-        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=M+PLUS+Rounded+1c:wght@700;800&display=swap" rel="stylesheet" />
     </head>
     <body style="margin:0;padding:0;background:#f2f2f2;font-family:Nunito,Arial,Helvetica,sans-serif;color:#2d2d2d;-webkit-text-size-adjust:none;text-size-adjust:none;">
         <table role="presentation" width="720" cellspacing="0" cellpadding="0" align="center" background="https://images2.imgbox.com/37/6d/pTFz4JIU_o.png" style="width:720px;min-width:720px;margin:0 auto;border-collapse:collapse;table-layout:fixed;background-color:#f5f1e8;background-image:url('https://images2.imgbox.com/37/6d/pTFz4JIU_o.png');background-position:center top;background-repeat:no-repeat;background-size:720px auto;">
             <tr>
                 <td style="padding:0;">
-                    <!-- header -->
+                    <!-- Header Card -->
                     <table role="presentation" width="720" cellspacing="0" cellpadding="0" style="width:720px;border-collapse:collapse;">
                         <tr>
-                            <td style="padding:24px 34px 12px;"><img src="https://kyoucdn.id/static/assets/brand_logo.png" alt="Kyou.id" height="24" style="display:block;height:24px;width:auto;border:0;"></td>
-                            <td align="right" style="padding:24px 34px 12px;font-size:11px;font-weight:800;letter-spacing:1.5px;color:#fc4c02;text-transform:uppercase;white-space:nowrap;">{{ .DiscountName }}</td>
+                            <td style="padding:24px 30px 0;">
+                                <table role="presentation" width="660" cellspacing="0" cellpadding="0" style="width:660px;border-collapse:collapse;background:#ffffff;border-radius:24px;">
+                                    <tr>
+                                        <td style="padding:24px 32px 32px;">
+                                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse;">
+                                                <tr>
+                                                    <td valign="middle" style="padding-bottom:24px;">
+                                                        <a href="https://kyou.id/" style="display:inline-block;border:0;text-decoration:none;">
+                                                            <img src="https://kyoucdn.id/static/assets/brand_logo.png" alt="Kyou.id" width="64" style="display:block;width:64px;height:auto;border:0;">
+                                                        </a>
+                                                    </td>
+                                                    <td valign="middle" align="right" style="padding-bottom:24px;">
+                                                        <span style="display:inline-block;padding:8px 16px;background:#fff3ee;color:#fc4c02;border-radius:999px;font-size:12px;font-weight:900;">
+                                                          <span style="display:inline-block;width:6px;height:6px;background:#fc4c02;border-radius:50%;margin-right:6px;vertical-align:middle;"></span>
+                                                          <span style="vertical-align:middle;">{{ .DiscountName }}</span>
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse;">
+                                                <tr>
+                                                    <td valign="top" width="440" style="width:440px;">
+                                                        <p style="margin:0 0 12px;color:#fc4c02;font-size:12px;font-weight:900;letter-spacing:1px;text-transform:uppercase;">HALO, {{ .FirstName }}</p>
+                                                        <h1 style="margin:0 0 12px;color:#2d2d2d;font-size:32px;font-weight:900;line-height:1.2;letter-spacing:-0.5px;">Sebagai&nbsp;<span style="color:#fc4c02;">teman Khilaf</span>&nbsp;yang baik, Kouka mau kasih tau!</h1>
+                                                        <p style="margin:0;color:#565252;font-size:15px;font-weight:600;line-height:1.6;">Wishlist kamu lagi diskon {{ .DiscountName }}. Nggak tega rasanya kalau kamu sampai kelewatan harga diskon ini.</p>
+                                                    </td>
+                                                    <td valign="bottom" align="right">
+                                                        <img src="https://kyoucdn.id/static/assets/koukachibi.png" alt="Kouka" width="100" style="display:block;">
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
                         </tr>
-                    </table>
-                    <!-- HERO -->
-                    <table role="presentation" width="720" cellspacing="0" cellpadding="0" style="width:720px;border-collapse:collapse;">
-                        <tr><td style="padding:12px 30px 0;">
-                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="width:100%;border-collapse:separate;background:#ffffff;border-radius:22px;border:1px solid #f7e4d8;border-bottom:5px solid #f2d3bf;">
-                                <tr>
-                                    <td valign="top" style="padding:30px 8px 28px 30px;">
-                                        <span style="display:inline-block;background:#fff0e9;color:#bf3901;font-size:11px;font-weight:800;padding:6px 13px;border-radius:999px;margin-bottom:16px;">Haii, {{ .FirstName }}!</span>
-                                        <h1 style="margin:0;font-family:\'M PLUS Rounded 1c\',\'Nunito\',Arial,sans-serif;font-size:38px;font-weight:800;line-height:1.06;color:#2d2d2d;letter-spacing:-1px;">Ada diskon buat<br><span style="color:#fc4c02;">wishlist-mu!</span></h1>
-                                        <p style="margin:16px 0 0;font-size:15px;line-height:1.65;color:#565252;">{{ .DiscountName }} udah jalan, item incaranmu di wishlist lagi turun harga. Buruan cek sebelum promonya keburu abis.</p>
-                                    </td>
-                                    <td width="130" valign="bottom" align="right" style="width:130px;padding:0 18px 0 0;"><img src="https://kyoucdn.id/static/assets/koukachibi.png" alt="" width="110" style="display:block;width:110px;height:auto;border:0;"></td>
-                                </tr>
-                            </table>
-                        </td></tr>
                     </table>
 
                     <table role="presentation" width="720" cellspacing="0" cellpadding="0" style="width:720px;border-collapse:collapse;">
