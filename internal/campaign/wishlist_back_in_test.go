@@ -1,8 +1,10 @@
 package campaign
 
 import (
+	"fmt"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/kyou-id/makoto/internal/domain"
 )
@@ -62,6 +64,54 @@ func TestWishlistBackInMergeDataEscapesItemsAndHandlesCompanion(t *testing.T) {
 	}
 }
 
+// Subject i must ship with template i: both selectors draw from the same seed.
+// If they ever diverge, template 2's art would go out under template 3's subject.
+func TestWishlistBackInSubjectIsPairedWithTemplate(t *testing.T) {
+	c := WishlistBackInCampaign{
+		TemplateIDs: []string{"wishlist_back_in1.html", "wishlist_back_in2.html", "wishlist_back_in3.html"},
+		Subjects:    []string{"subject-1", "subject-2", "subject-3"},
+	}
+	now := time.Date(2026, 7, 10, 9, 0, 0, 0, time.UTC)
+	// Walk enough job IDs that every template index gets exercised.
+	seen := map[string]bool{}
+	for i := 0; i < 40; i++ {
+		key := fmt.Sprintf("wishlist-back-in-2026-07-10-user-%d", i)
+		template := c.SelectTemplate(now, key)
+		subject := c.SelectSubject(now, key)
+		want := map[string]string{
+			"wishlist_back_in1.html": "subject-1",
+			"wishlist_back_in2.html": "subject-2",
+			"wishlist_back_in3.html": "subject-3",
+		}[template]
+		if subject != want {
+			t.Fatalf("template %s paired with %s, want %s", template, subject, want)
+		}
+		seen[template] = true
+	}
+	if len(seen) != 3 {
+		t.Fatalf("expected all three templates exercised, got %v", seen)
+	}
+}
+
+func TestWishlistBackInRenderSubjectUsesFirstName(t *testing.T) {
+	c := WishlistBackInCampaign{}
+	got, err := c.RenderSubject("Kabar baik untuk {{ .FirstName }}!", domain.User{Name: "Ruby Reinze"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got != "Kabar baik untuk Ruby!" {
+		t.Fatalf("got %q", got)
+	}
+}
+
+// An empty Subjects list must leave the renderer's single subject in place.
+func TestWishlistBackInSelectSubjectEmpty(t *testing.T) {
+	c := WishlistBackInCampaign{TemplateIDs: []string{"a.html"}}
+	if got := c.SelectSubject(time.Now(), "key"); got != "" {
+		t.Fatalf("expected empty subject, got %q", got)
+	}
+}
+
 // The coupon block prints the tier, so it must not render when the tier is
 // unknown — a job serialized before the tier field existed, or a user whose items
 // all sat below the 25% GP floor.
@@ -110,7 +160,7 @@ func TestCleanItemNameStripsLeadingTags(t *testing.T) {
 		"[REVIVE] Figure-rise Standard":                    "Figure-rise Standard",
 		"[] Nendoroid Kafka":                               "Nendoroid Kafka",
 		"Luminasta Hatsune Miku (18cm)":                    "Luminasta Hatsune Miku (18cm)", // no leading tag, parens kept
-		"[Set of 6]":                                       "[Set of 6]",                     // all-tag -> keep original
+		"[Set of 6]":                                       "[Set of 6]",                    // all-tag -> keep original
 	}
 	for in, want := range cases {
 		if got := cleanItemName(in); got != want {

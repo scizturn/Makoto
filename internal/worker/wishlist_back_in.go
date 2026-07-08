@@ -51,6 +51,14 @@ func (p *WishlistBackInProcessor) Process(ctx context.Context, job domain.Wishli
 		if err != nil {
 			return ProcessResult{}, err
 		}
+		// Same seed as SelectTemplate, so the subject matches the template that
+		// was picked. Falls back to the renderer's single subject when unset.
+		if subjectTpl := p.campaign.SelectSubject(job.Date, job.ID); subjectTpl != "" {
+			subject, err = p.campaign.RenderSubject(subjectTpl, user)
+			if err != nil {
+				return ProcessResult{}, err
+			}
+		}
 		message.Subject = subject
 		message.HTMLBody = body
 		message.TextBody = subject + "\n\n" + greeting

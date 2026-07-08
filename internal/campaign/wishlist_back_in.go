@@ -29,10 +29,13 @@ func cleanItemName(name string) string {
 
 type WishlistBackInCampaign struct {
 	TemplateIDs []string
-	Greetings   []string
-	ActionURL   string
-	Closing     string
-	RandomIntn  func(n int) int
+	// Subjects is index-aligned with TemplateIDs: SelectSubject reuses the seed
+	// SelectTemplate uses, so subject i always ships with template i.
+	Subjects   []string
+	Greetings  []string
+	ActionURL  string
+	Closing    string
+	RandomIntn func(n int) int
 }
 
 func (c WishlistBackInCampaign) SelectTemplate(now time.Time, key string) string {
@@ -44,6 +47,29 @@ func (c WishlistBackInCampaign) SelectTemplate(now time.Time, key string) string
 		randomIntn = rand.New(rand.NewSource(templateSeed(now, key))).Intn
 	}
 	return c.TemplateIDs[randomIntn(len(c.TemplateIDs))]
+}
+
+func (c WishlistBackInCampaign) SelectSubject(now time.Time, key string) string {
+	if len(c.Subjects) == 0 {
+		return ""
+	}
+	randomIntn := c.RandomIntn
+	if randomIntn == nil {
+		randomIntn = rand.New(rand.NewSource(templateSeed(now, key))).Intn
+	}
+	return c.Subjects[randomIntn(len(c.Subjects))]
+}
+
+func (c WishlistBackInCampaign) RenderSubject(tpl string, user domain.User) (string, error) {
+	t, err := texttemplate.New("subject").Parse(tpl)
+	if err != nil {
+		return "", err
+	}
+	var output strings.Builder
+	if err := t.Execute(&output, struct{ Name, FirstName string }{user.Name, firstName(user.Name)}); err != nil {
+		return "", err
+	}
+	return output.String(), nil
 }
 
 func (c WishlistBackInCampaign) SelectGreeting(now time.Time, key string) string {

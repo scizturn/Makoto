@@ -104,9 +104,10 @@ func main() {
 	// --- Wishlist Back In ---
 	wishlistBackInCampaign := campaign.WishlistBackInCampaign{
 		TemplateIDs: cfg.WishlistBackInTemplateIDs,
+		Subjects:    cfg.WishlistBackInEmailSubjects,
 		Greetings:   cfg.WishlistBackInGreetings,
 		ActionURL:   cfg.WishlistBackInActionURL,
-		Closing:     "Mumpung sudah kembali, jangan sampai kelewatan lagi ya!",
+		Closing:     "Jangan sampai kelewatan lagi ya!",
 	}
 	wishlistBackInProcessor := worker.NewWishlistBackInProcessor(sender, validator, wishlistBackInCampaign)
 	wishlistBackInProcessor.Domain = cfg.KirimEmailDomain

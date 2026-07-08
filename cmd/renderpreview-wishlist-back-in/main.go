@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/kyou-id/makoto/internal/campaign"
+	"github.com/kyou-id/makoto/internal/config"
 	"github.com/kyou-id/makoto/internal/domain"
 	"github.com/kyou-id/makoto/internal/emailtemplate"
 )
@@ -26,7 +27,10 @@ func main() {
 	if err := json.Unmarshal(payload, &job); err != nil {
 		log.Fatal(err)
 	}
-	c := campaign.WishlistBackInCampaign{ActionURL: "https://kyou.id/user/my-voucher", Closing: "Mumpung sudah kembali, jangan sampai kelewatan lagi ya!"}
+	// Pull the subjects from config, not a literal, so the preview shows exactly
+	// what production sends. Subject i is paired with templateIDs[i].
+	subjects := config.Load().WishlistBackInEmailSubjects
+	c := campaign.WishlistBackInCampaign{Subjects: subjects, ActionURL: "https://kyou.id/user/my-voucher", Closing: "Jangan sampai kelewatan lagi ya!"}
 	greeting := c.RenderGreeting("Omatase, {{ .FirstName }}! Yang kamu tunggu akhirnya balik.", job.User)
 	mergeData := c.BuildMergeData(job.User, job.VoucherCode, job.VoucherDiscountPercent, job.Items, job.CompanionItem, job.RecoItems, greeting)
 	renderer := emailtemplate.FileRenderer{Dir: templateDir, Subject: "{{ .FirstName }}, wishlist kamu tersedia lagi!"}
@@ -34,6 +38,13 @@ func main() {
 		_, body, err := renderer.Render(templateID, mergeData)
 		if err != nil {
 			log.Fatal(err)
+		}
+		if index < len(subjects) {
+			subject, err := c.RenderSubject(subjects[index], job.User)
+			if err != nil {
+				log.Fatal(err)
+			}
+			log.Printf("subject %d (%s): %s", index+1, templateID, subject)
 		}
 		path := fmt.Sprintf("templates/preview/wishlist-back-in%d-preview.html", index+1)
 		if err := os.WriteFile(path, []byte(body), 0o600); err != nil {
