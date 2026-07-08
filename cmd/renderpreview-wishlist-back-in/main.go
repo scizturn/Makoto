@@ -28,7 +28,7 @@ func main() {
 	}
 	c := campaign.WishlistBackInCampaign{ActionURL: "https://kyou.id/user/my-voucher", Closing: "Mumpung sudah kembali, jangan sampai kelewatan lagi ya!"}
 	greeting := c.RenderGreeting("Omatase, {{ .FirstName }}! Yang kamu tunggu akhirnya balik.", job.User)
-	mergeData := c.BuildMergeData(job.User, job.VoucherCode, job.Items, job.CompanionItem, job.RecoItems, greeting)
+	mergeData := c.BuildMergeData(job.User, job.VoucherCode, job.VoucherDiscountPercent, job.Items, job.CompanionItem, job.RecoItems, greeting)
 	renderer := emailtemplate.FileRenderer{Dir: templateDir, Subject: "{{ .FirstName }}, wishlist kamu tersedia lagi!"}
 	for index, templateID := range templateIDs {
 		_, body, err := renderer.Render(templateID, mergeData)

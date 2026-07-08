@@ -88,6 +88,9 @@ type viewData struct {
 	RecoSeries           string
 	HasCompanion         bool
 	HasVoucher           bool
+	// VoucherDiscount is the tier percent as text ("8"/"6"). Templates print it
+	// next to a literal '%'. Never hardcode the number in the HTML.
+	VoucherDiscount string
 	// PO Ready fields
 	OrderID         string
 	ItemsHTML       template.HTML
@@ -131,6 +134,7 @@ func viewDataFromMergeData(data map[string]any) viewData {
 		RecoSeries:           stringValue(data["reco_series"]),
 		HasCompanion:         boolValue(data["has_companion"]),
 		HasVoucher:           boolValue(data["has_voucher"]),
+		VoucherDiscount:      stringValue(data["voucher_discount"]),
 		OrderID:              stringValue(data["order_id"]),
 		ItemsHTML:            template.HTML(stringValue(data["items_html"])),
 		ItemCount:            stringValue(data["item_count"]),

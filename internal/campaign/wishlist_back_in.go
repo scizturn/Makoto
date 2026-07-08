@@ -70,7 +70,7 @@ func (c WishlistBackInCampaign) RenderGreeting(tpl string, user domain.User) str
 	return output.String()
 }
 
-func (c WishlistBackInCampaign) BuildMergeData(user domain.User, voucherCode string, items []domain.WishlistBackInItem, companion domain.WishlistBackInItem, recos []domain.WishlistBackInItem, greeting string) map[string]any {
+func (c WishlistBackInCampaign) BuildMergeData(user domain.User, voucherCode string, discountPercent int, items []domain.WishlistBackInItem, companion domain.WishlistBackInItem, recos []domain.WishlistBackInItem, greeting string) map[string]any {
 	// The "Lengkapin koleksi" cross-sell renders only with an anchor (a purchased
 	// item) AND a full set of popular recommendations in its series/category.
 	hasReco := companion.ID != "" && len(recos) > 0
@@ -78,12 +78,18 @@ func (c WishlistBackInCampaign) BuildMergeData(user domain.User, voucherCode str
 	if hasReco {
 		recoSeries = wishlistBackInRecoSeries(companion, recos)
 	}
+	// The coupon block prints discountPercent, so it renders only when Yukari told
+	// us the tier. A job serialized before the tier existed carries a code but no
+	// percent; suppressing the block there is better than shouting "0%". The
+	// voucher is still claimable from the item links' ?claim= parameter.
+	hasVoucher := strings.TrimSpace(voucherCode) != "" && discountPercent > 0
 	return map[string]any{
 		"name":              user.Name,
 		"first_name":        firstName(user.Name),
 		"greeting":          greeting,
 		"voucher_code":      voucherCode,
-		"has_voucher":       strings.TrimSpace(voucherCode) != "",
+		"voucher_discount":  discountPercent,
+		"has_voucher":       hasVoucher,
 		"action_url":        actionURLWithClaim(c.ActionURL, voucherCode),
 		"back_in_item_html": renderWishlistBackInItems(items),
 		"item_count":        len(items),
