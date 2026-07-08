@@ -107,6 +107,7 @@ func main() {
 		Subjects:    cfg.WishlistBackInEmailSubjects,
 		Greetings:   cfg.WishlistBackInGreetings,
 		ActionURL:   cfg.WishlistBackInActionURL,
+		WishlistURL: "https://kyou.id/user/wishlist",
 		Closing:     "Jangan sampai kelewatan lagi ya!",
 	}
 	wishlistBackInProcessor := worker.NewWishlistBackInProcessor(sender, validator, wishlistBackInCampaign)

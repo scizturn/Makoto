@@ -31,11 +31,16 @@ type WishlistBackInCampaign struct {
 	TemplateIDs []string
 	// Subjects is index-aligned with TemplateIDs: SelectSubject reuses the seed
 	// SelectTemplate uses, so subject i always ships with template i.
-	Subjects   []string
-	Greetings  []string
-	ActionURL  string
-	Closing    string
-	RandomIntn func(n int) int
+	Subjects  []string
+	Greetings []string
+	// ActionURL is the claim landing page; the voucher code is appended as
+	// ?claim=<code>, and the coupon block links to it.
+	ActionURL string
+	// WishlistURL is where the closing CTA points — the reader's wishlist, not
+	// the claim page.
+	WishlistURL string
+	Closing     string
+	RandomIntn  func(n int) int
 }
 
 func (c WishlistBackInCampaign) SelectTemplate(now time.Time, key string) string {
@@ -117,6 +122,7 @@ func (c WishlistBackInCampaign) BuildMergeData(user domain.User, voucherCode str
 		"voucher_discount":  discountPercent,
 		"has_voucher":       hasVoucher,
 		"action_url":        actionURLWithClaim(c.ActionURL, voucherCode),
+		"wishlist_url":      c.WishlistURL,
 		"back_in_item_html": renderWishlistBackInItems(items),
 		"item_count":        len(items),
 		"reco_html":         renderWishlistBackInRecoGrid(recos),

@@ -64,6 +64,23 @@ func TestWishlistBackInMergeDataEscapesItemsAndHandlesCompanion(t *testing.T) {
 	}
 }
 
+// Two distinct links: the coupon block carries ?claim=<code> so opening it
+// redeems the voucher, while the closing CTA goes to the reader's wishlist. Swap
+// them and the voucher silently stops being claimable from the email.
+func TestWishlistBackInKeepsClaimURLSeparateFromWishlistURL(t *testing.T) {
+	c := WishlistBackInCampaign{
+		ActionURL:   "https://kyou.id/user/my-voucher",
+		WishlistURL: "https://kyou.id/user/wishlist",
+	}
+	data := c.BuildMergeData(domain.User{Name: "Ruby"}, "WBI8-ABC", 8, nil, domain.WishlistBackInItem{}, nil, "Omatase!")
+	if got := data["action_url"]; got != "https://kyou.id/user/my-voucher?claim=WBI8-ABC" {
+		t.Fatalf("action_url = %v, want the claim URL", got)
+	}
+	if got := data["wishlist_url"]; got != "https://kyou.id/user/wishlist" {
+		t.Fatalf("wishlist_url = %v, want the wishlist page", got)
+	}
+}
+
 // Subject i must ship with template i: both selectors draw from the same seed.
 // If they ever diverge, template 2's art would go out under template 3's subject.
 func TestWishlistBackInSubjectIsPairedWithTemplate(t *testing.T) {

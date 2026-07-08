@@ -30,7 +30,7 @@ func main() {
 	// Pull the subjects from config, not a literal, so the preview shows exactly
 	// what production sends. Subject i is paired with templateIDs[i].
 	subjects := config.Load().WishlistBackInEmailSubjects
-	c := campaign.WishlistBackInCampaign{Subjects: subjects, ActionURL: "https://kyou.id/user/my-voucher", Closing: "Jangan sampai kelewatan lagi ya!"}
+	c := campaign.WishlistBackInCampaign{Subjects: subjects, ActionURL: "https://kyou.id/user/my-voucher", WishlistURL: "https://kyou.id/user/wishlist", Closing: "Jangan sampai kelewatan lagi ya!"}
 	greeting := c.RenderGreeting("Omatase, {{ .FirstName }}! Yang kamu tunggu akhirnya balik.", job.User)
 	mergeData := c.BuildMergeData(job.User, job.VoucherCode, job.VoucherDiscountPercent, job.Items, job.CompanionItem, job.RecoItems, greeting)
 	renderer := emailtemplate.FileRenderer{Dir: templateDir, Subject: "{{ .FirstName }}, wishlist kamu tersedia lagi!"}
