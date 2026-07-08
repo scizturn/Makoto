@@ -11,3 +11,8 @@
 dump.rdb
 .DS_Store
 .gocache/
+
+# Preview job payloads are generated from the live DB by Yukari's previewjob-*
+# commands and carry a real user's name and email address. Regenerate them
+# locally; never commit them.
+templates/preview/*-job.json
