@@ -10,7 +10,7 @@
     "created_at": "0001-01-01T00:00:00Z",
     "is_active": true
   },
-  "voucher_code": "WBI-PREVIEW-14D",
+  "voucher_code": "WBI8-PREVIEW14D",
   "items": [
     {
       "id": "67858",
@@ -40,13 +40,13 @@
     },
     {
       "id": "184714",
-      "name": "[Set of 2] Pop Up Parade Figure L Size Panty \u0026 Stocking Anarchy - Repent Ver. Panty \u0026 Stocking with Garterbelt (21cm)",
+      "name": "[Set of 2] Pop Up Parade Figure L Size Panty & Stocking Anarchy - Repent Ver. Panty & Stocking with Garterbelt (21cm)",
       "url": "https://kyou.id/items/184714/",
       "image_url": "https://kyoucdn.id/items/418851-set-of-2-pop-up-parade-figure-l-size-panty-stocking-anarchy-repent-ver-panty-stocking-with-garterbelt-21cm.jpg.webp",
       "price": 2450000,
       "status": "ready",
       "manufacturer": "Good Smile Company",
-      "series_name": "Panty \u0026 Stocking with Garterbelt",
+      "series_name": "Panty & Stocking with Garterbelt",
       "category_name": "Pop Up Parade",
       "restocked_at": "2026-06-24T06:12:19Z",
       "discount_price": 2249000
@@ -156,5 +156,6 @@
       "discount_price": 39000
     }
   ],
-  "attempt": 1
+  "attempt": 1,
+  "voucher_discount_percent": 8
 }

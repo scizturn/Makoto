@@ -15,7 +15,8 @@ func TestWishlistBackInMergeDataEscapesItemsAndHandlesCompanion(t *testing.T) {
 	}
 	data := campaign.BuildMergeData(
 		domain.User{Name: "Ruby Reinze"},
-		"WBI123",
+		"WBI8-123",
+		8,
 		[]domain.WishlistBackInItem{
 			{ID: "1", Name: "Figure <Ready>", URL: "https://kyou.id/items/1/", Price: 100000},
 			{ID: "3", Name: "Second Item", URL: "https://kyou.id/items/3/", Price: 250000},
@@ -48,13 +49,38 @@ func TestWishlistBackInMergeDataEscapesItemsAndHandlesCompanion(t *testing.T) {
 	}
 
 	// Section must hide when there are no recommendations, even with an anchor.
-	hidden := campaign.BuildMergeData(domain.User{Name: "Ruby"}, "WBI123", nil,
+	hidden := campaign.BuildMergeData(domain.User{Name: "Ruby"}, "WBI8-123", 8, nil,
 		domain.WishlistBackInItem{ID: "2", Name: "Purchased Pair"}, nil, "Omatase!")
 	if hidden["has_companion"] != false {
 		t.Fatalf("expected section hidden without recos, got %v", hidden["has_companion"])
 	}
-	if data["action_url"] != "https://kyou.id/user/my-voucher?claim=WBI123" {
+	if data["action_url"] != "https://kyou.id/user/my-voucher?claim=WBI8-123" {
 		t.Fatalf("unexpected action URL: %v", data["action_url"])
+	}
+	if data["voucher_discount"] != 8 || data["has_voucher"] != true {
+		t.Fatalf("expected the 8%% tier to surface, got discount=%v has_voucher=%v", data["voucher_discount"], data["has_voucher"])
+	}
+}
+
+// The coupon block prints the tier, so it must not render when the tier is
+// unknown — a job serialized before the tier field existed, or a user whose items
+// all sat below the 25% GP floor.
+func TestWishlistBackInHidesVoucherWithoutTier(t *testing.T) {
+	campaign := WishlistBackInCampaign{ActionURL: "https://kyou.id/user/my-voucher"}
+	for _, tc := range []struct {
+		name    string
+		code    string
+		percent int
+	}{
+		{"no voucher at all", "", 0},
+		{"legacy job: code but no tier", "WBIZEZ3HVQLT3F6A", 0},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			data := campaign.BuildMergeData(domain.User{Name: "Ruby"}, tc.code, tc.percent, nil, domain.WishlistBackInItem{}, nil, "Omatase!")
+			if data["has_voucher"] != false {
+				t.Fatalf("expected the coupon block suppressed, got has_voucher=%v", data["has_voucher"])
+			}
+		})
 	}
 }
 
