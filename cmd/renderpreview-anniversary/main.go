@@ -35,7 +35,9 @@ func main() {
 		ActionURL:  actionURL,
 		RandomIntn: func(n int) int { return 0 },
 	}
-	mergeData := anniversaryCampaign.BuildMergeData(job.User, "ANVPREVIEW2026", job.WishlistItems, job.Years, job.HistoricalItem, job.Date)
+	// Use the job's code, not a literal: previewjob-anniversary looks up the user's
+	// real live voucher, and hardcoding here threw that away.
+	mergeData := anniversaryCampaign.BuildMergeData(job.User, job.VoucherCode, job.WishlistItems, job.Years, job.HistoricalItem, job.Date)
 	renderer := emailtemplate.FileRenderer{Dir: templateDir, Subject: subject}
 
 	var rendered []string
