@@ -180,9 +180,9 @@ func Load() Config {
 		WinbackEmailTemplateDir: os.Getenv("MAKOTO_WINBACK_EMAIL_TEMPLATE_DIR"),
 		WinbackEmailSubject:     "Akhirnya kamu kembali! Kyou udah siapin hadiah spesial untuk {{ .FirstName }}",
 		WinbackEmailSubjects: []string{
-			"Akhirnya kamu kembali! Kyou udah siapin hadiah spesial untuk {{ .FirstName }}",
-			"Okaeri, {{ .FirstName }}! Kyou kangen. Ini hadiah spesial karena kamu sudah kembali!",
-			"Yeay, {{ .FirstName }} pulang! Ada Kejutan Spesial dari Kyou!",
+			"💌 Surat Kangen Untuk {{ .FirstName }} dari Kyou",
+			"💙 {{ .FirstName }}, Rasanya Sudah Lama Kita Tidak Bertemu",
+			"💙 {{ .FirstName }}, Kyou Kangen Kamu...",
 		},
 		WinbackGreetings: envListPipe("MAKOTO_WINBACK_GREETINGS", []string{
 			"Hei {{ .FirstName }}, udah lama banget nih nggak ketemu!",
