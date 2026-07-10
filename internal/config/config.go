@@ -200,9 +200,9 @@ func Load() Config {
 		WishlistBackInEmailSubject:     "{{ .FirstName }}, wishlist kamu tersedia lagi!",
 		// Index-aligned with WishlistBackInTemplateIDs: subject i ships with template i.
 		WishlistBackInEmailSubjects: []string{
-			"Kabar baik untuk {{ .FirstName }}! Wishlist kamu sudah tersedia kembali!",
-			"Surprise! Item inceran {{ .FirstName }} tersedia kembali hari ini",
-			"Yatta! Penantianmu berakhir, wishlist {{ .FirstName }} sudah bisa di-checkout lagi!",
+			"🚨 Wishlist yang Kemarin Habis, Sekarang Tersedia Lagi!",
+			"👀 Item Incaranmu Sudah Kembali Tersedia!",
+			"✨ Kabar Baik! Wishlist yang Sempat Habis Kini Kembali ~",
 		},
 		WishlistBackInGreetings: envListPipe("MAKOTO_WISHLIST_BACK_IN_GREETINGS", []string{
 			"Omatase, {{ .FirstName }}! Yang kamu tunggu akhirnya balik.",
