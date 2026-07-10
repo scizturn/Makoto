@@ -52,6 +52,7 @@ type Config struct {
 	LeftoverCartTemplateIDs            []string
 	LeftoverCartEmailTemplateDir       string
 	LeftoverCartEmailSubject           string
+	LeftoverCartEmailSubjects          []string
 	LeftoverCartGreetings              []string
 	LeftoverCartURL                    string
 	DiscountedWishlistEnabled          bool
@@ -144,6 +145,15 @@ func Load() Config {
 		LeftoverCartTemplateIDs:      envList("MAKOTO_LEFTOVER_CART_TEMPLATE_IDS", []string{"leftover_cart1.html", "leftover_cart2.html", "leftover_cart3.html", "leftover_cart4.html", "leftover_cart5.html"}),
 		LeftoverCartEmailTemplateDir: os.Getenv("MAKOTO_LEFTOVER_CART_EMAIL_TEMPLATE_DIR"),
 		LeftoverCartEmailSubject:     "Psst... Khilaf kamu masih tertunda nih!",
+		// Index-aligned with LeftoverCartTemplateIDs: subject i ships with design i,
+		// and repeats that design's browser title verbatim.
+		LeftoverCartEmailSubjects: []string{
+			"👀 Psst... Koleksi baru kamu masih ketinggalan nih!",
+			"✨ Keranjangmu masih nungguin kamu",
+			"⏳ Keranjangmu kesepian nungguin kamu dorong ke meja kasir",
+			"💙 Ada yang masih nungguin kamu, lho!",
+			"💫 Koleksi Incaranmu Masih Menunggumu di Keranjang",
+		},
 		LeftoverCartGreetings: envListPipe("MAKOTO_LEFTOVER_CART_GREETINGS", []string{
 			"Hei {{ .FirstName }}, kamu lagi sibuk ya?",
 			"Woi {{ .FirstName }}, jangan lupa sama keranjangmu!",

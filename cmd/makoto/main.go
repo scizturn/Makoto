@@ -141,6 +141,7 @@ func main() {
 	// --- Leftover Cart ---
 	leftoverCartCampaign := campaign.LeftoverCartCampaign{
 		TemplateIDs: cfg.LeftoverCartTemplateIDs,
+		Subjects:    cfg.LeftoverCartEmailSubjects,
 		Greetings:   cfg.LeftoverCartGreetings,
 		CartURL:     cfg.LeftoverCartURL,
 		Closing:     "Sampai ketemu lagi di Kyou!",

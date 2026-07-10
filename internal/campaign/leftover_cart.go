@@ -15,6 +15,7 @@ import (
 
 type LeftoverCartCampaign struct {
 	TemplateIDs []string
+	Subjects    []string
 	Greetings   []string
 	CartURL     string
 	Closing     string
@@ -30,6 +31,26 @@ func (c LeftoverCartCampaign) SelectTemplate(now time.Time, key string) string {
 		randomIntn = rand.New(rand.NewSource(templateSeed(now, key))).Intn
 	}
 	return c.TemplateIDs[randomIntn(len(c.TemplateIDs))]
+}
+
+// SelectSubject draws from the same seed as SelectTemplate, so subject i always
+// ships with design i — each design's subject repeats its own browser title.
+func (c LeftoverCartCampaign) SelectSubject(now time.Time, key string) string {
+	if len(c.Subjects) == 0 {
+		return ""
+	}
+	randomIntn := c.RandomIntn
+	if randomIntn == nil {
+		randomIntn = rand.New(rand.NewSource(templateSeed(now, key))).Intn
+	}
+	return c.Subjects[randomIntn(len(c.Subjects))]
+}
+
+// RenderSubject fills {{ .Name }} / {{ .FirstName }}, same as a greeting does.
+// None of the five subjects use them today, but a template that parses cleanly
+// costs nothing and the next subject may.
+func (c LeftoverCartCampaign) RenderSubject(tpl string, user domain.User) string {
+	return c.RenderGreeting(tpl, user)
 }
 
 func (c LeftoverCartCampaign) SelectGreeting(now time.Time, key string) string {

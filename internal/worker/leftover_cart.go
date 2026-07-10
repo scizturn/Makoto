@@ -66,6 +66,9 @@ func (p *LeftoverCartProcessor) Process(ctx context.Context, job domain.Leftover
 		if err != nil {
 			return ProcessResult{}, err
 		}
+		if subjectTpl := p.campaign.SelectSubject(job.Date, job.ID); subjectTpl != "" {
+			subject = p.campaign.RenderSubject(subjectTpl, user)
+		}
 		msg.Subject = subject
 		msg.HTMLBody = html
 		msg.TextBody = subject + "\n\n" + user.Name
