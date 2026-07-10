@@ -188,9 +188,9 @@ Anniversary menggunakan 3 subject yang dipilih secara deterministik (seed dari t
 - User berbeda di hari yang sama bisa dapat subject berbeda
 
 Default subjects:
-1. `Cieee anniversary! Cek hadiah dari Kyou buat nambahin khilafanmu!`
-2. `Ada kado spesial buat anniversary ke-{{ .Years }}, {{ .FirstName }}!`
-3. `Kejutan spesial untuk anniversary kamu, {{ .FirstName }}.`
+1. `Happy KyouVersary! 🎁 Kono Gift wo Anata ni!`
+2. `🎁 Kado spesial di hari istimewa! Happy KyouVersary ke-{{ .Years }}, {{ .FirstName }}! 🎉`
+3. `❤️ {{ .Years }} Tahun menjalin hubungan, dan terus berlanjut.`
 
 ## Redis Job Format
 

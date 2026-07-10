@@ -128,9 +128,9 @@ func Load() Config {
 		AnniversaryEmailTemplateDir:  os.Getenv("MAKOTO_ANNIVERSARY_EMAIL_TEMPLATE_DIR"),
 		AnniversaryEmailSubject:      env("MAKOTO_ANNIVERSARY_EMAIL_SUBJECT", "Happy Anniversary, {{ .Name }}! 🎉"),
 		AnniversaryEmailSubjects: envListPipe("MAKOTO_ANNIVERSARY_EMAIL_SUBJECTS", []string{
-			"Cieee anniversary! Cek hadiah dari Kyou buat nambahin khilafanmu!",
-			"Ada kado spesial buat anniversary ke-{{ .Years }}, {{ .FirstName }}!",
-			"Kejutan spesial untuk anniversary kamu, {{ .FirstName }}.",
+			"Happy KyouVersary! 🎁 Kono Gift wo Anata ni!",
+			"🎁 Kado spesial di hari istimewa! Happy KyouVersary ke-{{ .Years }}, {{ .FirstName }}! 🎉",
+			"❤️ {{ .Years }} Tahun menjalin hubungan, dan terus berlanjut.",
 		}),
 		LeftoverCartEnabled:          envBool("MAKOTO_LEFTOVER_CART_ENABLED", false),
 		LeftoverCartQueueName:        env("MAKOTO_LEFTOVER_CART_QUEUE_NAME", "leftover_cart_email_jobs"),
