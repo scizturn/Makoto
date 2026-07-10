@@ -137,22 +137,23 @@ type PoReadyItem struct {
 	URL      string `json:"url"`
 	ImageURL string `json:"image_url"`
 	Price    int    `json:"price"`
-	Quantity int    `json:"quantity"`
+	// DiscountPrice is the active discounted price (0 if not discounted). Price
+	// stays the original; the template strikes Price through when this is set.
+	DiscountPrice int `json:"discount_price,omitempty"`
+	// ReadyAt is when the item's PO stock was converted to ready.
+	ReadyAt time.Time `json:"ready_at"`
 }
 
-// PoReadyJob is a per-order pelunasan reminder: a PO the user paid a DP on has
-// arrived while the order still owes a balance.
+// PoReadyJob is user-centric: one email per user listing up to 5 of the user's own
+// wishlisted items whose pre-order stock was just converted to ready (newest
+// conversion first). No voucher — it is pure availability news.
 type PoReadyJob struct {
-	ID          string        `json:"job_id"`
-	OrderID     string        `json:"order_id"`
-	UserID      string        `json:"user_id"`
-	Date        time.Time     `json:"date"`
-	User        User          `json:"user"`
-	Items       []PoReadyItem `json:"items"`
-	Remaining   int           `json:"remaining"`
-	DownPayment int           `json:"down_payment"`
-	ETA         string        `json:"eta"`
-	Attempt     int           `json:"attempt"`
+	ID      string        `json:"job_id"`
+	UserID  string        `json:"user_id"`
+	Date    time.Time     `json:"date"`
+	User    User          `json:"user"`
+	Items   []PoReadyItem `json:"items"`
+	Attempt int           `json:"attempt"`
 }
 
 type WishlistBackInItem struct {

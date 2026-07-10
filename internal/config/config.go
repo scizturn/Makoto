@@ -207,19 +207,19 @@ func Load() Config {
 		PoReadyDeadLetterQueue:  env("MAKOTO_PO_READY_DEAD_LETTER_QUEUE", "po_ready_email_jobs_dead"),
 		PoReadyTemplateIDs:      envList("MAKOTO_PO_READY_TEMPLATE_IDS", []string{"po_ready1.html", "po_ready2.html", "po_ready3.html"}),
 		PoReadyEmailTemplateDir: os.Getenv("MAKOTO_PO_READY_EMAIL_TEMPLATE_DIR"),
-		PoReadyEmailSubject:     env("MAKOTO_PO_READY_EMAIL_SUBJECT", "{{ .FirstName }}, PO kamu udah sampai — yuk lunasin!"),
+		PoReadyEmailSubject:     env("MAKOTO_PO_READY_EMAIL_SUBJECT", "{{ .FirstName }}, wishlist kamu udah ready!"),
 		PoReadyEmailSubjects: envListPipe("MAKOTO_PO_READY_EMAIL_SUBJECTS", []string{
-			"Kabar baik {{ .FirstName }}! PO kamu udah ready, tinggal dilunasin~",
-			"Omatase {{ .FirstName }}! Pesanan PO kamu udah nyampe di Kyou.",
-			"{{ .FirstName }}, barang PO incaranmu udah ready — selesaikan pembayarannya yuk!",
+			"Kabar baik {{ .FirstName }}! Wishlist kamu udah jadi ready~",
+			"Omatase {{ .FirstName }}! Barang PO di wishlist kamu udah ready.",
+			"{{ .FirstName }}, wishlist incaranmu udah bisa dibeli sekarang!",
 		}),
 		PoReadyGreetings: envListPipe("MAKOTO_PO_READY_GREETINGS", []string{
-			"Omatase, {{ .FirstName }}! Barang PO kamu akhirnya sampai di Kyou.",
+			"Omatase, {{ .FirstName }}! Wishlist kamu akhirnya jadi ready.",
 			"Kabar baik, {{ .FirstName }}! PO yang kamu tunggu udah ready.",
-			"{{ .FirstName }}, penantianmu selesai — pesanan PO kamu udah tiba!",
-			"Hei {{ .FirstName }}, PO incaranmu udah ready nih di gudang Kyou!",
+			"{{ .FirstName }}, penantianmu selesai — wishlist kamu udah ready!",
+			"Hei {{ .FirstName }}, wishlist kamu udah ready nih di Kyou!",
 		}),
-		PoReadyURL: env("MAKOTO_PO_READY_URL", "https://kyou.id/user/history"),
+		PoReadyURL: env("MAKOTO_PO_READY_URL", "https://kyou.id/user/wishlist"),
 	}
 }
 

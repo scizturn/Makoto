@@ -87,8 +87,8 @@ func main() {
 		TemplateIDs: cfg.PoReadyTemplateIDs,
 		Subjects:    cfg.PoReadyEmailSubjects,
 		Greetings:   cfg.PoReadyGreetings,
-		HistoryURL:  cfg.PoReadyURL,
-		Closing:     "Barang udah di tangan Kyou — tinggal selesaikan pembayaran biar bisa segera dikirim!",
+		WishlistURL: cfg.PoReadyURL,
+		Closing:     "Stok ready biasanya cepat habis — cek wishlist kamu sebelum keduluan!",
 	}
 	poReadyProcessor := worker.NewPoReadyProcessor(sender, validator, poReadyCampaign)
 	poReadyProcessor.Domain = cfg.KirimEmailDomain
@@ -776,8 +776,8 @@ func runPoReadySender(ctx context.Context, q *queue.PoReadyRedisQueue, processor
 			_ = discord.Log(ctx, fmt.Sprintf("[PO Ready Email Ack Failed]\nJob: %s\nUser: %s\nEmail: %s\nAck error: %v", job.ID, job.UserID, maskEmail(job.User.Email), err))
 			continue
 		}
-		log.Printf("po ready email sent: job_id=%s user_id=%s order_id=%s", job.ID, job.UserID, job.OrderID)
-		_ = discord.Log(ctx, fmt.Sprintf("[PO Ready Email Sent]\nJob: %s\nUser: %s\nEmail: %s\nOrder: %s", job.ID, job.UserID, maskEmail(job.User.Email), job.OrderID))
+		log.Printf("po ready email sent: job_id=%s user_id=%s items=%d", job.ID, job.UserID, len(job.Items))
+		_ = discord.Log(ctx, fmt.Sprintf("[PO Ready Email Sent]\nJob: %s\nUser: %s\nEmail: %s\nItems: %d", job.ID, job.UserID, maskEmail(job.User.Email), len(job.Items)))
 	}
 }
 

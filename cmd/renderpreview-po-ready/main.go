@@ -19,8 +19,8 @@ func main() {
 	jobPath := env("MAKOTO_PREVIEW_JOB_PATH", "templates/preview/po-ready-job.json")
 	outputPath := env("MAKOTO_PREVIEW_HTML_PATH", "templates/preview/po-ready-preview.html")
 	templateDir := env("MAKOTO_PO_READY_EMAIL_TEMPLATE_DIR", "templates/po_ready")
-	subject := env("MAKOTO_PO_READY_EMAIL_SUBJECT", "{{ .FirstName }}, PO kamu udah sampai — yuk lunasin!")
-	historyURL := env("MAKOTO_PO_READY_URL", "https://kyou.id/user/history")
+	subject := env("MAKOTO_PO_READY_EMAIL_SUBJECT", "{{ .FirstName }}, wishlist kamu udah ready!")
+	wishlistURL := env("MAKOTO_PO_READY_URL", "https://kyou.id/user/wishlist")
 
 	job := sampleJob()
 	if payload, err := os.ReadFile(jobPath); err == nil {
@@ -32,13 +32,13 @@ func main() {
 	}
 
 	pr := campaign.PoReadyCampaign{
-		HistoryURL: historyURL,
-		Closing:    "Barang udah di tangan Kyou — tinggal selesaikan pembayaran biar bisa segera dikirim!",
-		RandomIntn: func(n int) int { return 0 },
+		WishlistURL: wishlistURL,
+		Closing:     "Stok ready biasanya cepat habis — cek wishlist kamu sebelum keduluan!",
+		RandomIntn:  func(n int) int { return 0 },
 	}
 
-	greeting := pr.RenderGreeting("Omatase, {{ .FirstName }}! Barang PO kamu akhirnya sampai di Kyou.", job.User)
-	mergeData := pr.BuildMergeData(job.User, job.OrderID, job.Items, job.Remaining, job.DownPayment, job.ETA, greeting)
+	greeting := pr.RenderGreeting("Omatase, {{ .FirstName }}! Wishlist kamu akhirnya jadi ready.", job.User)
+	mergeData := pr.BuildMergeData(job.User, job.Items, greeting)
 
 	renderer := emailtemplate.FileRenderer{Dir: templateDir, Subject: subject}
 
@@ -69,23 +69,19 @@ func main() {
 	if err := os.WriteFile(outputPath, []byte(index), 0o600); err != nil {
 		log.Fatal("failed writing index: ", err)
 	}
-	log.Printf("preview index written: %s (order_id=%s items=%d remaining=%d)", outputPath, job.OrderID, len(job.Items), job.Remaining)
+	log.Printf("preview index written: %s (user_id=%s items=%d)", outputPath, job.UserID, len(job.Items))
 }
 
 func sampleJob() domain.PoReadyJob {
 	return domain.PoReadyJob{
-		ID:      "preview-po-ready-sample",
-		OrderID: "123456",
-		UserID:  "1",
-		User:    domain.User{ID: "1", Name: "Reinze Tanaka", Email: "reinze@example.test", IsActive: true},
+		ID:     "preview-po-ready-sample",
+		UserID: "1",
+		User:   domain.User{ID: "1", Name: "Reinze Tanaka", Email: "reinze@example.test", IsActive: true},
 		Items: []domain.PoReadyItem{
-			{ID: "1", Name: "Hatsune Miku 1/7 Scale Figure", URL: "https://kyou.id/items/1/", ImageURL: "https://kyoucdn.id/static/assets/brand_logo.png", Price: 2350000, Quantity: 1},
-			{ID: "2", Name: "Nendoroid Frieren", URL: "https://kyou.id/items/2/", ImageURL: "https://kyoucdn.id/static/assets/brand_logo.png", Price: 850000, Quantity: 2},
+			{ID: "1", Name: "Hatsune Miku 1/7 Scale Figure", URL: "https://kyou.id/items/1/", ImageURL: "https://kyoucdn.id/static/assets/brand_logo.png", Price: 2350000},
+			{ID: "2", Name: "Nendoroid Frieren", URL: "https://kyou.id/items/2/", ImageURL: "https://kyoucdn.id/static/assets/brand_logo.png", Price: 850000, DiscountPrice: 720000},
 		},
-		Remaining:   2100000,
-		DownPayment: 1100000,
-		ETA:         "Juli 2026",
-		Attempt:     1,
+		Attempt: 1,
 	}
 }
 
