@@ -20,7 +20,7 @@ func main() {
 	outputPath := env("MAKOTO_PREVIEW_HTML_PATH", "templates/preview/discounted-wishlist-preview.html")
 	templateDir := env("MAKOTO_DISCOUNTED_WISHLIST_EMAIL_TEMPLATE_DIR", "templates/discounted_wishlist")
 	subject := env("MAKOTO_DISCOUNTED_WISHLIST_EMAIL_SUBJECT", "{{ .FirstName }}, wishlist kamu lagi diskon nih!")
-	wishlistURL := env("MAKOTO_DISCOUNTED_WISHLIST_URL", "https://kyou.id/user/wishlist")
+	wishlistURL := env("MAKOTO_DISCOUNTED_WISHLIST_URL", "https://kyou.id/user/wishlist?status=promotion")
 
 	payload, err := os.ReadFile(jobPath)
 	if err != nil {

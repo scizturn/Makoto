@@ -158,10 +158,12 @@ func Load() Config {
 		DiscountedWishlistTemplateIDs:      envList("MAKOTO_DISCOUNTED_WISHLIST_TEMPLATE_IDS", []string{"discounted_wishlist1.html", "discounted_wishlist2.html", "discounted_wishlist3.html"}),
 		DiscountedWishlistEmailTemplateDir: os.Getenv("MAKOTO_DISCOUNTED_WISHLIST_EMAIL_TEMPLATE_DIR"),
 		DiscountedWishlistEmailSubject:     "{{ .FirstName }}, wishlist kamu lagi diskon nih!",
+		// Drawn from a seed independent of the template: any subject can ship
+		// with any design, so all nine combinations must read sensibly.
 		DiscountedWishlistEmailSubjects: []string{
-			"Ssst... Kyou lihat wishlist {{ .FirstName }} lagi diskon nih!",
-			"Tadaaa~ Kyou nyempilin diskon di wishlist {{ .FirstName }}!",
-			"Okaeri {{ .FirstName }}! Kyou kasih potongan buat wishlist kamu!",
+			"🤫 Ssst... Wishlist {{ .FirstName }} lagi turun harga nih.",
+			"Tadaaa~ Wishlist kamu jadi semakin bisa dijangkau, {{ .FirstName }}!",
+			"Okaeri, {{ .FirstName }}! Wishlist kamu makin dekat nih!",
 		},
 		DiscountedWishlistGreetings: envListPipe("MAKOTO_DISCOUNTED_WISHLIST_GREETINGS", []string{
 			"Psst {{ .FirstName }}, wishlist incaran kamu lagi diskon nih!",
@@ -170,7 +172,7 @@ func Load() Config {
 			"Woi {{ .FirstName }}, item wishlist favoritmu lagi ada promo!",
 			"{{ .FirstName }}, jangan sampai nyesel — wishlistmu lagi diskon sekarang!",
 		}),
-		DiscountedWishlistURL:   env("MAKOTO_DISCOUNTED_WISHLIST_URL", "https://kyou.id/user/wishlist"),
+		DiscountedWishlistURL:   env("MAKOTO_DISCOUNTED_WISHLIST_URL", "https://kyou.id/user/wishlist?status=promotion"),
 		WinbackEnabled:          envBool("MAKOTO_WINBACK_ENABLED", false),
 		WinbackQueueName:        env("MAKOTO_WINBACK_QUEUE_NAME", "winback_email_jobs"),
 		WinbackDeadLetterQueue:  env("MAKOTO_WINBACK_DEAD_LETTER_QUEUE", "winback_email_jobs_dead"),

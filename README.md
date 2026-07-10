@@ -94,7 +94,8 @@ MAKOTO_DISCOUNTED_WISHLIST_QUEUE_NAME=discounted_wishlist_email_jobs
 MAKOTO_DISCOUNTED_WISHLIST_DEAD_LETTER_QUEUE=discounted_wishlist_email_jobs_dead
 MAKOTO_DISCOUNTED_WISHLIST_TEMPLATE_IDS=discounted_wishlist1.html,discounted_wishlist2.html,discounted_wishlist3.html
 MAKOTO_DISCOUNTED_WISHLIST_EMAIL_TEMPLATE_DIR=templates/discounted_wishlist
-MAKOTO_DISCOUNTED_WISHLIST_URL=https://kyou.id/user/wishlist
+# Wishlist user, difilter ke item yang promonya lagi aktif (hanamaru: ?status=promotion).
+MAKOTO_DISCOUNTED_WISHLIST_URL=https://kyou.id/user/wishlist?status=promotion
 # Required when the worker is enabled. Point this at the real preference center.
 MAKOTO_DISCOUNTED_WISHLIST_UNSUBSCRIBE_URL=
 
