@@ -29,6 +29,7 @@ func main() {
 	// --- Birthday ---
 	birthdayCampaign := campaign.BirthdayCampaign{
 		TemplateIDs: cfg.TemplateIDs,
+		Subjects:    cfg.EmailSubjects,
 		Closing:     "Selamat merayakan hari spesialmu di Kyou!",
 		ActionURL:   cfg.ActionURL,
 	}

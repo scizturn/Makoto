@@ -33,6 +33,7 @@ type Config struct {
 	TemplateIDs                        []string
 	EmailTemplateDir                   string
 	EmailSubject                       string
+	EmailSubjects                      []string
 	ActionURL                          string
 	KyouIDAPIBaseURL                   string
 	KyouIDAPIToken                     string
@@ -115,29 +116,34 @@ func Load() Config {
 		FromName:                     env("KIRIM_EMAIL_FROM_NAME", "Kyou.id"),
 		TemplateIDs:                  envList("MAKOTO_TEMPLATE_IDS", []string{"tpl_001", "tpl_002", "tpl_003"}),
 		EmailTemplateDir:             os.Getenv("MAKOTO_EMAIL_TEMPLATE_DIR"),
-		EmailSubject:                 env("MAKOTO_EMAIL_SUBJECT", "Selamat ulang tahun, {{ .Name }}"),
-		ActionURL:                    env("MAKOTO_ACTION_URL", "https://kyou.id/user/my-voucher"),
-		KyouIDAPIBaseURL:             env("KYOU_ID_API_BASE_URL", "https://kyou.id"),
-		KyouIDAPIToken:               os.Getenv("KYOU_ID_API_TOKEN"),
-		DiscordWebhookURL:            os.Getenv("DISCORD_WEBHOOK_URL"),
-		DiscordEnabled:               envBool("DISCORD_WEBHOOK_ENABLED", true),
-		AnniversaryEnabled:           envBool("MAKOTO_ANNIVERSARY_ENABLED", false),
-		AnniversaryQueueName:         env("MAKOTO_ANNIVERSARY_QUEUE_NAME", "anniversary_email_jobs"),
-		AnniversaryDeadLetterQueue:   env("MAKOTO_ANNIVERSARY_DEAD_LETTER_QUEUE", "anniversary_email_jobs_dead"),
-		AnniversaryTemplateIDs:       envList("MAKOTO_ANNIVERSARY_TEMPLATE_IDS", []string{"anniversary1.html", "anniversary2.html", "anniversary3.html"}),
-		AnniversaryEmailTemplateDir:  os.Getenv("MAKOTO_ANNIVERSARY_EMAIL_TEMPLATE_DIR"),
-		AnniversaryEmailSubject:      env("MAKOTO_ANNIVERSARY_EMAIL_SUBJECT", "Happy Anniversary, {{ .Name }}! 🎉"),
-		AnniversaryEmailSubjects: envListPipe("MAKOTO_ANNIVERSARY_EMAIL_SUBJECTS", []string{
+		EmailSubject:                 "Selamat ulang tahun, {{ .Name }}",
+		EmailSubjects: []string{
+			"Yay, {{ .Name }} lagi Ulang Tahun! Ini Hadiah Kecil untukmu 💝",
+			"Yay! Hari Ini Giliran {{ .Name }} Dapat Hadiah Ulang Tahun 🎉",
+			"Hore, {{ .Name }}! Saatnya Ambil Hadiah Ulang Tahunmu 🎂",
+		},
+		ActionURL:                   env("MAKOTO_ACTION_URL", "https://kyou.id/user/my-voucher"),
+		KyouIDAPIBaseURL:            env("KYOU_ID_API_BASE_URL", "https://kyou.id"),
+		KyouIDAPIToken:              os.Getenv("KYOU_ID_API_TOKEN"),
+		DiscordWebhookURL:           os.Getenv("DISCORD_WEBHOOK_URL"),
+		DiscordEnabled:              envBool("DISCORD_WEBHOOK_ENABLED", true),
+		AnniversaryEnabled:          envBool("MAKOTO_ANNIVERSARY_ENABLED", false),
+		AnniversaryQueueName:        env("MAKOTO_ANNIVERSARY_QUEUE_NAME", "anniversary_email_jobs"),
+		AnniversaryDeadLetterQueue:  env("MAKOTO_ANNIVERSARY_DEAD_LETTER_QUEUE", "anniversary_email_jobs_dead"),
+		AnniversaryTemplateIDs:      envList("MAKOTO_ANNIVERSARY_TEMPLATE_IDS", []string{"anniversary1.html", "anniversary2.html", "anniversary3.html"}),
+		AnniversaryEmailTemplateDir: os.Getenv("MAKOTO_ANNIVERSARY_EMAIL_TEMPLATE_DIR"),
+		AnniversaryEmailSubject:     "Happy Anniversary, {{ .Name }}! 🎉",
+		AnniversaryEmailSubjects: []string{
 			"Happy KyouVersary! 🎁 Kono Gift wo Anata ni!",
 			"🎁 Kado spesial di hari istimewa! Happy KyouVersary ke-{{ .Years }}, {{ .FirstName }}! 🎉",
 			"❤️ {{ .Years }} Tahun menjalin hubungan, dan terus berlanjut.",
-		}),
+		},
 		LeftoverCartEnabled:          envBool("MAKOTO_LEFTOVER_CART_ENABLED", false),
 		LeftoverCartQueueName:        env("MAKOTO_LEFTOVER_CART_QUEUE_NAME", "leftover_cart_email_jobs"),
 		LeftoverCartDeadLetterQueue:  env("MAKOTO_LEFTOVER_CART_DEAD_LETTER_QUEUE", "leftover_cart_email_jobs_dead"),
 		LeftoverCartTemplateIDs:      envList("MAKOTO_LEFTOVER_CART_TEMPLATE_IDS", []string{"leftover_cart1.html", "leftover_cart2.html", "leftover_cart3.html", "leftover_cart4.html", "leftover_cart5.html"}),
 		LeftoverCartEmailTemplateDir: os.Getenv("MAKOTO_LEFTOVER_CART_EMAIL_TEMPLATE_DIR"),
-		LeftoverCartEmailSubject:     env("MAKOTO_LEFTOVER_CART_EMAIL_SUBJECT", "Psst... Khilaf kamu masih tertunda nih!"),
+		LeftoverCartEmailSubject:     "Psst... Khilaf kamu masih tertunda nih!",
 		LeftoverCartGreetings: envListPipe("MAKOTO_LEFTOVER_CART_GREETINGS", []string{
 			"Hei {{ .FirstName }}, kamu lagi sibuk ya?",
 			"Woi {{ .FirstName }}, jangan lupa sama keranjangmu!",
@@ -151,12 +157,12 @@ func Load() Config {
 		DiscountedWishlistDeadLetterQueue:  env("MAKOTO_DISCOUNTED_WISHLIST_DEAD_LETTER_QUEUE", "discounted_wishlist_email_jobs_dead"),
 		DiscountedWishlistTemplateIDs:      envList("MAKOTO_DISCOUNTED_WISHLIST_TEMPLATE_IDS", []string{"discounted_wishlist1.html", "discounted_wishlist2.html", "discounted_wishlist3.html"}),
 		DiscountedWishlistEmailTemplateDir: os.Getenv("MAKOTO_DISCOUNTED_WISHLIST_EMAIL_TEMPLATE_DIR"),
-		DiscountedWishlistEmailSubject:     env("MAKOTO_DISCOUNTED_WISHLIST_EMAIL_SUBJECT", "{{ .FirstName }}, wishlist kamu lagi diskon nih!"),
-		DiscountedWishlistEmailSubjects: envListPipe("MAKOTO_DISCOUNTED_WISHLIST_EMAIL_SUBJECTS", []string{
+		DiscountedWishlistEmailSubject:     "{{ .FirstName }}, wishlist kamu lagi diskon nih!",
+		DiscountedWishlistEmailSubjects: []string{
 			"Ssst... Kyou lihat wishlist {{ .FirstName }} lagi diskon nih!",
 			"Tadaaa~ Kyou nyempilin diskon di wishlist {{ .FirstName }}!",
 			"Okaeri {{ .FirstName }}! Kyou kasih potongan buat wishlist kamu!",
-		}),
+		},
 		DiscountedWishlistGreetings: envListPipe("MAKOTO_DISCOUNTED_WISHLIST_GREETINGS", []string{
 			"Psst {{ .FirstName }}, wishlist incaran kamu lagi diskon nih!",
 			"Hei {{ .FirstName }}, ada kabar bagus buat koleksimu!",
@@ -170,12 +176,12 @@ func Load() Config {
 		WinbackDeadLetterQueue:  env("MAKOTO_WINBACK_DEAD_LETTER_QUEUE", "winback_email_jobs_dead"),
 		WinbackTemplateIDs:      envList("MAKOTO_WINBACK_TEMPLATE_IDS", []string{"winback1.html", "winback2.html", "winback3.html"}),
 		WinbackEmailTemplateDir: os.Getenv("MAKOTO_WINBACK_EMAIL_TEMPLATE_DIR"),
-		WinbackEmailSubject:     env("MAKOTO_WINBACK_EMAIL_SUBJECT", "Akhirnya kamu kembali! Kyou udah siapin hadiah spesial untuk {{ .FirstName }}"),
-		WinbackEmailSubjects: envListPipe("MAKOTO_WINBACK_EMAIL_SUBJECTS", []string{
+		WinbackEmailSubject:     "Akhirnya kamu kembali! Kyou udah siapin hadiah spesial untuk {{ .FirstName }}",
+		WinbackEmailSubjects: []string{
 			"Akhirnya kamu kembali! Kyou udah siapin hadiah spesial untuk {{ .FirstName }}",
 			"Okaeri, {{ .FirstName }}! Kyou kangen. Ini hadiah spesial karena kamu sudah kembali!",
 			"Yeay, {{ .FirstName }} pulang! Ada Kejutan Spesial dari Kyou!",
-		}),
+		},
 		WinbackGreetings: envListPipe("MAKOTO_WINBACK_GREETINGS", []string{
 			"Hei {{ .FirstName }}, udah lama banget nih nggak ketemu!",
 			"{{ .FirstName }}, kita kangen sama kamu!",
@@ -189,13 +195,13 @@ func Load() Config {
 		WishlistBackInDeadLetterQueue:  env("MAKOTO_WISHLIST_BACK_IN_DEAD_LETTER_QUEUE", "wishlist_back_in_email_jobs_dead"),
 		WishlistBackInTemplateIDs:      envList("MAKOTO_WISHLIST_BACK_IN_TEMPLATE_IDS", []string{"wishlist_back_in1.html", "wishlist_back_in2.html", "wishlist_back_in3.html"}),
 		WishlistBackInEmailTemplateDir: os.Getenv("MAKOTO_WISHLIST_BACK_IN_EMAIL_TEMPLATE_DIR"),
-		WishlistBackInEmailSubject:     env("MAKOTO_WISHLIST_BACK_IN_EMAIL_SUBJECT", "{{ .FirstName }}, wishlist kamu tersedia lagi!"),
+		WishlistBackInEmailSubject:     "{{ .FirstName }}, wishlist kamu tersedia lagi!",
 		// Index-aligned with WishlistBackInTemplateIDs: subject i ships with template i.
-		WishlistBackInEmailSubjects: envListPipe("MAKOTO_WISHLIST_BACK_IN_EMAIL_SUBJECTS", []string{
+		WishlistBackInEmailSubjects: []string{
 			"Kabar baik untuk {{ .FirstName }}! Wishlist kamu sudah tersedia kembali!",
 			"Surprise! Item inceran {{ .FirstName }} tersedia kembali hari ini",
 			"Yatta! Penantianmu berakhir, wishlist {{ .FirstName }} sudah bisa di-checkout lagi!",
-		}),
+		},
 		WishlistBackInGreetings: envListPipe("MAKOTO_WISHLIST_BACK_IN_GREETINGS", []string{
 			"Omatase, {{ .FirstName }}! Yang kamu tunggu akhirnya balik.",
 			"{{ .FirstName }}, penantiannya selesai. Wishlist kamu ready lagi!",
@@ -207,12 +213,12 @@ func Load() Config {
 		PoReadyDeadLetterQueue:  env("MAKOTO_PO_READY_DEAD_LETTER_QUEUE", "po_ready_email_jobs_dead"),
 		PoReadyTemplateIDs:      envList("MAKOTO_PO_READY_TEMPLATE_IDS", []string{"po_ready1.html", "po_ready2.html", "po_ready3.html"}),
 		PoReadyEmailTemplateDir: os.Getenv("MAKOTO_PO_READY_EMAIL_TEMPLATE_DIR"),
-		PoReadyEmailSubject:     env("MAKOTO_PO_READY_EMAIL_SUBJECT", "{{ .FirstName }}, wishlist kamu udah ready!"),
-		PoReadyEmailSubjects: envListPipe("MAKOTO_PO_READY_EMAIL_SUBJECTS", []string{
+		PoReadyEmailSubject:     "{{ .FirstName }}, wishlist kamu udah ready!",
+		PoReadyEmailSubjects: []string{
 			"Kabar baik {{ .FirstName }}! Wishlist kamu udah jadi ready~",
 			"Omatase {{ .FirstName }}! Barang PO di wishlist kamu udah ready.",
 			"{{ .FirstName }}, wishlist incaranmu udah bisa dibeli sekarang!",
-		}),
+		},
 		PoReadyGreetings: envListPipe("MAKOTO_PO_READY_GREETINGS", []string{
 			"Omatase, {{ .FirstName }}! Wishlist kamu akhirnya jadi ready.",
 			"Kabar baik, {{ .FirstName }}! PO yang kamu tunggu udah ready.",

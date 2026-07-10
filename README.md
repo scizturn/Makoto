@@ -78,7 +78,6 @@ MAKOTO_DEAD_LETTER_QUEUE=birthday_email_jobs_dead
 MAKOTO_MAX_ATTEMPTS=3
 MAKOTO_TEMPLATE_IDS=birthday1.html,birthday2.html,birthday3.html
 MAKOTO_EMAIL_TEMPLATE_DIR=templates/birthday
-MAKOTO_EMAIL_SUBJECT=Tanjoubi Omedetto, {{ .Name }}! Ada hadiah spesial dari Kyou 🎁
 
 # Anniversary
 MAKOTO_ANNIVERSARY_ENABLED=true
@@ -86,8 +85,7 @@ MAKOTO_ANNIVERSARY_QUEUE_NAME=anniversary_email_jobs
 MAKOTO_ANNIVERSARY_DEAD_LETTER_QUEUE=anniversary_email_jobs_dead
 MAKOTO_ANNIVERSARY_TEMPLATE_IDS=anniversary1.html,anniversary2.html,anniversary3.html
 MAKOTO_ANNIVERSARY_EMAIL_TEMPLATE_DIR=templates/anniversary
-# Subject berotasi otomatis (3 variant). Override via MAKOTO_ANNIVERSARY_EMAIL_SUBJECTS
-# dengan separator pipe: "Subject 1|Subject 2|Subject 3"
+# Subject berotasi otomatis (3 variant), didefinisikan di internal/config/config.go.
 # Variabel tersedia: {{ .Name }}, {{ .FirstName }}, {{ .Years }}
 
 # Discounted wishlist
@@ -106,7 +104,6 @@ MAKOTO_WISHLIST_BACK_IN_QUEUE_NAME=wishlist_back_in_email_jobs
 MAKOTO_WISHLIST_BACK_IN_DEAD_LETTER_QUEUE=wishlist_back_in_email_jobs_dead
 MAKOTO_WISHLIST_BACK_IN_TEMPLATE_IDS=wishlist_back_in1.html,wishlist_back_in2.html,wishlist_back_in3.html
 MAKOTO_WISHLIST_BACK_IN_EMAIL_TEMPLATE_DIR=templates/wishlist_back_in
-MAKOTO_WISHLIST_BACK_IN_EMAIL_SUBJECT='{{ .FirstName }}, wishlist kamu tersedia lagi!'
 # 3 greeting berotasi, separator pipe:
 MAKOTO_WISHLIST_BACK_IN_GREETINGS='Omatase, {{ .FirstName }}! Yang kamu tunggu akhirnya balik.|{{ .FirstName }}, penantiannya selesai. Wishlist kamu ready lagi!|Kabar baik, {{ .FirstName }}. Item incaranmu sudah kembali!'
 MAKOTO_WISHLIST_BACK_IN_ACTION_URL=https://kyou.id/user/my-voucher
@@ -182,12 +179,21 @@ Output ditulis ke `templates/preview/discounted-wishlist*-preview.html`.
 
 ## Subject Rotation
 
-Anniversary menggunakan 3 subject yang dipilih secara deterministik (seed dari tanggal + job ID), sehingga:
+Semua subject didefinisikan di `internal/config/config.go`, **bukan** di env — ubah subject berarti ubah kode dan redeploy.
+
+Birthday dan anniversary sama-sama menggunakan 3 subject yang dipilih secara deterministik (seed dari tanggal + job ID), sehingga:
 - Template dan subject selalu berpasangan (template 1 → subject 1)
 - Retry job yang sama menghasilkan subject yang sama
 - User berbeda di hari yang sama bisa dapat subject berbeda
 
-Default subjects:
+Leftover cart adalah kebalikannya: 5 template, 1 subject untuk semuanya.
+
+Default subjects birthday:
+1. `Yay, {{ .Name }} lagi Ulang Tahun! Ini Hadiah Kecil untukmu 💝`
+2. `Yay! Hari Ini Giliran {{ .Name }} Dapat Hadiah Ulang Tahun 🎉`
+3. `Hore, {{ .Name }}! Saatnya Ambil Hadiah Ulang Tahunmu 🎂`
+
+Default subjects anniversary:
 1. `Happy KyouVersary! 🎁 Kono Gift wo Anata ni!`
 2. `🎁 Kado spesial di hari istimewa! Happy KyouVersary ke-{{ .Years }}, {{ .FirstName }}! 🎉`
 3. `❤️ {{ .Years }} Tahun menjalin hubungan, dan terus berlanjut.`

@@ -134,6 +134,12 @@ func (p *Processor) Process(ctx context.Context, job domain.BirthdayJob) (Proces
 		if err != nil {
 			return ProcessResult{}, err
 		}
+		if subjectTpl := p.campaign.SelectSubject(job.Date, templateSelectionKey(job, user)); subjectTpl != "" {
+			subject, err = p.campaign.RenderSubject(subjectTpl, user)
+			if err != nil {
+				return ProcessResult{}, err
+			}
+		}
 		msg.Subject = subject
 		msg.HTMLBody = html
 		msg.TextBody = subject + "\n\n" + user.Name + ", voucher: " + voucherCode

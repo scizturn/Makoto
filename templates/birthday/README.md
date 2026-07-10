@@ -7,8 +7,9 @@ Set these env values:
 ```env
 MAKOTO_TEMPLATE_IDS=birthday1.html,birthday2.html,birthday3.html
 MAKOTO_EMAIL_TEMPLATE_DIR=templates/birthday
-MAKOTO_EMAIL_SUBJECT='Selamat ulang tahun, {{ .Name }}'
 ```
+
+Subjects are not configurable via env — they live in `internal/config/config.go`, one per template.
 
 Available variables:
 

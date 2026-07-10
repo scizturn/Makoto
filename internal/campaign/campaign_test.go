@@ -1,6 +1,7 @@
 package campaign
 
 import (
+	"fmt"
 	"os"
 	"strings"
 	"testing"
@@ -24,6 +25,39 @@ func TestSelectTemplateUsesRandomChoice(t *testing.T) {
 
 	if got != "tpl_003" {
 		t.Fatalf("expected tpl_003, got %q", got)
+	}
+}
+
+func TestBirthdaySubjectAlwaysPairsWithItsTemplate(t *testing.T) {
+	campaign := BirthdayCampaign{
+		TemplateIDs: []string{"birthday1.html", "birthday2.html", "birthday3.html"},
+		Subjects:    []string{"subject-1", "subject-2", "subject-3"},
+	}
+	now := time.Date(2026, 5, 29, 0, 0, 0, 0, time.FixedZone("Asia/Jakarta", 7*60*60))
+
+	pairs := map[string]string{
+		"birthday1.html": "subject-1",
+		"birthday2.html": "subject-2",
+		"birthday3.html": "subject-3",
+	}
+	for i := 0; i < 60; i++ {
+		key := fmt.Sprintf("birthday-2026-05-29-user-%d", i)
+		tmpl := campaign.SelectTemplate(now, key)
+		subject := campaign.SelectSubject(now, key)
+		if want := pairs[tmpl]; subject != want {
+			t.Fatalf("template %s drew subject %q, want %q", tmpl, subject, want)
+		}
+	}
+}
+
+func TestBirthdayRenderSubjectFillsName(t *testing.T) {
+	campaign := BirthdayCampaign{}
+	got, err := campaign.RenderSubject("Hore, {{ .Name }}! Saatnya Ambil Hadiah Ulang Tahunmu 🎂", domain.User{Name: "Bimo Tyastomo"})
+	if err != nil {
+		t.Fatalf("render subject: %v", err)
+	}
+	if want := "Hore, Bimo Tyastomo! Saatnya Ambil Hadiah Ulang Tahunmu 🎂"; got != want {
+		t.Fatalf("got %q, want %q", got, want)
 	}
 }
 
@@ -397,7 +431,7 @@ func TestBirthdayTemplatesUseTextFooterDesign(t *testing.T) {
 				`border-top: 6px solid #7a3b14`,
 				`background: #efad3e`,
 				`border-radius: 0 0 24px 24px`,
-				`Ayo cintai hobimu bareng Kyou!`,
+				`Ayo #RayakanHobimu bareng Kyou!`,
 				`©2014–2026 Kyou Hobby Shop / Kyou Hobby Shop`,
 				`Kamu menerima email ini karena terdaftar sebagai Teman Kyou.`,
 				`margin:0 0 8px;color:#5a351d;font-size:20px;font-weight:900;line-height:1.2;`,

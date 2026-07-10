@@ -7,6 +7,7 @@ import (
 	"math/rand"
 	"net/url"
 	"strings"
+	texttemplate "text/template"
 	"time"
 
 	"github.com/kyou-id/makoto/internal/domain"
@@ -14,6 +15,7 @@ import (
 
 type BirthdayCampaign struct {
 	TemplateIDs []string
+	Subjects    []string
 	Closing     string
 	ActionURL   string
 	RandomIntn  func(n int) int
@@ -28,6 +30,35 @@ func (c BirthdayCampaign) SelectTemplate(now time.Time, key string) string {
 		randomIntn = rand.New(rand.NewSource(templateSeed(now, key))).Intn
 	}
 	return c.TemplateIDs[randomIntn(len(c.TemplateIDs))]
+}
+
+// SelectSubject draws from the same seed as SelectTemplate, so subject i always
+// ships with design i.
+func (c BirthdayCampaign) SelectSubject(now time.Time, key string) string {
+	if len(c.Subjects) == 0 {
+		return ""
+	}
+	randomIntn := c.RandomIntn
+	if randomIntn == nil {
+		randomIntn = rand.New(rand.NewSource(templateSeed(now, key))).Intn
+	}
+	return c.Subjects[randomIntn(len(c.Subjects))]
+}
+
+func (c BirthdayCampaign) RenderSubject(tpl string, user domain.User) (string, error) {
+	firstName := user.Name
+	if i := strings.Index(user.Name, " "); i > 0 {
+		firstName = user.Name[:i]
+	}
+	t, err := texttemplate.New("subject").Parse(tpl)
+	if err != nil {
+		return "", err
+	}
+	var buf strings.Builder
+	if err := t.Execute(&buf, subjectData{Name: user.Name, FirstName: firstName}); err != nil {
+		return "", err
+	}
+	return buf.String(), nil
 }
 
 func templateSeed(now time.Time, key string) int64 {
