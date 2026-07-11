@@ -136,7 +136,7 @@ func poReadyNameData(user domain.User) struct{ Name, FirstName string } {
 // transition — the story of this campaign.
 func RenderPoReadyItemsHTML(items []domain.PoReadyItem, fallbackURL string) string {
 	if len(items) == 0 {
-		return `<p style="margin:0;color:#6b7280;">Ada barang wishlist kamu yang udah ready — cek langsung di wishlist-mu.</p>`
+		return `<p style="margin:0;color:#6b7280;">Ada barang wishlist kamu yang udah ready, cek langsung di wishlist-mu.</p>`
 	}
 	if len(items) > poReadyItemLimit {
 		items = items[:poReadyItemLimit]

@@ -89,7 +89,7 @@ func main() {
 		Subjects:    cfg.PoReadyEmailSubjects,
 		Greetings:   cfg.PoReadyGreetings,
 		WishlistURL: cfg.PoReadyURL,
-		Closing:     "Stok ready biasanya cepat habis — cek wishlist kamu sebelum keduluan!",
+		Closing:     "Stok ready biasanya cepat habis, cek wishlist kamu sebelum keduluan!",
 	}
 	poReadyProcessor := worker.NewPoReadyProcessor(sender, validator, poReadyCampaign)
 	poReadyProcessor.Domain = cfg.KirimEmailDomain

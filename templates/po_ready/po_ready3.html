@@ -23,7 +23,7 @@
                     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse;">
                         <tr>
                             <td valign="middle" align="left">
-                                <span style="display:inline-block;background:#eafaf1;color:#2e9c5f;font-size:11px;font-weight:800;letter-spacing:0.5px;padding:6px 12px;border-radius:6px;text-transform:uppercase;">Item Ready</span>
+                                <span style="display:inline-block;background:#eafaf1;color:#2e9c5f;font-size:11px;font-weight:800;letter-spacing:0.5px;padding:6px 12px;border-radius:6px;text-transform:uppercase;">Udah Ready</span>
                             </td>
                             <td valign="middle" align="right">
                                 <span style="font-family:'Courier New',monospace;font-size:10px;font-weight:700;letter-spacing:0.5px;color:#a2988a;text-transform:uppercase;">{{ .BlastDate }}</span>
@@ -31,7 +31,7 @@
                         </tr>
                     </table>
                     <h1 style="margin:16px 0 0;color:#231f1b;font-size:34px;font-weight:900;line-height:1.1;letter-spacing:-1px;">Wishlist kamu<br><span style="color:#fc4c02;">siap jalan ke kamu.</span></h1>
-                    <p style="margin:14px 0 0;color:#5b5347;font-size:15px;font-weight:600;line-height:1.6;">Barang PO yang kamu simpan di wishlist barusan pindah dari antrian <b>Pre-Order</b> ke <b>Ready Stock</b>. Begitu checkout, langsung kami proses &amp; kirim &mdash; nggak nunggu produksi lagi.</p>
+                    <p style="margin:14px 0 0;color:#5b5347;font-size:15px;font-weight:600;line-height:1.6;">Kabar baik! Item PO di wishlist kamu udah ready dan siap jalan ke rumahmu. Checkout sekarang, kami langsung siapkan paketnya, tanpa nunggu produksi lagi.</p>
                 </td>
             </tr>
 
@@ -89,7 +89,7 @@
             <!-- ── ITEMS ── -->
             <tr>
                 <td style="padding:26px 34px 0;">
-                    <p style="margin:0 0 12px;font-family:'Courier New',monospace;font-size:10px;font-weight:800;letter-spacing:1.5px;color:#a2988a;text-transform:uppercase;">Item di wishlist kamu ({{ .ItemCount }})</p>
+                    <p style="margin:0 0 12px;font-family:'Courier New',monospace;font-size:10px;font-weight:800;letter-spacing:1.5px;color:#a2988a;text-transform:uppercase;">Wishlist kamu yang udah ready ({{ .ItemCount }})</p>
                     {{ .ItemsHTML }}
                 </td>
             </tr>
@@ -97,7 +97,7 @@
             <!-- ── DUAL CTA ── -->
             <tr>
                 <td style="padding:22px 34px 32px;">
-                    <a href="{{ .ActionURL }}" style="display:block;background:#fc4c02;color:#ffffff;font-size:16px;font-weight:900;text-decoration:none;text-align:center;padding:17px 20px;border-radius:10px;">Checkout dari Wishlist &nbsp;&rarr;</a>
+                    <a href="{{ .ActionURL }}" style="display:block;background:#fc4c02;color:#ffffff;font-size:16px;font-weight:900;text-decoration:none;text-align:center;padding:17px 20px;border-radius:10px;">Checkout &amp; Kirim &nbsp;&rarr;</a>
                     <a href="https://kyou.id" style="display:block;background:transparent;color:#5b5347;font-size:14px;font-weight:800;text-decoration:none;text-align:center;padding:14px 20px;border-radius:10px;border:2px solid #d8cfc0;margin-top:11px;">Atau lanjut belanja di <span style="color:#fc4c02;font-weight:900;">kyou.id</span></a>
                 </td>
             </tr>
