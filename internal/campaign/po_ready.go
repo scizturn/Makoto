@@ -85,7 +85,18 @@ func (c PoReadyCampaign) RenderGreeting(tpl string, user domain.User) string {
 	return buf.String()
 }
 
-func (c PoReadyCampaign) BuildMergeData(user domain.User, items []domain.PoReadyItem, greeting string) map[string]any {
+// poReadyMonthName are the full Indonesian month names for the send-date stamp, so
+// it reads naturally (e.g. "11 Juli").
+var poReadyMonthName = [...]string{"Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"}
+
+func formatPoReadyBlastDate(t time.Time) string {
+	if t.IsZero() {
+		return ""
+	}
+	return fmt.Sprintf("%d %s %d", t.Day(), poReadyMonthName[int(t.Month())-1], t.Year())
+}
+
+func (c PoReadyCampaign) BuildMergeData(user domain.User, items []domain.PoReadyItem, greeting string, blastDate time.Time) map[string]any {
 	firstName := user.Name
 	if i := strings.Index(user.Name, " "); i > 0 {
 		firstName = user.Name[:i]
@@ -103,6 +114,7 @@ func (c PoReadyCampaign) BuildMergeData(user domain.User, items []domain.PoReady
 		"name":        user.Name,
 		"first_name":  firstName,
 		"greeting":    greeting,
+		"blast_date":  formatPoReadyBlastDate(blastDate),
 		"items_html":  RenderPoReadyItemsHTML(items, wishlistURL),
 		"item_count":  strconv.Itoa(len(items)),
 		"action_url":  wishlistURL,
@@ -119,7 +131,9 @@ func poReadyNameData(user domain.User) struct{ Name, FirstName string } {
 	return struct{ Name, FirstName string }{user.Name, firstName}
 }
 
-// RenderPoReadyItemsHTML renders the readied items as a two-column grid.
+// RenderPoReadyItemsHTML renders the readied items as full-width "manifest" rows,
+// stacked one per line (newest first), each showing the Pre-Order → Ready Stock
+// transition — the story of this campaign.
 func RenderPoReadyItemsHTML(items []domain.PoReadyItem, fallbackURL string) string {
 	if len(items) == 0 {
 		return `<p style="margin:0;color:#6b7280;">Ada barang wishlist kamu yang udah ready — cek langsung di wishlist-mu.</p>`
@@ -129,27 +143,12 @@ func RenderPoReadyItemsHTML(items []domain.PoReadyItem, fallbackURL string) stri
 	}
 
 	var builder strings.Builder
-	builder.WriteString(`<table role="presentation" width="636" cellspacing="0" cellpadding="0" align="center" style="width:636px;border-collapse:collapse;margin:0 auto;">`)
-	for rowStart := 0; rowStart < len(items); rowStart += 2 {
-		rowEnd := rowStart + 2
-		if rowEnd > len(items) {
-			rowEnd = len(items)
+	for i, item := range items {
+		if i > 0 {
+			builder.WriteString(`<div style="height:12px;line-height:12px;font-size:12px;">&nbsp;</div>`)
 		}
-		if rowStart > 0 {
-			builder.WriteString(`<tr><td colspan="2" style="height:14px;line-height:14px;font-size:14px;">&nbsp;</td></tr>`)
-		}
-		builder.WriteString(`<tr>`)
-		for i := rowStart; i < rowEnd; i++ {
-			builder.WriteString(`<td width="318" valign="top" align="center" style="width:318px;padding:0 7px;text-align:center;">`)
-			builder.WriteString(renderPoReadyItemCard(items[i], fallbackURL))
-			builder.WriteString(`</td>`)
-		}
-		for i := rowEnd; i < rowStart+2; i++ {
-			builder.WriteString(`<td width="318" valign="top" align="center" style="width:318px;padding:0 7px;text-align:center;">&nbsp;</td>`)
-		}
-		builder.WriteString(`</tr>`)
+		builder.WriteString(renderPoReadyItemCard(item, fallbackURL))
 	}
-	builder.WriteString(`</table>`)
 	return builder.String()
 }
 
@@ -158,32 +157,42 @@ func renderPoReadyItemCard(item domain.PoReadyItem, fallbackURL string) string {
 	safeURL := html.EscapeString(itemURLOrFallback(item.URL, fallbackURL))
 	safeImageURL := html.EscapeString(item.ImageURL)
 
-	imgHTML := fmt.Sprintf(
-		`<img src="%s" alt="%s" width="120" height="120" style="display:block;width:120px;height:120px;object-fit:cover;background:#f3f4f6;border:0;border-radius:8px;">`,
-		safeImageURL, safeName,
-	)
-	if safeImageURL == "" {
-		imgHTML = `<div style="width:120px;height:120px;background:#f3f4f6;border-radius:8px;"></div>`
+	imgHTML := `&nbsp;`
+	if safeImageURL != "" {
+		imgHTML = fmt.Sprintf(
+			`<img src="%s" alt="%s" width="76" height="76" style="display:block;width:76px;height:76px;object-fit:contain;border:0;margin:0 auto;">`,
+			safeImageURL, safeName,
+		)
 	}
 
-	// A discounted item shows the original struck through next to the live price.
-	priceHTML := ""
+	// A discounted item shows the live price with the original struck through.
+	priceHTML := fmt.Sprintf(`<span style="color:#fc4c02;font-size:18px;font-weight:900;">%s</span>`, formatIDR(item.Price))
 	if item.DiscountPrice > 0 && item.DiscountPrice < item.Price {
 		priceHTML = fmt.Sprintf(
-			`<p style="margin:6px 0 0;line-height:1.2;"><span style="color:#2d2d2d;font-size:14px;font-weight:900;">%s</span> <span style="color:#9ca3af;font-size:12px;font-weight:700;text-decoration:line-through;">%s</span></p>`,
+			`<span style="color:#fc4c02;font-size:18px;font-weight:900;">%s</span>&nbsp;<span style="color:#a2988a;font-size:13px;font-weight:700;text-decoration:line-through;">%s</span>`,
 			formatIDR(item.DiscountPrice), formatIDR(item.Price),
 		)
-	} else if price := formatIDR(item.Price); price != "" {
-		priceHTML = fmt.Sprintf(`<p style="margin:6px 0 0;color:#2d2d2d;font-size:14px;font-weight:900;line-height:1.2;">%s</p>`, price)
 	}
 
-	inner := fmt.Sprintf(
-		`<table role="presentation" width="304" cellspacing="0" cellpadding="0" style="width:304px;border-collapse:separate;border:1px solid #e8e1d6;border-radius:10px;background:#ffffff;"><tr><td width="136" valign="middle" align="center" style="width:136px;padding:12px;">%s</td><td valign="middle" align="left" style="padding:12px 14px 12px 0;text-align:left;"><span style="display:inline-block;margin-bottom:6px;padding:3px 8px;border-radius:999px;background:#e8f5e9;color:#2e7d32;font-size:9px;font-weight:900;letter-spacing:.5px;text-transform:uppercase;">READY</span><p style="margin:0;color:#2d2d2d;font-size:13px;font-weight:800;line-height:1.3;">%s</p>%s</td></tr></table>`,
+	// Pre-Order (struck) → Ready Stock transition badges + name + price.
+	inner := fmt.Sprintf(`<table role="presentation" width="100%%" cellspacing="0" cellpadding="0" style="width:100%%;border-collapse:separate;background:#ffffff;border:1px solid #e4dccd;border-radius:12px;">`+
+		`<tr>`+
+		`<td width="108" valign="middle" align="center" style="width:108px;padding:16px;">`+
+		`<table role="presentation" width="76" cellspacing="0" cellpadding="0" align="center" style="width:76px;border-collapse:collapse;background:#f4f0e8;border:1px solid #ece5d8;border-radius:8px;"><tr><td align="center" valign="middle" style="padding:6px;">%s</td></tr></table>`+
+		`</td>`+
+		`<td valign="middle" align="left" style="padding:16px 18px 16px 0;">`+
+		`<span style="display:inline-block;background:#eef0f2;color:#8a9199;font-size:10px;font-weight:800;padding:3px 8px;border-radius:5px;text-decoration:line-through;vertical-align:middle;">Pre-Order</span>`+
+		`<span style="color:#fc4c02;font-size:14px;font-weight:900;vertical-align:middle;padding:0 7px;">&rarr;</span>`+
+		`<span style="display:inline-block;background:#eafaf1;color:#2e9c5f;font-size:10px;font-weight:900;padding:3px 9px;border-radius:5px;vertical-align:middle;">Ready Stock</span>`+
+		`<div style="margin-top:9px;color:#231f1b;font-size:16px;font-weight:800;line-height:1.3;">%s</div>`+
+		`<div style="margin-top:6px;line-height:1;">%s</div>`+
+		`</td>`+
+		`</tr></table>`,
 		imgHTML, safeName, priceHTML,
 	)
 
 	if safeURL == "" {
 		return inner
 	}
-	return fmt.Sprintf(`<a href="%s" style="display:block;width:304px;margin:auto;color:inherit;text-decoration:none;">%s</a>`, safeURL, inner)
+	return fmt.Sprintf(`<a href="%s" style="display:block;color:inherit;text-decoration:none;">%s</a>`, safeURL, inner)
 }

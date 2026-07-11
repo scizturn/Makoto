@@ -38,7 +38,7 @@ func main() {
 	}
 
 	greeting := pr.RenderGreeting("Omatase, {{ .FirstName }}! Wishlist kamu akhirnya jadi ready.", job.User)
-	mergeData := pr.BuildMergeData(job.User, job.Items, greeting)
+	mergeData := pr.BuildMergeData(job.User, job.Items, greeting, job.Date)
 
 	renderer := emailtemplate.FileRenderer{Dir: templateDir, Subject: subject}
 

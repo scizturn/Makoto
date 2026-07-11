@@ -53,7 +53,7 @@ func (p *PoReadyProcessor) Process(ctx context.Context, job domain.PoReadyJob) (
 	greetingTpl := p.campaign.SelectGreeting(job.Date, job.ID)
 	greeting := p.campaign.RenderGreeting(greetingTpl, user)
 	templateID := p.campaign.SelectTemplate(job.Date, job.ID)
-	mergeData := p.campaign.BuildMergeData(user, job.Items, greeting)
+	mergeData := p.campaign.BuildMergeData(user, job.Items, greeting, job.Date)
 
 	result := ProcessResult{
 		TemplateID: templateID,
