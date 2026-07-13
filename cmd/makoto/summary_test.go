@@ -62,7 +62,7 @@ func TestSummaryEmbedReportsWhatHappened(t *testing.T) {
 
 	embed := summaryEmbed(batch, outcomes, start.Add(20*time.Minute))
 
-	if embed.Title != "📊 Winback · Ringkasan Pengiriman" {
+	if embed.Title != "📊 Winback" {
 		t.Fatalf("unexpected title %q", embed.Title)
 	}
 	// Bounces and failures mean the run needs a second look, so it must not be green.

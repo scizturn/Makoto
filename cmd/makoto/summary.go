@@ -178,10 +178,10 @@ func summaryEmbed(batch runBatch, outcomes audit.DeliveryOutcomes, now time.Time
 	})
 
 	return notify.Embed{
-		Title:     "📊 " + batch.title + " · Ringkasan Pengiriman",
+		Title:     "📊 " + batch.title,
 		Color:     color,
 		Fields:    fields,
-		Footer:    "Kyou Email System · angka pengiriman dari Kirim.email",
+		Footer:    "Kyou Email System",
 		Timestamp: now,
 	}
 }
