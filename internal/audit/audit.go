@@ -160,6 +160,15 @@ func (l *Logger) InsertRetryQueued(ctx context.Context, jobID string, attempt in
 	if l == nil {
 		return nil
 	}
+	// The source is wrapped in an aliased derived table, and the ON DUPLICATE KEY
+	// UPDATE clause names the target table explicitly. Both are load-bearing: this
+	// INSERT selects from the same table it writes to, so a bare `queued_at` in the
+	// UPDATE clause matches two columns and MySQL rejects the whole statement with
+	//
+	//   Error 1052 (23000): Column 'queued_at' in field list is ambiguous
+	//
+	// which meant every retry of a failed email failed to be recorded — silently,
+	// until the Discord webhook started reporting the failure handler's own failures.
 	_, err := l.db.ExecContext(ctx, `
 INSERT INTO email_delivery_logs (
   feature,
@@ -179,27 +188,30 @@ INSERT INTO email_delivery_logs (
   queued_at
 )
 SELECT
-  feature,
-  reference_type,
-  reference_id,
-  job_id,
-  queue_name,
-  attempt + 1,
-  user_id,
-  to_email,
-  template_id,
-  subject,
-  action_url,
-  metadata,
-  provider,
+  source.feature,
+  source.reference_type,
+  source.reference_id,
+  source.job_id,
+  source.queue_name,
+  source.attempt + 1,
+  source.user_id,
+  source.to_email,
+  source.template_id,
+  source.subject,
+  source.action_url,
+  source.metadata,
+  source.provider,
   'queued',
   NOW()
-FROM email_delivery_logs
-WHERE job_id = ?
-  AND attempt = ?
+FROM (
+  SELECT *
+  FROM email_delivery_logs
+  WHERE job_id = ?
+    AND attempt = ?
+) AS source
 ON DUPLICATE KEY UPDATE
   status = 'queued',
-  queued_at = COALESCE(queued_at, NOW()),
+  queued_at = COALESCE(email_delivery_logs.queued_at, NOW()),
   updated_at = NOW()`,
 		jobID,
 		normalizedAttempt(attempt),
