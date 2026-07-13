@@ -5,8 +5,10 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"strings"
 	"testing"
 	"time"
@@ -200,5 +202,79 @@ func TestHandlerRejectsNonPost(t *testing.T) {
 
 	if response.Code != http.StatusMethodNotAllowed {
 		t.Fatalf("expected 405, got %d", response.Code)
+	}
+}
+
+// The exact "Delivered" payload the dashboard's Test button sends. Its timestamp
+// hides under `delivered_at`, not `timestamp` — and it shares the document with an
+// smtp_response string that must not be mistaken for one.
+const deliveredPayload = `{
+  "message_guid": "test-6a54b777ab1e0",
+  "type": "email",
+  "sender": "test-sender@example.com",
+  "sender_domain": "example.com",
+  "sender_ip": "192.168.1.100",
+  "recipient": "test-recipient@example.com",
+  "recipient_domain": "example.com",
+  "recipient_ip": "192.168.1.101",
+  "event_type": "delivered",
+  "event": "delivered",
+  "subject": "Test Webhook Email Subject",
+  "status": "delivered",
+  "tags": "test,webhook",
+  "signature": "%s",
+  "event_detail": "{\"smtp_response\":\"250 2.0.0 OK: queued as 12345ABC\",\"delivered_at\":1783936887}"
+}`
+
+func TestHandlerAcceptsTheDashboardDeliveredPayload(t *testing.T) {
+	recorder := &fakeRecorder{}
+	handler := Handler{Secret: testSecret, Recorder: recorder}
+
+	body := fmt.Sprintf(deliveredPayload, signatureFor("test-6a54b777ab1e0"))
+	response := post(t, handler, body)
+
+	if response.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d: %s", response.Code, response.Body)
+	}
+	got := recorder.records[0]
+	if want := time.Unix(1783936887, 0); !got.OccurredAt.Equal(want) {
+		t.Fatalf("expected the delivered_at timestamp %s, got %s", want, got.OccurredAt)
+	}
+}
+
+// Kirim.email's own test post came back 400 "malformed payload" in production, so
+// the body on the wire is not always the JSON the dashboard displays. Accept the
+// form-encoded shapes too — the signature still has to check out either way.
+func TestParsePayloadAcceptsFormEncodedBodies(t *testing.T) {
+	guid := "guid-form-1"
+
+	flat := url.Values{
+		"message_guid": {guid},
+		"event_type":   {"bounced"},
+		"recipient":    {"someone@example.com"},
+		"tags":         {"birthday-2026-07-13-user-42"},
+		"signature":    {signatureFor(guid)},
+	}
+	event, err := ParsePayload([]byte(flat.Encode()))
+	if err != nil {
+		t.Fatalf("flat form: %v", err)
+	}
+	if event.Kind() != "bounced" || event.JobID() != "birthday-2026-07-13-user-42" {
+		t.Fatalf("flat form decoded wrong: %#v", event)
+	}
+
+	nested := url.Values{"payload": {fmt.Sprintf(`{"message_guid":%q,"event_type":"opened","signature":%q}`, guid, signatureFor(guid))}}
+	event, err = ParsePayload([]byte(nested.Encode()))
+	if err != nil {
+		t.Fatalf("nested form: %v", err)
+	}
+	if event.MessageGUID != guid || event.Kind() != "opened" {
+		t.Fatalf("nested form decoded wrong: %#v", event)
+	}
+}
+
+func TestParsePayloadRejectsGarbage(t *testing.T) {
+	if _, err := ParsePayload([]byte("this is not a payload at all")); err == nil {
+		t.Fatal("expected an error for a body that is neither JSON nor a usable form")
 	}
 }

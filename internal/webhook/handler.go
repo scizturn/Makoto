@@ -2,7 +2,6 @@ package webhook
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -71,9 +70,13 @@ func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var event Event
-	if err := json.Unmarshal(body, &event); err != nil {
-		log.Printf("kirim webhook: malformed payload: %v", err)
+	event, err := ParsePayload(body)
+	if err != nil {
+		// Log what actually came down the wire. The dashboard shows the payload it
+		// *means* to send, which is not the same thing as the bytes it sends, and
+		// guessing at the difference is how you burn a deploy cycle per attempt.
+		log.Printf("kirim webhook: unreadable payload: %v | content-type=%q | body=%.500q",
+			err, r.Header.Get("Content-Type"), body)
 		http.Error(w, "malformed payload", http.StatusBadRequest)
 		return
 	}
