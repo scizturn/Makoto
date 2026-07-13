@@ -208,6 +208,13 @@ type EmailMessage struct {
 	TextBody         string
 	TemplateID       string
 	SubstitutionData map[string]any
+
+	// Tags is sent to Kirim.email as the X-Tags header and comes back verbatim in
+	// every delivery webhook for this message. It carries the job ID, because
+	// Kirim.email's send response returns no message ID of its own (only
+	// {"success":true,"message":"…"}), so a webhook has nothing else to join on.
+	// Keep it comma-free: Kirim.email treats commas as a tag separator.
+	Tags string
 }
 
 type SendResult struct {

@@ -44,7 +44,7 @@ func (p *WishlistBackInProcessor) Process(ctx context.Context, job domain.Wishli
 	result := ProcessResult{TemplateID: templateID, ActionURL: mergeString(mergeData, "action_url")}
 	message := domain.EmailMessage{
 		Domain: p.Domain, FromEmail: p.FromEmail, FromName: p.FromName,
-		ToEmail: user.Email, TemplateID: templateID, SubstitutionData: mergeData,
+		ToEmail: user.Email, TemplateID: templateID, SubstitutionData: mergeData, Tags: job.ID,
 	}
 	if p.Renderer != nil {
 		subject, body, err := p.Renderer.Render(templateID, mergeData)

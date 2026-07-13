@@ -26,6 +26,15 @@ services:
       KYOU_ID_API_TOKEN: ${KYOU_ID_API_TOKEN:-}
       DISCORD_WEBHOOK_ENABLED: ${DISCORD_WEBHOOK_ENABLED:-true}
       DISCORD_WEBHOOK_URL: ${DISCORD_WEBHOOK_URL:-}
+      # Endpoint laporan pengiriman Kirim.email. Harus 0.0.0.0 (bukan 127.0.0.1),
+      # kalau tidak dia cuma bisa dihubungi dari dalam container itu sendiri dan
+      # Coolify tidak akan pernah bisa meneruskan apa pun ke sini.
+      # Kunci tanda tangannya otomatis pakai KIRIM_EMAIL_API_TOKEN di atas.
+      MAKOTO_WEBHOOK_ADDR: ${MAKOTO_WEBHOOK_ADDR:-0.0.0.0:8080}
+      MAKOTO_WEBHOOK_PATH: ${MAKOTO_WEBHOOK_PATH:-/webhooks/kirim}
+      MAKOTO_WEBHOOK_NOTIFY_EVENTS: ${MAKOTO_WEBHOOK_NOTIFY_EVENTS:-bounced,permanent_fail}
+    ports:
+      - "${MAKOTO_WEBHOOK_PORT:-8080}:8080"
 
   redis:
     image: redis:7-alpine

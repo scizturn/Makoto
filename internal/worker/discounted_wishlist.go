@@ -63,6 +63,7 @@ func (p *DiscountedWishlistProcessor) Process(ctx context.Context, job domain.Di
 		ToEmail:          user.Email,
 		TemplateID:       templateID,
 		SubstitutionData: mergeData,
+		Tags:             job.ID,
 	}
 	if p.Renderer != nil {
 		subject, htmlBody, err := p.Renderer.Render(templateID, mergeData)

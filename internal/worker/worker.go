@@ -128,6 +128,7 @@ func (p *Processor) Process(ctx context.Context, job domain.BirthdayJob) (Proces
 		ToEmail:          user.Email,
 		TemplateID:       templateID,
 		SubstitutionData: mergeData,
+		Tags:             job.ID,
 	}
 	if p.Renderer != nil {
 		subject, html, err := p.Renderer.Render(templateID, mergeData)

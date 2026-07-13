@@ -33,6 +33,9 @@ func (c KirimClient) SendTemplate(ctx context.Context, msg domain.EmailMessage) 
 		"template_id":       msg.TemplateID,
 		"substitution_data": msg.SubstitutionData,
 	}
+	if headers := tagHeaders(msg.Tags); headers != "" {
+		payload["headers"] = headers
+	}
 
 	var body bytes.Buffer
 	if err := json.NewEncoder(&body).Encode(payload); err != nil {
@@ -89,6 +92,9 @@ func (c KirimClient) sendTransactionalV4(ctx context.Context, msg domain.EmailMe
 	form.Set("html", msg.HTMLBody)
 	if msg.TextBody != "" {
 		form.Set("text", msg.TextBody)
+	}
+	if headers := tagHeaders(msg.Tags); headers != "" {
+		form.Set("headers", headers)
 	}
 
 	url := strings.TrimRight(c.BaseURL, "/") + "/api/v4/transactional/message"
@@ -178,6 +184,23 @@ func (c KirimClient) Validate(ctx context.Context, email string) (bool, error) {
 		return *result.Data.IsValid, nil
 	}
 	return strings.EqualFold(result.Status, "valid"), nil
+}
+
+// tagHeaders renders the X-Tags custom header Kirim.email echoes back in every
+// webhook for the message. Both send endpoints accept `headers` as a JSON string.
+//
+// Commas separate tags on Kirim.email's side, so one is stripped rather than
+// allowed to split a job ID into two meaningless halves.
+func tagHeaders(tags string) string {
+	tags = strings.ReplaceAll(strings.TrimSpace(tags), ",", "")
+	if tags == "" {
+		return ""
+	}
+	encoded, err := json.Marshal(map[string]string{"X-Tags": tags})
+	if err != nil {
+		return ""
+	}
+	return string(encoded)
 }
 
 func readResponseBody(resp *http.Response) string {

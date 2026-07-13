@@ -78,6 +78,50 @@ func TestKirimClientSendsRenderedHTMLWithTransactionalV4(t *testing.T) {
 	}
 }
 
+// Kirim.email's send response carries no message id, so the ONLY thing tying a
+// later delivery webhook back to a job is the X-Tags header stamped here. If this
+// stops going out, every webhook arrives orphaned and silently unmatchable.
+func TestKirimClientStampsTheJobIDIntoXTags(t *testing.T) {
+	var gotForm url.Values
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if err := r.ParseForm(); err != nil {
+			t.Fatal(err)
+		}
+		gotForm = r.PostForm
+		w.WriteHeader(http.StatusAccepted)
+		_, _ = w.Write([]byte(`{"success":true,"message":"Email send jobs dispatched for 1 recipients in 1 job(s)"}`))
+	}))
+	defer server.Close()
+
+	client := KirimClient{BaseURL: server.URL, Username: "key", APIToken: "secret"}
+	_, err := client.SendTemplate(context.Background(), domain.EmailMessage{
+		Domain:    "kyou.id",
+		FromEmail: "nandayo@kyou.id",
+		ToEmail:   "ruby@example.test",
+		Subject:   "Selamat ulang tahun, Ruby",
+		HTMLBody:  "<h1>Happy birthday</h1>",
+		Tags:      "birthday-2026-07-13-user-42",
+	})
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+
+	if got, want := gotForm.Get("headers"), `{"X-Tags":"birthday-2026-07-13-user-42"}`; got != want {
+		t.Fatalf("expected headers %s, got %s", want, got)
+	}
+}
+
+// A comma would split the job id into two tags on Kirim.email's side, and the
+// webhook would hand back a truncated id that matches nothing.
+func TestTagHeadersStripCommas(t *testing.T) {
+	if got := tagHeaders("job,with,commas"); got != `{"X-Tags":"jobwithcommas"}` {
+		t.Fatalf("got %s", got)
+	}
+	if got := tagHeaders("  "); got != "" {
+		t.Fatalf("expected no headers for an empty tag, got %s", got)
+	}
+}
+
 func TestKirimClientValidatesEmailFromStrictValidationData(t *testing.T) {
 	var gotPath string
 	var gotAuthUser string

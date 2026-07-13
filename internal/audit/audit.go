@@ -89,7 +89,11 @@ SET
   template_id = COALESCE(NULLIF(?, ''), template_id),
   subject = COALESCE(NULLIF(?, ''), subject),
   action_url = COALESCE(NULLIF(?, ''), action_url),
-  provider_message_id = NULLIF(?, ''),
+  -- COALESCE, not a bare assignment: Kirim.email's send response carries no message
+  -- id, so this always writes NULL — and a 'queued' webhook can land while we are
+  -- still reading that response, having just filled the column with the real guid.
+  -- A bare write would wipe it back out.
+  provider_message_id = COALESCE(NULLIF(?, ''), provider_message_id),
   provider_status_code = ?,
   provider_response = LEFT(?, 4096),
   sent_at = NOW(),

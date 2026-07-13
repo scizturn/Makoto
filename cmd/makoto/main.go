@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"net/http"
 	"strings"
 	"sync"
 	"time"
@@ -19,6 +20,7 @@ import (
 	"github.com/kyou-id/makoto/internal/notify"
 	"github.com/kyou-id/makoto/internal/queue"
 	"github.com/kyou-id/makoto/internal/voucher"
+	"github.com/kyou-id/makoto/internal/webhook"
 	"github.com/kyou-id/makoto/internal/worker"
 	"github.com/redis/go-redis/v9"
 )
@@ -363,7 +365,70 @@ func main() {
 	} else {
 		log.Print("MAKOTO_PO_READY_ENABLED is false; skipping po ready sender")
 	}
+	startWebhookServer(ctx, cfg, auditLogger, discord)
+
 	wg.Wait()
+}
+
+// startWebhookServer opens the one door into Makoto: the endpoint Kirim.email posts
+// delivery events to (delivered, bounced, opened, clicked). Without
+// MAKOTO_WEBHOOK_ADDR there is no listener at all, which is how Makoto ran before
+// this existed — the senders do not depend on it.
+//
+// It is not part of the sender WaitGroup: the workers decide when Makoto lives, and
+// a listener that cannot bind must not take the senders down with it.
+func startWebhookServer(ctx context.Context, cfg config.Config, auditLogger *audit.Logger, discord notify.DiscordLogger) {
+	if strings.TrimSpace(cfg.WebhookAddr) == "" {
+		log.Print("MAKOTO_WEBHOOK_ADDR is empty; not listening for Kirim.email delivery webhooks")
+		return
+	}
+	if strings.TrimSpace(cfg.WebhookSecret) == "" {
+		// The signing secret is KIRIM_EMAIL_API_TOKEN (Kirim.email signs with
+		// sha256($apiSecret . $messageGuid)), so this only happens when Makoto has no
+		// Kirim.email credentials at all. Opening anyway would answer 401 to every
+		// event forever while looking healthy from the outside.
+		log.Print("KIRIM_EMAIL_API_TOKEN is empty; not opening the webhook endpoint (every event would fail the signature check)")
+		return
+	}
+
+	notifyEvents := make(map[string]bool, len(cfg.WebhookNotifyEvents))
+	for _, event := range cfg.WebhookNotifyEvents {
+		notifyEvents[strings.ToLower(strings.TrimSpace(event))] = true
+	}
+
+	handler := webhook.Handler{
+		Secret:       cfg.WebhookSecret,
+		Recorder:     auditLogger,
+		Discord:      discord,
+		NotifyEvents: notifyEvents,
+	}
+
+	mux := http.NewServeMux()
+	mux.Handle(cfg.WebhookPath, handler)
+	mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte("ok"))
+	})
+
+	server := &http.Server{
+		Addr:              cfg.WebhookAddr,
+		Handler:           mux,
+		ReadHeaderTimeout: 10 * time.Second,
+	}
+
+	go func() {
+		log.Printf("kirim.email webhook listening on %s%s", cfg.WebhookAddr, cfg.WebhookPath)
+		if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			log.Printf("webhook server stopped: %v", err)
+		}
+	}()
+
+	go func() {
+		<-ctx.Done()
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		_ = server.Shutdown(shutdownCtx)
+	}()
 }
 
 func buildAuditLogger(cfg config.Config) (*audit.Logger, error) {

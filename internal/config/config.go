@@ -10,38 +10,44 @@ import (
 )
 
 type Config struct {
-	Mode                               string
-	Timezone                           string
-	RateLimitPerMinute                 int
-	LinkTrackingEnabled                bool
-	UTMSource                          string
-	UTMMedium                          string
-	DatabaseDSN                        string
-	RedisAddr                          string
-	RedisPassword                      string
-	RedisDB                            int
-	QueueName                          string
-	DeadLetterQueue                    string
-	MaxAttempts                        int
-	KirimEmailUsername                 string
-	KirimEmailAPIToken                 string
-	KirimEmailValidationUsername       string
-	KirimEmailValidationAPIToken       string
-	KirimEmailValidationFailOpen       bool
-	KirimEmailBaseURL                  string
-	KirimEmailDomain                   string
-	KirimEmailValidate                 bool
-	FromEmail                          string
-	FromName                           string
-	TemplateIDs                        []string
-	EmailTemplateDir                   string
-	EmailSubject                       string
-	EmailSubjects                      []string
-	ActionURL                          string
-	KyouIDAPIBaseURL                   string
-	KyouIDAPIToken                     string
-	DiscordWebhookURL                  string
-	DiscordEnabled                     bool
+	Mode                         string
+	Timezone                     string
+	RateLimitPerMinute           int
+	LinkTrackingEnabled          bool
+	UTMSource                    string
+	UTMMedium                    string
+	DatabaseDSN                  string
+	RedisAddr                    string
+	RedisPassword                string
+	RedisDB                      int
+	QueueName                    string
+	DeadLetterQueue              string
+	MaxAttempts                  int
+	KirimEmailUsername           string
+	KirimEmailAPIToken           string
+	KirimEmailValidationUsername string
+	KirimEmailValidationAPIToken string
+	KirimEmailValidationFailOpen bool
+	KirimEmailBaseURL            string
+	KirimEmailDomain             string
+	KirimEmailValidate           bool
+	FromEmail                    string
+	FromName                     string
+	TemplateIDs                  []string
+	EmailTemplateDir             string
+	EmailSubject                 string
+	EmailSubjects                []string
+	ActionURL                    string
+	KyouIDAPIBaseURL             string
+	KyouIDAPIToken               string
+	DiscordWebhookURL            string
+	DiscordEnabled               bool
+	// Kirim.email delivery webhooks. WebhookAddr empty -> no HTTP listener at all,
+	// which is how Makoto ran before this existed.
+	WebhookAddr                        string
+	WebhookPath                        string
+	WebhookSecret                      string
+	WebhookNotifyEvents                []string
 	AnniversaryEnabled                 bool
 	AnniversaryQueueName               string
 	AnniversaryDeadLetterQueue         string
@@ -129,11 +135,21 @@ func Load() Config {
 			"Yay! Hari Ini Giliran {{ .Name }} Dapat Hadiah Ulang Tahun 🎉",
 			"Hore, {{ .Name }}! Saatnya Ambil Hadiah Ulang Tahunmu 🎂",
 		},
-		ActionURL:                   env("MAKOTO_ACTION_URL", "https://kyou.id/user/my-voucher"),
-		KyouIDAPIBaseURL:            env("KYOU_ID_API_BASE_URL", "https://kyou.id"),
-		KyouIDAPIToken:              os.Getenv("KYOU_ID_API_TOKEN"),
-		DiscordWebhookURL:           os.Getenv("DISCORD_WEBHOOK_URL"),
-		DiscordEnabled:              envBool("DISCORD_WEBHOOK_ENABLED", true),
+		ActionURL:         env("MAKOTO_ACTION_URL", "https://kyou.id/user/my-voucher"),
+		KyouIDAPIBaseURL:  env("KYOU_ID_API_BASE_URL", "https://kyou.id"),
+		KyouIDAPIToken:    os.Getenv("KYOU_ID_API_TOKEN"),
+		DiscordWebhookURL: os.Getenv("DISCORD_WEBHOOK_URL"),
+		DiscordEnabled:    envBool("DISCORD_WEBHOOK_ENABLED", true),
+		WebhookAddr:       os.Getenv("MAKOTO_WEBHOOK_ADDR"),
+		WebhookPath:       env("MAKOTO_WEBHOOK_PATH", "/webhooks/kirim"),
+		// Kirim.email signs webhooks with hash('sha256', $apiSecret . $messageGuid) —
+		// and $apiSecret is the very API token we already send email with, verified
+		// against a real test payload. So there is no separate webhook secret to
+		// configure; the override exists only for the day they split the two.
+		WebhookSecret: env("KIRIM_WEBHOOK_SECRET", os.Getenv("KIRIM_EMAIL_API_TOKEN")),
+		// Deliveries and opens arrive in the thousands; bounces are what a human
+		// needs to see, so only those are announced by default.
+		WebhookNotifyEvents:         envList("MAKOTO_WEBHOOK_NOTIFY_EVENTS", []string{"bounced", "permanent_fail"}),
 		AnniversaryEnabled:          envBool("MAKOTO_ANNIVERSARY_ENABLED", false),
 		AnniversaryQueueName:        env("MAKOTO_ANNIVERSARY_QUEUE_NAME", "anniversary_email_jobs"),
 		AnniversaryDeadLetterQueue:  env("MAKOTO_ANNIVERSARY_DEAD_LETTER_QUEUE", "anniversary_email_jobs_dead"),

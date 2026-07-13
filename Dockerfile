@@ -20,4 +20,8 @@ COPY db/migrations ./db/migrations
 
 USER makoto
 
+# Kirim.email delivery webhooks (MAKOTO_WEBHOOK_ADDR). Makoto is a queue consumer
+# first — this port only listens when that variable is set.
+EXPOSE 8080
+
 ENTRYPOINT ["makoto"]

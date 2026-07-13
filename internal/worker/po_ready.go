@@ -66,6 +66,7 @@ func (p *PoReadyProcessor) Process(ctx context.Context, job domain.PoReadyJob) (
 		ToEmail:          user.Email,
 		TemplateID:       templateID,
 		SubstitutionData: mergeData,
+		Tags:             job.ID,
 	}
 	if p.Renderer != nil {
 		subject, htmlBody, err := p.Renderer.Render(templateID, mergeData)
