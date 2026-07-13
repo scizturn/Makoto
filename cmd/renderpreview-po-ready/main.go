@@ -33,7 +33,7 @@ func main() {
 
 	pr := campaign.PoReadyCampaign{
 		WishlistURL: wishlistURL,
-		Closing:     "Stok ready biasanya cepat habis, cek wishlist kamu sebelum keduluan!",
+		Closing:     "Delivering Happiness Since 2014.",
 		RandomIntn:  func(n int) int { return 0 },
 	}
 

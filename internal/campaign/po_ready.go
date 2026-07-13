@@ -134,10 +134,10 @@ func poReadyNameData(user domain.User) struct{ Name, FirstName string } {
 // RenderPoReadyItemsHTML renders the readied items as full-width "manifest" rows,
 // stacked one per line (newest first), each showing the Pre-Order → Ready Stock
 // transition — the story of this campaign.
+// An empty item list renders nothing: the worker skips such a job as
+// no_ready_items before it ever reaches a template, so there is no empty-state
+// copy to write.
 func RenderPoReadyItemsHTML(items []domain.PoReadyItem, fallbackURL string) string {
-	if len(items) == 0 {
-		return `<p style="margin:0;color:#6b7280;">Ada barang wishlist kamu yang udah ready, cek langsung di wishlist-mu.</p>`
-	}
 	if len(items) > poReadyItemLimit {
 		items = items[:poReadyItemLimit]
 	}
