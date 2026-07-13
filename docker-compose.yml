@@ -33,8 +33,12 @@ services:
       MAKOTO_WEBHOOK_ADDR: ${MAKOTO_WEBHOOK_ADDR:-0.0.0.0:8080}
       MAKOTO_WEBHOOK_PATH: ${MAKOTO_WEBHOOK_PATH:-/webhooks/kirim}
       MAKOTO_WEBHOOK_NOTIFY_EVENTS: ${MAKOTO_WEBHOOK_NOTIFY_EVENTS:-bounced,permanent_fail}
-    ports:
-      - "${MAKOTO_WEBHOOK_PORT:-8080}:8080"
+    # `expose`, not `ports`: the port is reachable inside the Docker network — which
+    # is all Coolify's proxy needs to route https://makoto.kyoucdn.id to it — without
+    # publishing a bare HTTP endpoint on the host's public IP. One door in, and it is
+    # the TLS one.
+    expose:
+      - "8080"
 
   redis:
     image: redis:7-alpine
