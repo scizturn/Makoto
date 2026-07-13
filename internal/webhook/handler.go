@@ -2,7 +2,6 @@ package webhook
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -10,6 +9,7 @@ import (
 	"time"
 
 	"github.com/kyou-id/makoto/internal/mask"
+	"github.com/kyou-id/makoto/internal/notify"
 )
 
 // maxBodyBytes caps what we will read from a webhook post. The payloads are a few
@@ -22,9 +22,9 @@ type Recorder interface {
 	RecordDeliveryEvent(ctx context.Context, event Record) error
 }
 
-// Notifier posts a line to Discord.
+// Notifier posts an embed to Discord.
 type Notifier interface {
-	Log(ctx context.Context, content string) error
+	LogEmbed(ctx context.Context, embed notify.Embed) error
 }
 
 // Record is what we keep from an event, resolved to our own identifiers.
@@ -135,6 +135,24 @@ func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	_, _ = w.Write([]byte(`{"ok":true}`))
 }
 
+// eventStyle gives each event its own headline and colour, so a bounce is
+// distinguishable from a delivery at a glance, without reading a word.
+var eventStyle = map[string]struct {
+	title string
+	color int
+}{
+	"delivered":      {"📬 Email Delivered", notify.ColorSuccess},
+	"opened":         {"👀 Email Opened", notify.ColorInfo},
+	"clicked":        {"🖱️ Link Clicked", notify.ColorInfo},
+	"bounced":        {"⚠️ Email Bounced", notify.ColorDanger},
+	"permanent_fail": {"❌ Permanent Failure", notify.ColorDanger},
+	"temporary_fail": {"🕐 Temporary Failure", notify.ColorWarning},
+	"unsubscribed":   {"🚪 Unsubscribed", notify.ColorWarning},
+	"deferred":       {"🕐 Deferred", notify.ColorNeutral},
+	"queued":         {"📮 Queued at Kirim.email", notify.ColorNeutral},
+	"send":           {"📤 Handed to the Mail Server", notify.ColorNeutral},
+}
+
 // notify posts the noteworthy events to Discord. It never fails the request — the
 // event is already stored, and making Kirim.email retry because *Discord* is down
 // would replay it forever.
@@ -142,15 +160,51 @@ func (h Handler) notify(ctx context.Context, record Record) {
 	if h.Discord == nil || !h.NotifyEvents[record.EventType] {
 		return
 	}
-	job := record.JobID
-	if job == "" {
-		job = "(untagged: " + record.MessageGUID + ")"
+
+	style, known := eventStyle[record.EventType]
+	if !known {
+		style.title = "📨 " + strings.ToUpper(record.EventType)
+		style.color = notify.ColorNeutral
 	}
-	content := fmt.Sprintf("⚠️ [Kirim.email %s]\nJob: %s\nEmail: %s\nSubject: %s",
-		strings.ToUpper(record.EventType), job, MaskEmail(record.ToEmail), record.Subject)
-	if err := h.Discord.Log(ctx, content); err != nil {
+
+	facts := ParseJobID(record.JobID)
+
+	campaign := facts.Campaign
+	if campaign == "" {
+		// Either an email sent before Makoto stamped its job id into `tags`, or the
+		// stamp did not come back. Say so plainly rather than leave the field blank —
+		// a silent gap here is the one failure mode of the whole tagging scheme.
+		campaign = "❓ unknown (no job tag)"
+	}
+	if facts.Forced {
+		campaign += " · forced"
+	}
+
+	fields := []notify.Field{
+		{Name: "🎯 Campaign", Value: campaign, Inline: true},
+		{Name: "👤 User ID", Value: facts.UserID, Inline: true},
+		{Name: "📧 Recipient", Value: MaskEmail(record.ToEmail), Inline: true},
+		{Name: "✉️ Subject", Value: record.Subject, Inline: false},
+		{Name: "🆔 Job", Value: jobFieldValue(record), Inline: false},
+	}
+
+	embed := notify.Embed{
+		Title:     style.title,
+		Color:     style.color,
+		Fields:    fields,
+		Footer:    "Kyou Email System · Kirim.email",
+		Timestamp: record.OccurredAt,
+	}
+	if err := h.Discord.LogEmbed(ctx, embed); err != nil {
 		log.Printf("kirim webhook: discord notify failed: %v", err)
 	}
+}
+
+func jobFieldValue(record Record) string {
+	if record.JobID != "" {
+		return "`" + record.JobID + "`"
+	}
+	return "_untagged_ · guid `" + record.MessageGUID + "`"
 }
 
 // MaskEmail hides the local part before an address reaches a log line or Discord.

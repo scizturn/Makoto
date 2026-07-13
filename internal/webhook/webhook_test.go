@@ -12,6 +12,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/kyou-id/makoto/internal/notify"
 )
 
 const testSecret = "s3cr3t"
@@ -56,11 +58,21 @@ func (f *fakeRecorder) RecordDeliveryEvent(_ context.Context, record Record) err
 	return nil
 }
 
-type fakeNotifier struct{ messages []string }
+type fakeNotifier struct{ embeds []notify.Embed }
 
-func (f *fakeNotifier) Log(_ context.Context, content string) error {
-	f.messages = append(f.messages, content)
+func (f *fakeNotifier) LogEmbed(_ context.Context, embed notify.Embed) error {
+	f.embeds = append(f.embeds, embed)
 	return nil
+}
+
+// field returns the value of a named embed field, or "" when it was dropped.
+func (f *fakeNotifier) field(embedIndex int, name string) string {
+	for _, got := range f.embeds[embedIndex].Fields {
+		if strings.Contains(got.Name, name) {
+			return got.Value
+		}
+	}
+	return ""
 }
 
 func post(t *testing.T, handler Handler, body string) *httptest.ResponseRecorder {
@@ -154,20 +166,65 @@ func TestHandlerAnnouncesOnlyTheNoteworthyEvents(t *testing.T) {
 
 	post(t, handler, testPayload("guid-1", "delivered", "birthday-1"))
 	post(t, handler, testPayload("guid-2", "opened", "birthday-1"))
-	if len(discord.messages) != 0 {
-		t.Fatalf("deliveries and opens would drown the channel, got %v", discord.messages)
+	if len(discord.embeds) != 0 {
+		t.Fatalf("deliveries and opens would drown the channel, got %v", discord.embeds)
 	}
 
-	post(t, handler, testPayload("guid-3", "bounced", "birthday-2026-07-13-user-42"))
-	if len(discord.messages) != 1 {
-		t.Fatalf("expected a bounce to be announced, got %d messages", len(discord.messages))
+	post(t, handler, testPayload("guid-3", "bounced", "discounted-wishlist-2026-07-10-user-113164"))
+	if len(discord.embeds) != 1 {
+		t.Fatalf("expected a bounce to be announced, got %d embeds", len(discord.embeds))
 	}
-	message := discord.messages[0]
-	if !strings.Contains(message, "birthday-2026-07-13-user-42") {
-		t.Fatalf("expected the job id in the message, got %q", message)
+
+	embed := discord.embeds[0]
+	if embed.Title != "⚠️ Email Bounced" || embed.Color != notify.ColorDanger {
+		t.Fatalf("a bounce must be red and named as one, got %q / %#x", embed.Title, embed.Color)
 	}
-	if strings.Contains(message, "someone@example.com") {
-		t.Fatalf("the recipient must be masked, got %q", message)
+	if got := discord.field(0, "Campaign"); got != "Discounted Wishlist" {
+		t.Fatalf("expected the campaign name, got %q", got)
+	}
+	if got := discord.field(0, "User ID"); got != "113164" {
+		t.Fatalf("expected the user id, got %q", got)
+	}
+	if got := discord.field(0, "Recipient"); got == "someone@example.com" {
+		t.Fatalf("the recipient must be masked, got %q", got)
+	}
+	if got := discord.field(0, "Job"); !strings.Contains(got, "discounted-wishlist-2026-07-10-user-113164") {
+		t.Fatalf("expected the job id, got %q", got)
+	}
+}
+
+// An event whose tag never came back must say so, not quietly show a blank
+// campaign — that gap is the one failure mode of the whole tagging scheme.
+func TestNotifySaysSoWhenTheJobTagIsMissing(t *testing.T) {
+	discord := &fakeNotifier{}
+	handler := Handler{
+		Secret:       testSecret,
+		Recorder:     &fakeRecorder{},
+		Discord:      discord,
+		NotifyEvents: map[string]bool{"bounced": true},
+	}
+
+	post(t, handler, testPayload("guid-9", "bounced", ""))
+
+	if got := discord.field(0, "Campaign"); !strings.Contains(got, "unknown") {
+		t.Fatalf("expected the campaign to be flagged unknown, got %q", got)
+	}
+}
+
+func TestParseJobID(t *testing.T) {
+	cases := map[string]JobFacts{
+		"discounted-wishlist-2026-07-10-user-113164": {Campaign: "Discounted Wishlist", UserID: "113164"},
+		"wishlist-back-in-2026-07-10-user-7":         {Campaign: "Wishlist Back In", UserID: "7"},
+		"birthday-2026-07-13-user-42":                {Campaign: "Birthday", UserID: "42"},
+		"po-ready-2026-07-11-user-9":                 {Campaign: "PO Ready", UserID: "9"},
+		"winback-2026-07-13-user-190531":             {Campaign: "Winback", UserID: "190531"},
+		"force-po-ready-2026-07-13-150405-user-42":   {Campaign: "PO Ready", UserID: "42", Forced: true},
+		"something-else":                             {},
+	}
+	for jobID, want := range cases {
+		if got := ParseJobID(jobID); got != want {
+			t.Fatalf("ParseJobID(%q) = %#v, want %#v", jobID, got, want)
+		}
 	}
 }
 
