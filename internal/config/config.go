@@ -5,6 +5,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/go-sql-driver/mysql"
 )
@@ -44,10 +45,14 @@ type Config struct {
 	DiscordEnabled               bool
 	// Kirim.email delivery webhooks. WebhookAddr empty -> no HTTP listener at all,
 	// which is how Makoto ran before this existed.
-	WebhookAddr                        string
-	WebhookPath                        string
-	WebhookSecret                      string
-	WebhookNotifyEvents                []string
+	WebhookAddr         string
+	WebhookPath         string
+	WebhookSecret       string
+	WebhookNotifyEvents []string
+	// One summary per campaign run instead of one message per email.
+	SummaryEnabled                     bool
+	SummarySettle                      time.Duration
+	DiscordPerEmail                    bool
 	AnniversaryEnabled                 bool
 	AnniversaryQueueName               string
 	AnniversaryDeadLetterQueue         string
@@ -147,9 +152,19 @@ func Load() Config {
 		// against a real test payload. So there is no separate webhook secret to
 		// configure; the override exists only for the day they split the two.
 		WebhookSecret: env("KIRIM_WEBHOOK_SECRET", os.Getenv("KIRIM_EMAIL_API_TOKEN")),
-		// Deliveries and opens arrive in the thousands; bounces are what a human
-		// needs to see, so only those are announced by default.
-		WebhookNotifyEvents:         envList("MAKOTO_WEBHOOK_NOTIFY_EVENTS", []string{"bounced", "permanent_fail"}),
+		// Empty by default: individual delivery events are counted into the per-run
+		// summary rather than announced one by one. Set it to e.g.
+		// "bounced,permanent_fail" to also get a card the moment a bounce lands.
+		WebhookNotifyEvents: envList("MAKOTO_WEBHOOK_NOTIFY_EVENTS", nil),
+		SummaryEnabled:      envBool("MAKOTO_SUMMARY_ENABLED", true),
+		// How long a campaign's queue must stay quiet before its summary is posted.
+		// This is NOT politeness: Kirim.email's delivered/bounced webhooks land
+		// seconds to minutes after the send, so summarising the instant the queue
+		// drains would report zero delivered and zero bounced, every single time.
+		SummarySettle: time.Duration(envInt("MAKOTO_SUMMARY_SETTLE_MINUTES", 10)) * time.Minute,
+		// One message per email would bury the summary: Discord drops webhook posts
+		// above roughly 30/min, and a winback run sends thousands.
+		DiscordPerEmail:             envBool("MAKOTO_DISCORD_PER_EMAIL", false),
 		AnniversaryEnabled:          envBool("MAKOTO_ANNIVERSARY_ENABLED", false),
 		AnniversaryQueueName:        env("MAKOTO_ANNIVERSARY_QUEUE_NAME", "anniversary_email_jobs"),
 		AnniversaryDeadLetterQueue:  env("MAKOTO_ANNIVERSARY_DEAD_LETTER_QUEUE", "anniversary_email_jobs_dead"),

@@ -217,6 +217,11 @@ func main() {
 		WebhookURL: cfg.DiscordWebhookURL,
 		Enabled:    cfg.DiscordEnabled,
 	}
+	// The same webhook, muted unless MAKOTO_DISCORD_PER_EMAIL says otherwise. `discord`
+	// keeps carrying the alarms (ack failed, failure handling failed) — those mean the
+	// plumbing is broken and must never be silenced by a reporting preference.
+	perEmail := discord
+	perEmail.Enabled = cfg.DiscordEnabled && cfg.DiscordPerEmail
 	auditLogger, err := buildAuditLogger(cfg)
 	if err != nil {
 		log.Fatalf("build audit logger: %v", err)
@@ -280,6 +285,10 @@ func main() {
 			rateLimitPerMinute: cfg.RateLimitPerMinute,
 			deadLetterQueue:    cfg.DeadLetterQueue,
 			maxAttempts:        cfg.MaxAttempts,
+			run:                newCampaignRun("birthday_voucher", "Birthday", cfg.QueueName),
+			summaryEnabled:     cfg.SummaryEnabled,
+			summarySettle:      cfg.SummarySettle,
+			perEmail:           perEmail,
 		})
 	}()
 
@@ -291,6 +300,10 @@ func main() {
 				rateLimitPerMinute: cfg.RateLimitPerMinute,
 				deadLetterQueue:    cfg.AnniversaryDeadLetterQueue,
 				maxAttempts:        cfg.MaxAttempts,
+				run:                newCampaignRun("anniversary_voucher", "Anniversary", cfg.AnniversaryQueueName),
+				summaryEnabled:     cfg.SummaryEnabled,
+				summarySettle:      cfg.SummarySettle,
+				perEmail:           perEmail,
 			})
 		}()
 	} else {
@@ -305,6 +318,10 @@ func main() {
 				rateLimitPerMinute: cfg.RateLimitPerMinute,
 				deadLetterQueue:    cfg.LeftoverCartDeadLetterQueue,
 				maxAttempts:        cfg.MaxAttempts,
+				run:                newCampaignRun("leftover_cart", "Leftover Cart", cfg.LeftoverCartQueueName),
+				summaryEnabled:     cfg.SummaryEnabled,
+				summarySettle:      cfg.SummarySettle,
+				perEmail:           perEmail,
 			})
 		}()
 	} else {
@@ -319,6 +336,10 @@ func main() {
 				rateLimitPerMinute: cfg.RateLimitPerMinute,
 				deadLetterQueue:    cfg.DiscountedWishlistDeadLetterQueue,
 				maxAttempts:        cfg.MaxAttempts,
+				run:                newCampaignRun("discounted_wishlist", "Discounted Wishlist", cfg.DiscountedWishlistQueueName),
+				summaryEnabled:     cfg.SummaryEnabled,
+				summarySettle:      cfg.SummarySettle,
+				perEmail:           perEmail,
 			})
 		}()
 	} else {
@@ -333,6 +354,10 @@ func main() {
 				rateLimitPerMinute: cfg.RateLimitPerMinute,
 				deadLetterQueue:    cfg.WishlistBackInDeadLetterQueue,
 				maxAttempts:        cfg.MaxAttempts,
+				run:                newCampaignRun("wishlist_back_in", "Wishlist Back In", cfg.WishlistBackInQueueName),
+				summaryEnabled:     cfg.SummaryEnabled,
+				summarySettle:      cfg.SummarySettle,
+				perEmail:           perEmail,
 			})
 		}()
 	} else {
@@ -347,6 +372,10 @@ func main() {
 				rateLimitPerMinute: cfg.RateLimitPerMinute,
 				deadLetterQueue:    cfg.WinbackDeadLetterQueue,
 				maxAttempts:        cfg.MaxAttempts,
+				run:                newCampaignRun("winback", "Winback", cfg.WinbackQueueName),
+				summaryEnabled:     cfg.SummaryEnabled,
+				summarySettle:      cfg.SummarySettle,
+				perEmail:           perEmail,
 			})
 		}()
 	} else {
@@ -361,6 +390,10 @@ func main() {
 				rateLimitPerMinute: cfg.RateLimitPerMinute,
 				deadLetterQueue:    cfg.PoReadyDeadLetterQueue,
 				maxAttempts:        cfg.MaxAttempts,
+				run:                newCampaignRun("po_ready", "PO Ready", cfg.PoReadyQueueName),
+				summaryEnabled:     cfg.SummaryEnabled,
+				summarySettle:      cfg.SummarySettle,
+				perEmail:           perEmail,
 			})
 		}()
 	} else {
@@ -539,6 +572,30 @@ type senderConfig struct {
 	deadLetterQueue    string
 	maxAttempts        int
 	retryBackoffs      []time.Duration
+
+	// run accumulates this campaign's batch; when its queue goes quiet for
+	// summarySettle, the batch is posted to Discord as one summary.
+	run            *campaignRun
+	summaryEnabled bool
+	summarySettle  time.Duration
+
+	// perEmail carries the routine "sent"/"failed" notices. It is muted by default
+	// (MAKOTO_DISCORD_PER_EMAIL) so the channel carries summaries, not a line per
+	// email — Discord drops webhook posts above ~30/min, and a winback run would
+	// otherwise bury the one bounce that mattered under a thousand successes.
+	// The `discord` logger the senders also hold stays on: it carries the alarms
+	// (ack failed, failure handling failed), which mean the plumbing is broken.
+	perEmail notify.DiscordLogger
+}
+
+// summarizeRun is called on every idle tick of a sender loop. It does nothing until
+// the campaign's queue has been quiet long enough for the delivery webhooks to catch
+// up — see campaignRun.due.
+func summarizeRun(ctx context.Context, cfg senderConfig, auditLogger *audit.Logger, discord notify.DiscordLogger) {
+	if !cfg.summaryEnabled || cfg.run == nil {
+		return
+	}
+	summarize(ctx, cfg.run, auditLogger, discord, cfg.summarySettle, time.Now())
 }
 
 func runSender(ctx context.Context, redisQueue *queue.RedisQueue, processor *worker.Processor, discord notify.DiscordLogger, auditLogger *audit.Logger, cfg senderConfig) {
@@ -566,6 +623,7 @@ func runSender(ctx context.Context, redisQueue *queue.RedisQueue, processor *wor
 	for {
 		processingJob, err := redisQueue.Dequeue(ctx, 5*time.Second)
 		if errors.Is(err, redis.Nil) {
+			summarizeRun(ctx, cfg, auditLogger, discord)
 			continue
 		}
 		if err != nil {
@@ -596,7 +654,8 @@ func runSender(ctx context.Context, redisQueue *queue.RedisQueue, processor *wor
 				continue
 			}
 			log.Printf("birthday email failed: job_id=%s user_id=%s attempt=%d state=%s err=%v", job.ID, job.UserID, result.attempt, result.state, err)
-			_ = discord.Log(ctx, fmt.Sprintf("[Birthday Email Failed]\nJob: %s\nUser: %s\nEmail: %s\nAttempt: %d/%d\nState: %s\nRetry delay: %s\nError: %v", job.ID, job.UserID, maskEmail(job.User.Email), result.attempt, cfg.maxAttempts, result.state, result.delay, err))
+			cfg.run.record(job.ID, result.state, time.Now())
+			_ = cfg.perEmail.Log(ctx, fmt.Sprintf("[Birthday Email Failed]\nJob: %s\nUser: %s\nEmail: %s\nAttempt: %d/%d\nState: %s\nRetry delay: %s\nError: %v", job.ID, job.UserID, maskEmail(job.User.Email), result.attempt, cfg.maxAttempts, result.state, result.delay, err))
 			continue
 		}
 
@@ -609,7 +668,8 @@ func runSender(ctx context.Context, redisQueue *queue.RedisQueue, processor *wor
 			continue
 		}
 		log.Printf("birthday email sent: job_id=%s user_id=%s", job.ID, job.UserID)
-		_ = discord.Log(ctx, fmt.Sprintf("[Birthday Email Sent]\nJob: %s\nUser: %s\nEmail: %s", job.ID, job.UserID, maskEmail(job.User.Email)))
+		cfg.run.record(job.ID, "sent", time.Now())
+		_ = cfg.perEmail.Log(ctx, fmt.Sprintf("[Birthday Email Sent]\nJob: %s\nUser: %s\nEmail: %s", job.ID, job.UserID, maskEmail(job.User.Email)))
 	}
 }
 
@@ -638,6 +698,7 @@ func runAnniversarySender(ctx context.Context, redisQueue *queue.AnniversaryRedi
 	for {
 		processingJob, err := redisQueue.Dequeue(ctx, 5*time.Second)
 		if errors.Is(err, redis.Nil) {
+			summarizeRun(ctx, cfg, auditLogger, discord)
 			continue
 		}
 		if err != nil {
@@ -657,7 +718,8 @@ func runAnniversarySender(ctx context.Context, redisQueue *queue.AnniversaryRedi
 		auditInfo := auditInfoFromAnniversaryJob(job, processResult)
 		if err != nil {
 			log.Printf("anniversary email failed: job_id=%s user_id=%s err=%v", job.ID, job.UserID, err)
-			_ = discord.Log(ctx, fmt.Sprintf("[Anniversary Email Failed]\nJob: %s\nUser: %s\nEmail: %s\nError: %v", job.ID, job.UserID, maskEmail(job.User.Email), err))
+			cfg.run.record(job.ID, "failed", time.Now())
+			_ = cfg.perEmail.Log(ctx, fmt.Sprintf("[Anniversary Email Failed]\nJob: %s\nUser: %s\nEmail: %s\nError: %v", job.ID, job.UserID, maskEmail(job.User.Email), err))
 			if ackErr := redisQueue.Ack(ctx, processingJob.Payload); ackErr != nil {
 				log.Printf("anniversary email failed but ack failed: job_id=%s err=%v ack_err=%v", job.ID, err, ackErr)
 			}
@@ -676,7 +738,8 @@ func runAnniversarySender(ctx context.Context, redisQueue *queue.AnniversaryRedi
 			continue
 		}
 		log.Printf("anniversary email sent: job_id=%s user_id=%s", job.ID, job.UserID)
-		_ = discord.Log(ctx, fmt.Sprintf("[Anniversary Email Sent]\nJob: %s\nUser: %s\nEmail: %s", job.ID, job.UserID, maskEmail(job.User.Email)))
+		cfg.run.record(job.ID, "sent", time.Now())
+		_ = cfg.perEmail.Log(ctx, fmt.Sprintf("[Anniversary Email Sent]\nJob: %s\nUser: %s\nEmail: %s", job.ID, job.UserID, maskEmail(job.User.Email)))
 	}
 }
 
@@ -814,6 +877,7 @@ func runPoReadySender(ctx context.Context, q *queue.PoReadyRedisQueue, processor
 	for {
 		processingJob, err := q.Dequeue(ctx, 5*time.Second)
 		if errors.Is(err, redis.Nil) {
+			summarizeRun(ctx, cfg, auditLogger, discord)
 			continue
 		}
 		if err != nil {
@@ -843,7 +907,8 @@ func runPoReadySender(ctx context.Context, q *queue.PoReadyRedisQueue, processor
 				continue
 			}
 			log.Printf("po ready email failed: job_id=%s user_id=%s attempt=%d state=%s err=%v", job.ID, job.UserID, result.attempt, result.state, err)
-			_ = discord.Log(ctx, fmt.Sprintf("[PO Ready Email Failed]\nJob: %s\nUser: %s\nEmail: %s\nAttempt: %d/%d\nState: %s\nRetry delay: %s\nError: %v", job.ID, job.UserID, maskEmail(job.User.Email), result.attempt, cfg.maxAttempts, result.state, result.delay, err))
+			cfg.run.record(job.ID, result.state, time.Now())
+			_ = cfg.perEmail.Log(ctx, fmt.Sprintf("[PO Ready Email Failed]\nJob: %s\nUser: %s\nEmail: %s\nAttempt: %d/%d\nState: %s\nRetry delay: %s\nError: %v", job.ID, job.UserID, maskEmail(job.User.Email), result.attempt, cfg.maxAttempts, result.state, result.delay, err))
 			continue
 		}
 		if processResult.Outcome == worker.ProcessOutcomeSkipped {
@@ -854,6 +919,7 @@ func runPoReadySender(ctx context.Context, q *queue.PoReadyRedisQueue, processor
 				log.Printf("po ready email skipped but ack failed: job_id=%s user_id=%s err=%v", job.ID, job.UserID, err)
 				continue
 			}
+			cfg.run.record(job.ID, "skipped", time.Now())
 			log.Printf("po ready email skipped: job_id=%s user_id=%s reason=%s", job.ID, job.UserID, processResult.SkipReason)
 			continue
 		}
@@ -867,7 +933,8 @@ func runPoReadySender(ctx context.Context, q *queue.PoReadyRedisQueue, processor
 			continue
 		}
 		log.Printf("po ready email sent: job_id=%s user_id=%s items=%d", job.ID, job.UserID, len(job.Items))
-		_ = discord.Log(ctx, fmt.Sprintf("[PO Ready Email Sent]\nJob: %s\nUser: %s\nEmail: %s\nItems: %d", job.ID, job.UserID, maskEmail(job.User.Email), len(job.Items)))
+		cfg.run.record(job.ID, "sent", time.Now())
+		_ = cfg.perEmail.Log(ctx, fmt.Sprintf("[PO Ready Email Sent]\nJob: %s\nUser: %s\nEmail: %s\nItems: %d", job.ID, job.UserID, maskEmail(job.User.Email), len(job.Items)))
 	}
 }
 
@@ -998,6 +1065,7 @@ func runLeftoverCartSender(ctx context.Context, q *queue.LeftoverCartRedisQueue,
 	for {
 		processingJob, err := q.Dequeue(ctx, 5*time.Second)
 		if errors.Is(err, redis.Nil) {
+			summarizeRun(ctx, cfg, auditLogger, discord)
 			continue
 		}
 		if err != nil {
@@ -1017,7 +1085,8 @@ func runLeftoverCartSender(ctx context.Context, q *queue.LeftoverCartRedisQueue,
 		auditInfo := auditInfoFromLeftoverCartJob(job, processResult)
 		if err != nil {
 			log.Printf("leftover cart email failed: job_id=%s user_id=%s err=%v", job.ID, job.UserID, err)
-			_ = discord.Log(ctx, fmt.Sprintf("[Leftover Cart Email Failed]\nJob: %s\nUser: %s\nEmail: %s\nError: %v", job.ID, job.UserID, maskEmail(job.User.Email), err))
+			cfg.run.record(job.ID, "failed", time.Now())
+			_ = cfg.perEmail.Log(ctx, fmt.Sprintf("[Leftover Cart Email Failed]\nJob: %s\nUser: %s\nEmail: %s\nError: %v", job.ID, job.UserID, maskEmail(job.User.Email), err))
 			if ackErr := q.Ack(ctx, processingJob.Payload); ackErr != nil {
 				log.Printf("leftover cart email failed but ack failed: job_id=%s err=%v ack_err=%v", job.ID, err, ackErr)
 			}
@@ -1036,7 +1105,8 @@ func runLeftoverCartSender(ctx context.Context, q *queue.LeftoverCartRedisQueue,
 			continue
 		}
 		log.Printf("leftover cart email sent: job_id=%s user_id=%s", job.ID, job.UserID)
-		_ = discord.Log(ctx, fmt.Sprintf("[Leftover Cart Email Sent]\nJob: %s\nUser: %s\nEmail: %s", job.ID, job.UserID, maskEmail(job.User.Email)))
+		cfg.run.record(job.ID, "sent", time.Now())
+		_ = cfg.perEmail.Log(ctx, fmt.Sprintf("[Leftover Cart Email Sent]\nJob: %s\nUser: %s\nEmail: %s", job.ID, job.UserID, maskEmail(job.User.Email)))
 	}
 }
 
@@ -1065,6 +1135,7 @@ func runDiscountedWishlistSender(ctx context.Context, q *queue.DiscountedWishlis
 	for {
 		processingJob, err := q.Dequeue(ctx, 5*time.Second)
 		if errors.Is(err, redis.Nil) {
+			summarizeRun(ctx, cfg, auditLogger, discord)
 			continue
 		}
 		if err != nil {
@@ -1094,7 +1165,8 @@ func runDiscountedWishlistSender(ctx context.Context, q *queue.DiscountedWishlis
 				continue
 			}
 			log.Printf("discounted wishlist email failed: job_id=%s user_id=%s attempt=%d state=%s err=%v", job.ID, job.UserID, result.attempt, result.state, err)
-			_ = discord.Log(ctx, fmt.Sprintf("[Discounted Wishlist Email Failed]\nJob: %s\nUser: %s\nEmail: %s\nAttempt: %d/%d\nState: %s\nRetry delay: %s\nError: %v", job.ID, job.UserID, maskEmail(job.User.Email), result.attempt, cfg.maxAttempts, result.state, result.delay, err))
+			cfg.run.record(job.ID, result.state, time.Now())
+			_ = cfg.perEmail.Log(ctx, fmt.Sprintf("[Discounted Wishlist Email Failed]\nJob: %s\nUser: %s\nEmail: %s\nAttempt: %d/%d\nState: %s\nRetry delay: %s\nError: %v", job.ID, job.UserID, maskEmail(job.User.Email), result.attempt, cfg.maxAttempts, result.state, result.delay, err))
 			continue
 		}
 		if processResult.Outcome == worker.ProcessOutcomeSkipped {
@@ -1105,6 +1177,7 @@ func runDiscountedWishlistSender(ctx context.Context, q *queue.DiscountedWishlis
 				log.Printf("discounted wishlist email skipped but ack failed: job_id=%s user_id=%s err=%v", job.ID, job.UserID, err)
 				continue
 			}
+			cfg.run.record(job.ID, "skipped", time.Now())
 			log.Printf("discounted wishlist email skipped: job_id=%s user_id=%s reason=%s", job.ID, job.UserID, processResult.SkipReason)
 			continue
 		}
@@ -1118,7 +1191,8 @@ func runDiscountedWishlistSender(ctx context.Context, q *queue.DiscountedWishlis
 			continue
 		}
 		log.Printf("discounted wishlist email sent: job_id=%s user_id=%s", job.ID, job.UserID)
-		_ = discord.Log(ctx, fmt.Sprintf("[Discounted Wishlist Email Sent]\nJob: %s\nUser: %s\nEmail: %s", job.ID, job.UserID, maskEmail(job.User.Email)))
+		cfg.run.record(job.ID, "sent", time.Now())
+		_ = cfg.perEmail.Log(ctx, fmt.Sprintf("[Discounted Wishlist Email Sent]\nJob: %s\nUser: %s\nEmail: %s", job.ID, job.UserID, maskEmail(job.User.Email)))
 	}
 }
 
@@ -1200,6 +1274,7 @@ func runWishlistBackInSender(ctx context.Context, q *queue.WishlistBackInRedisQu
 	for {
 		processingJob, err := q.Dequeue(ctx, 5*time.Second)
 		if errors.Is(err, redis.Nil) {
+			summarizeRun(ctx, cfg, auditLogger, discord)
 			continue
 		}
 		if err != nil {
@@ -1223,7 +1298,8 @@ func runWishlistBackInSender(ctx context.Context, q *queue.WishlistBackInRedisQu
 			if ackErr := q.Ack(ctx, processingJob.Payload); ackErr != nil {
 				log.Printf("wishlist back in email failed but ack failed: job_id=%s err=%v", job.ID, ackErr)
 			}
-			_ = discord.Log(ctx, fmt.Sprintf("[Wishlist Back In Email Failed]\nJob: %s\nUser: %s\nEmail: %s\nError: %v", job.ID, job.UserID, maskEmail(job.User.Email), err))
+			cfg.run.record(job.ID, "failed", time.Now())
+			_ = cfg.perEmail.Log(ctx, fmt.Sprintf("[Wishlist Back In Email Failed]\nJob: %s\nUser: %s\nEmail: %s\nError: %v", job.ID, job.UserID, maskEmail(job.User.Email), err))
 			continue
 		}
 		if err := auditLogger.MarkSent(ctx, auditInfo); err != nil {
@@ -1233,6 +1309,7 @@ func runWishlistBackInSender(ctx context.Context, q *queue.WishlistBackInRedisQu
 			log.Printf("wishlist back in email sent but ack failed: job_id=%s err=%v", job.ID, err)
 			continue
 		}
+		cfg.run.record(job.ID, "sent", time.Now())
 		log.Printf("wishlist back in email sent: job_id=%s user_id=%s", job.ID, job.UserID)
 	}
 }
@@ -1276,6 +1353,7 @@ func runWinbackSender(ctx context.Context, q *queue.WinbackRedisQueue, processor
 	for {
 		processingJob, err := q.Dequeue(ctx, 5*time.Second)
 		if errors.Is(err, redis.Nil) {
+			summarizeRun(ctx, cfg, auditLogger, discord)
 			continue
 		}
 		if err != nil {
@@ -1295,7 +1373,8 @@ func runWinbackSender(ctx context.Context, q *queue.WinbackRedisQueue, processor
 		auditInfo := auditInfoFromWinbackJob(job, processResult)
 		if err != nil {
 			log.Printf("winback email failed: job_id=%s user_id=%s err=%v", job.ID, job.UserID, err)
-			_ = discord.Log(ctx, fmt.Sprintf("[Winback Email Failed]\nJob: %s\nUser: %s\nEmail: %s\nError: %v", job.ID, job.UserID, maskEmail(job.User.Email), err))
+			cfg.run.record(job.ID, "failed", time.Now())
+			_ = cfg.perEmail.Log(ctx, fmt.Sprintf("[Winback Email Failed]\nJob: %s\nUser: %s\nEmail: %s\nError: %v", job.ID, job.UserID, maskEmail(job.User.Email), err))
 			if ackErr := q.Ack(ctx, processingJob.Payload); ackErr != nil {
 				log.Printf("winback email failed but ack failed: job_id=%s err=%v ack_err=%v", job.ID, err, ackErr)
 			}
@@ -1314,7 +1393,8 @@ func runWinbackSender(ctx context.Context, q *queue.WinbackRedisQueue, processor
 			continue
 		}
 		log.Printf("winback email sent: job_id=%s user_id=%s", job.ID, job.UserID)
-		_ = discord.Log(ctx, fmt.Sprintf("[Winback Email Sent]\nJob: %s\nUser: %s\nEmail: %s", job.ID, job.UserID, maskEmail(job.User.Email)))
+		cfg.run.record(job.ID, "sent", time.Now())
+		_ = cfg.perEmail.Log(ctx, fmt.Sprintf("[Winback Email Sent]\nJob: %s\nUser: %s\nEmail: %s", job.ID, job.UserID, maskEmail(job.User.Email)))
 	}
 }
 
