@@ -60,7 +60,7 @@ func main() {
 		// Stamp the same UTM params the TrackingSender adds on the way out, so the
 		// preview links are the links the recipient actually clicks.
 		html = email.StampHTML(html, email.UTM{
-			Source:   env("MAKOTO_UTM_SOURCE", "makoto"),
+			Source:   env("MAKOTO_UTM_SOURCE", "kyou-email"),
 			Medium:   env("MAKOTO_UTM_MEDIUM", "email"),
 			Campaign: "leftover_cart",
 		}, tmplID)

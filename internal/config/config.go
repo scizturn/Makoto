@@ -102,7 +102,7 @@ func Load() Config {
 		Timezone:                     env("MAKOTO_TIMEZONE", "Asia/Jakarta"),
 		RateLimitPerMinute:           envInt("MAKOTO_RATE_LIMIT_PER_MINUTE", 100),
 		LinkTrackingEnabled:          envBool("MAKOTO_LINK_TRACKING_ENABLED", true),
-		UTMSource:                    env("MAKOTO_UTM_SOURCE", "makoto"),
+		UTMSource:                    env("MAKOTO_UTM_SOURCE", "kyou-email"),
 		UTMMedium:                    env("MAKOTO_UTM_MEDIUM", "email"),
 		DatabaseDSN:                  oldDatabaseDSN(),
 		RedisAddr:                    env("REDIS_ADDR", "redis:6379"),
