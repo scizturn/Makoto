@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/kyou-id/makoto/internal/mask"
 )
 
 // maxBodyBytes caps what we will read from a webhook post. The payloads are a few
@@ -151,15 +153,7 @@ func (h Handler) notify(ctx context.Context, record Record) {
 	}
 }
 
-// MaskEmail hides the local part before an address reaches a log line or Discord,
-// matching what the senders already do.
+// MaskEmail hides the local part before an address reaches a log line or Discord.
 func MaskEmail(email string) string {
-	local, domain, ok := strings.Cut(email, "@")
-	if !ok || local == "" {
-		return "***"
-	}
-	if len(local) <= 2 {
-		return local[:1] + "***@" + domain
-	}
-	return local[:2] + "***@" + domain
+	return mask.Email(email)
 }

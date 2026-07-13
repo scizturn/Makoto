@@ -17,6 +17,7 @@ import (
 	"github.com/kyou-id/makoto/internal/domain"
 	"github.com/kyou-id/makoto/internal/email"
 	"github.com/kyou-id/makoto/internal/emailtemplate"
+	"github.com/kyou-id/makoto/internal/mask"
 	"github.com/kyou-id/makoto/internal/notify"
 	"github.com/kyou-id/makoto/internal/queue"
 	"github.com/kyou-id/makoto/internal/voucher"
@@ -1305,13 +1306,5 @@ func retryDelay(attempt int, backoffs []time.Duration) time.Duration {
 }
 
 func maskEmail(email string) string {
-	parts := strings.Split(email, "@")
-	if len(parts) != 2 || parts[0] == "" {
-		return email
-	}
-	local := parts[0]
-	if len(local) == 1 {
-		return local[:1] + "***@" + parts[1]
-	}
-	return local[:1] + "***" + local[len(local)-1:] + "@" + parts[1]
+	return mask.Email(email)
 }

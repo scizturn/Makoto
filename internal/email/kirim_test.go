@@ -214,3 +214,28 @@ type errorValidator struct {
 func (v errorValidator) Validate(context.Context, string) (bool, error) {
 	return false, v.err
 }
+
+// The address that broke production: a trailing dot in the local part. Kirim.email's
+// validation API answers 500 (not "invalid") on it, so failing open let it through
+// and the send came back 422 "The to.0 field must be a valid email address" — then
+// retried until it dead-lettered. A malformed address is not an outage.
+func TestFailOpenValidatorStillRejectsAMalformedAddress(t *testing.T) {
+	validator := FailOpenValidator{Validator: errorValidator{err: errors.New("provider 500")}}
+
+	for _, address := range []string{"fajri.@gmail.com", ".fajri@gmail.com", "no-at-sign", ""} {
+		valid, err := validator.Validate(context.Background(), address)
+		if err != nil {
+			t.Fatalf("%q: expected no error, got %v", address, err)
+		}
+		if valid {
+			t.Fatalf("%q: a malformed address must not be failed open", address)
+		}
+	}
+
+	// A well-formed address still gets the benefit of the doubt when the provider is
+	// down — that is the whole point of failing open.
+	valid, err := validator.Validate(context.Background(), "bimo@kyou.id")
+	if err != nil || !valid {
+		t.Fatalf("expected a valid address to pass when the provider errors, got valid=%v err=%v", valid, err)
+	}
+}
