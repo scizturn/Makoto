@@ -79,9 +79,9 @@ func TestKirimClientSendsRenderedHTMLWithTransactionalV4(t *testing.T) {
 }
 
 // Kirim.email's send response carries no message id, so the ONLY thing tying a
-// later delivery webhook back to a job is the X-Tags header stamped here. If this
-// stops going out, every webhook arrives orphaned and silently unmatchable.
-func TestKirimClientStampsTheJobIDIntoXTags(t *testing.T) {
+// later delivery webhook back to a job is the tag stamped here. If this stops going
+// out, every webhook arrives orphaned and silently unmatchable.
+func TestKirimClientStampsTheJobIDIntoTags(t *testing.T) {
 	var gotForm url.Values
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if err := r.ParseForm(); err != nil {
@@ -106,19 +106,53 @@ func TestKirimClientStampsTheJobIDIntoXTags(t *testing.T) {
 		t.Fatalf("expected no error, got %v", err)
 	}
 
-	if got, want := gotForm.Get("headers"), `{"X-Tags":"birthday-2026-07-13-user-42"}`; got != want {
-		t.Fatalf("expected headers %s, got %s", want, got)
+	if got, want := gotForm.Get("tags"), "birthday-2026-07-13-user-42"; got != want {
+		t.Fatalf("expected tags=%s, got %q (form: %#v)", want, got, gotForm)
+	}
+	// `headers` must never be sent. Its validator rejects a string as "must be an
+	// array" AND an array as "must be a string" — nothing passes, and sending it
+	// 422'd every outgoing email in production.
+	for field := range gotForm {
+		if strings.HasPrefix(field, "headers") {
+			t.Fatalf("the headers field is unusable and 422s every send, got %q", field)
+		}
 	}
 }
 
 // A comma would split the job id into two tags on Kirim.email's side, and the
 // webhook would hand back a truncated id that matches nothing.
-func TestTagHeadersStripCommas(t *testing.T) {
-	if got := tagHeaders("job,with,commas"); got != `{"X-Tags":"jobwithcommas"}` {
+func TestJobTagStripsCommas(t *testing.T) {
+	if got := jobTag("job,with,commas"); got != "jobwithcommas" {
 		t.Fatalf("got %s", got)
 	}
-	if got := tagHeaders("  "); got != "" {
-		t.Fatalf("expected no headers for an empty tag, got %s", got)
+	if got := jobTag("  "); got != "" {
+		t.Fatalf("expected an empty tag, got %q", got)
+	}
+}
+
+// An untagged message must send no headers field at all — an empty one is still a
+// field, and this endpoint validates fields it is given.
+func TestKirimClientOmitsTheTagFieldWhenThereIsNoTag(t *testing.T) {
+	var gotForm url.Values
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if err := r.ParseForm(); err != nil {
+			t.Fatal(err)
+		}
+		gotForm = r.PostForm
+		w.WriteHeader(http.StatusAccepted)
+	}))
+	defer server.Close()
+
+	client := KirimClient{BaseURL: server.URL, Username: "key", APIToken: "secret"}
+	if _, err := client.SendTemplate(context.Background(), domain.EmailMessage{
+		Domain: "kyou.id", FromEmail: "nandayo@kyou.id", ToEmail: "ruby@example.test",
+		Subject: "x", HTMLBody: "<p>x</p>",
+	}); err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+
+	if got := gotForm.Get("tags"); got != "" {
+		t.Fatalf("expected no tags field on an untagged message, got %q", got)
 	}
 }
 

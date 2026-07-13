@@ -33,8 +33,8 @@ func (c KirimClient) SendTemplate(ctx context.Context, msg domain.EmailMessage) 
 		"template_id":       msg.TemplateID,
 		"substitution_data": msg.SubstitutionData,
 	}
-	if headers := tagHeaders(msg.Tags); headers != "" {
-		payload["headers"] = headers
+	if tag := jobTag(msg.Tags); tag != "" {
+		payload["tags"] = tag
 	}
 
 	var body bytes.Buffer
@@ -93,8 +93,8 @@ func (c KirimClient) sendTransactionalV4(ctx context.Context, msg domain.EmailMe
 	if msg.TextBody != "" {
 		form.Set("text", msg.TextBody)
 	}
-	if headers := tagHeaders(msg.Tags); headers != "" {
-		form.Set("headers", headers)
+	if tag := jobTag(msg.Tags); tag != "" {
+		form.Set("tags", tag)
 	}
 
 	url := strings.TrimRight(c.BaseURL, "/") + "/api/v4/transactional/message"
@@ -186,21 +186,20 @@ func (c KirimClient) Validate(ctx context.Context, email string) (bool, error) {
 	return strings.EqualFold(result.Status, "valid"), nil
 }
 
-// tagHeaders renders the X-Tags custom header Kirim.email echoes back in every
-// webhook for the message. Both send endpoints accept `headers` as a JSON string.
+// jobTag cleans the job ID for use as the `tags` field, which Kirim.email echoes
+// back in every webhook for the message — the only thing tying a delivery event to
+// the job that sent it, since the send API returns no message id of its own.
 //
-// Commas separate tags on Kirim.email's side, so one is stripped rather than
-// allowed to split a job ID into two meaningless halves.
-func tagHeaders(tags string) string {
-	tags = strings.ReplaceAll(strings.TrimSpace(tags), ",", "")
-	if tags == "" {
-		return ""
-	}
-	encoded, err := json.Marshal(map[string]string{"X-Tags": tags})
-	if err != nil {
-		return ""
-	}
-	return string(encoded)
+// It goes in `tags`, NOT in the documented `headers` / X-Tags header. That field is
+// unusable: its validator rejects a string with "The headers field must be an array"
+// and an array with "The headers field must be a string", on both the multipart and
+// the urlencoded endpoint. Nothing passes. Sending it 422'd every outgoing email in
+// production. `tags` validates, and is the same name the webhook hands back.
+//
+// Commas separate tags on Kirim.email's side, so one is stripped rather than allowed
+// to split a job ID into two meaningless halves.
+func jobTag(tags string) string {
+	return strings.ReplaceAll(strings.TrimSpace(tags), ",", "")
 }
 
 func readResponseBody(resp *http.Response) string {
