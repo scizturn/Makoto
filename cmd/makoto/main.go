@@ -909,11 +909,23 @@ func handleFailedPoReadyJob(ctx context.Context, redisQueue poReadyRetryQueue, a
 		case <-timer.C:
 		}
 	}
-	if err := redisQueue.Enqueue(ctx, job); err != nil {
-		return failedJobResult{}, err
-	}
+	// Audit BEFORE the requeue, and compensate if the requeue then fails — the same
+	// order handleFailedJob (birthday) already uses.
+	//
+	// Reversed, a failing audit write returns an error to the caller, which does NOT
+	// ack — while the copy is already on the queue. The original then sits stranded
+	// in the processing list until RecoverProcessing puts it back too, and the job
+	// has bred. That is exactly what the ambiguous-queued_at bug did: every retry of
+	// every failed email duplicated it, quietly, for as long as the audit write kept
+	// failing.
 	if err := auditLogger.InsertRetryQueued(ctx, job.ID, attempt); err != nil {
 		return failedJobResult{}, err
+	}
+	if err := redisQueue.Enqueue(ctx, job); err != nil {
+		retryAuditInfo := auditInfo
+		retryAuditInfo.Attempt = job.Attempt
+		retryAuditInfo.FailureReason = "retry enqueue failed: " + err.Error()
+		return failedJobResult{}, errors.Join(err, auditLogger.MarkFailed(ctx, retryAuditInfo))
 	}
 	return failedJobResult{state: "requeued", attempt: job.Attempt, delay: delay}, nil
 }
@@ -1148,11 +1160,23 @@ func handleFailedDiscountedWishlistJob(ctx context.Context, redisQueue discounte
 		case <-timer.C:
 		}
 	}
-	if err := redisQueue.Enqueue(ctx, job); err != nil {
-		return failedJobResult{}, err
-	}
+	// Audit BEFORE the requeue, and compensate if the requeue then fails — the same
+	// order handleFailedJob (birthday) already uses.
+	//
+	// Reversed, a failing audit write returns an error to the caller, which does NOT
+	// ack — while the copy is already on the queue. The original then sits stranded
+	// in the processing list until RecoverProcessing puts it back too, and the job
+	// has bred. That is exactly what the ambiguous-queued_at bug did: every retry of
+	// every failed email duplicated it, quietly, for as long as the audit write kept
+	// failing.
 	if err := auditLogger.InsertRetryQueued(ctx, job.ID, attempt); err != nil {
 		return failedJobResult{}, err
+	}
+	if err := redisQueue.Enqueue(ctx, job); err != nil {
+		retryAuditInfo := auditInfo
+		retryAuditInfo.Attempt = job.Attempt
+		retryAuditInfo.FailureReason = "retry enqueue failed: " + err.Error()
+		return failedJobResult{}, errors.Join(err, auditLogger.MarkFailed(ctx, retryAuditInfo))
 	}
 	return failedJobResult{state: "requeued", attempt: job.Attempt, delay: delay}, nil
 }
