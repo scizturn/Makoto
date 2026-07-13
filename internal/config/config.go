@@ -13,6 +13,9 @@ type Config struct {
 	Mode                               string
 	Timezone                           string
 	RateLimitPerMinute                 int
+	LinkTrackingEnabled                bool
+	UTMSource                          string
+	UTMMedium                          string
 	DatabaseDSN                        string
 	RedisAddr                          string
 	RedisPassword                      string
@@ -98,6 +101,9 @@ func Load() Config {
 		Mode:                         env("MAKOTO_MODE", "run-once"),
 		Timezone:                     env("MAKOTO_TIMEZONE", "Asia/Jakarta"),
 		RateLimitPerMinute:           envInt("MAKOTO_RATE_LIMIT_PER_MINUTE", 100),
+		LinkTrackingEnabled:          envBool("MAKOTO_LINK_TRACKING_ENABLED", true),
+		UTMSource:                    env("MAKOTO_UTM_SOURCE", "makoto"),
+		UTMMedium:                    env("MAKOTO_UTM_MEDIUM", "email"),
 		DatabaseDSN:                  oldDatabaseDSN(),
 		RedisAddr:                    env("REDIS_ADDR", "redis:6379"),
 		RedisPassword:                os.Getenv("REDIS_PASSWORD"),

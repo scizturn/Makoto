@@ -22,6 +22,7 @@ import (
 	"github.com/kyou-id/makoto/internal/worker"
 	"github.com/redis/go-redis/v9"
 )
+
 func main() {
 	ctx := context.Background()
 	cfg := config.Load()
@@ -34,8 +35,9 @@ func main() {
 		ActionURL:   cfg.ActionURL,
 	}
 	sender, validator := buildEmail(cfg)
+	tracked := buildLinkTracking(cfg, sender)
 	voucherIssuer := buildVoucherIssuer(cfg)
-	processor := worker.NewProcessor(nil, sender, validator, voucherIssuer, birthdayCampaign)
+	processor := worker.NewProcessor(nil, tracked("birthday"), validator, voucherIssuer, birthdayCampaign)
 	processor.Domain = cfg.KirimEmailDomain
 	processor.FromEmail = cfg.FromEmail
 	processor.FromName = cfg.FromName
@@ -53,7 +55,7 @@ func main() {
 		Closing:     "Terima kasih sudah menjadi bagian dari Kyou! 🎉",
 		ActionURL:   cfg.ActionURL,
 	}
-	anniversaryProcessor := worker.NewAnniversaryProcessor(nil, sender, validator, voucherIssuer, anniversaryCampaign)
+	anniversaryProcessor := worker.NewAnniversaryProcessor(nil, tracked("anniversary"), validator, voucherIssuer, anniversaryCampaign)
 	anniversaryProcessor.Domain = cfg.KirimEmailDomain
 	anniversaryProcessor.FromEmail = cfg.FromEmail
 	anniversaryProcessor.FromName = cfg.FromName
@@ -66,13 +68,13 @@ func main() {
 
 	// --- Discounted Wishlist ---
 	discountedWishlistCampaign := campaign.DiscountedWishlistCampaign{
-		TemplateIDs:    cfg.DiscountedWishlistTemplateIDs,
-		Subjects:       cfg.DiscountedWishlistEmailSubjects,
-		Greetings:      cfg.DiscountedWishlistGreetings,
-		WishlistURL:    cfg.DiscountedWishlistURL,
-		Closing:        "Yuk cek wishlistmu di Kyou sekarang!",
+		TemplateIDs: cfg.DiscountedWishlistTemplateIDs,
+		Subjects:    cfg.DiscountedWishlistEmailSubjects,
+		Greetings:   cfg.DiscountedWishlistGreetings,
+		WishlistURL: cfg.DiscountedWishlistURL,
+		Closing:     "Yuk cek wishlistmu di Kyou sekarang!",
 	}
-	discountedWishlistProcessor := worker.NewDiscountedWishlistProcessor(sender, validator, discountedWishlistCampaign)
+	discountedWishlistProcessor := worker.NewDiscountedWishlistProcessor(tracked("discounted_wishlist"), validator, discountedWishlistCampaign)
 	discountedWishlistProcessor.Domain = cfg.KirimEmailDomain
 	discountedWishlistProcessor.FromEmail = cfg.FromEmail
 	discountedWishlistProcessor.FromName = cfg.FromName
@@ -91,7 +93,7 @@ func main() {
 		WishlistURL: cfg.PoReadyURL,
 		Closing:     "Stok ready biasanya cepat habis, cek wishlist kamu sebelum keduluan!",
 	}
-	poReadyProcessor := worker.NewPoReadyProcessor(sender, validator, poReadyCampaign)
+	poReadyProcessor := worker.NewPoReadyProcessor(tracked("po_ready"), validator, poReadyCampaign)
 	poReadyProcessor.Domain = cfg.KirimEmailDomain
 	poReadyProcessor.FromEmail = cfg.FromEmail
 	poReadyProcessor.FromName = cfg.FromName
@@ -111,7 +113,7 @@ func main() {
 		WishlistURL: "https://kyou.id/user/wishlist",
 		Closing:     "Jangan sampai kelewatan lagi ya!",
 	}
-	wishlistBackInProcessor := worker.NewWishlistBackInProcessor(sender, validator, wishlistBackInCampaign)
+	wishlistBackInProcessor := worker.NewWishlistBackInProcessor(tracked("wishlist_back_in"), validator, wishlistBackInCampaign)
 	wishlistBackInProcessor.Domain = cfg.KirimEmailDomain
 	wishlistBackInProcessor.FromEmail = cfg.FromEmail
 	wishlistBackInProcessor.FromName = cfg.FromName
@@ -127,7 +129,7 @@ func main() {
 		ActionURL:   cfg.WinbackActionURL,
 		Closing:     "Ayo #RayakanHobimu kembali bersama Kyou!",
 	}
-	winbackProcessor := worker.NewWinbackProcessor(sender, validator, winbackCampaign)
+	winbackProcessor := worker.NewWinbackProcessor(tracked("winback"), validator, winbackCampaign)
 	winbackProcessor.Domain = cfg.KirimEmailDomain
 	winbackProcessor.FromEmail = cfg.FromEmail
 	winbackProcessor.FromName = cfg.FromName
@@ -146,7 +148,7 @@ func main() {
 		CartURL:     cfg.LeftoverCartURL,
 		Closing:     "Sampai ketemu lagi di Kyou!",
 	}
-	leftoverCartProcessor := worker.NewLeftoverCartProcessor(sender, validator, leftoverCartCampaign)
+	leftoverCartProcessor := worker.NewLeftoverCartProcessor(tracked("leftover_cart"), validator, leftoverCartCampaign)
 	leftoverCartProcessor.Domain = cfg.KirimEmailDomain
 	leftoverCartProcessor.FromEmail = cfg.FromEmail
 	leftoverCartProcessor.FromName = cfg.FromName
@@ -381,6 +383,26 @@ func buildVoucherIssuer(cfg config.Config) voucher.Issuer {
 	return voucher.KyouClient{
 		BaseURL: cfg.KyouIDAPIBaseURL,
 		Token:   cfg.KyouIDAPIToken,
+	}
+}
+
+// buildLinkTracking returns a per-campaign sender that stamps UTM params on every
+// kyou.id link on its way out. It wraps the Sender rather than the templates so
+// links from all three sources are covered at once -- Yukari's SQL-built item URLs,
+// the grids rendered in internal/campaign, and the hardcoded links in the HTML
+// templates -- and a new template inherits tracking without being edited.
+func buildLinkTracking(cfg config.Config, sender email.Sender) func(feature string) email.Sender {
+	if !cfg.LinkTrackingEnabled {
+		log.Print("MAKOTO_LINK_TRACKING_ENABLED is false; sending links without UTM params")
+		return func(string) email.Sender { return sender }
+	}
+	log.Printf("link tracking enabled: utm_source=%s utm_medium=%s (utm_campaign=<feature>, utm_content=<template>)", cfg.UTMSource, cfg.UTMMedium)
+	return func(feature string) email.Sender {
+		return email.WithUTM(sender, email.UTM{
+			Source:   cfg.UTMSource,
+			Medium:   cfg.UTMMedium,
+			Campaign: feature,
+		})
 	}
 }
 

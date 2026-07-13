@@ -9,6 +9,7 @@ import (
 
 	"github.com/kyou-id/makoto/internal/campaign"
 	"github.com/kyou-id/makoto/internal/domain"
+	"github.com/kyou-id/makoto/internal/email"
 	"github.com/kyou-id/makoto/internal/emailtemplate"
 )
 
@@ -56,6 +57,13 @@ func main() {
 			rendered = append(rendered, "")
 			continue
 		}
+		// Stamp the same UTM params the TrackingSender adds on the way out, so the
+		// preview links are the links the recipient actually clicks.
+		html = email.StampHTML(html, email.UTM{
+			Source:   env("MAKOTO_UTM_SOURCE", "makoto"),
+			Medium:   env("MAKOTO_UTM_MEDIUM", "email"),
+			Campaign: "leftover_cart",
+		}, tmplID)
 		idx := len(rendered) + 1
 		individualPath := fmt.Sprintf("templates/preview/leftover-cart%d-preview.html", idx)
 		if writeErr := os.WriteFile(individualPath, []byte(html), 0o600); writeErr != nil {
