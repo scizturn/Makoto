@@ -295,7 +295,7 @@ func TestRenderFYPHTMLUsesImageCardsWhenImageURLExists(t *testing.T) {
 		`1/8 Sunday`,
 		`Star Rail LIVE Ver`,
 		`https://kyou.id/items/fyp-1/`,
-		`https://images2.imgbox.com/ef/f8/mAoUYtqE_o.png`,
+		`https://kyoucdn.id/static/assets/PO_CTA_Email.png`,
 		`alt="Cek item"`,
 		`Honkai: Star Rail`,
 		`Vocaloid`,
@@ -317,7 +317,7 @@ func TestRenderFYPHTMLUsesImageCardsWhenImageURLExists(t *testing.T) {
 	if countOccurrences(got, `<td width="230"`) != 3 {
 		t.Fatalf("expected exactly three table cells, got %q", got)
 	}
-	if countOccurrences(got, `https://images2.imgbox.com/ef/f8/mAoUYtqE_o.png`) != 3 {
+	if countOccurrences(got, `https://kyoucdn.id/static/assets/PO_CTA_Email.png`) != 3 {
 		t.Fatalf("expected one image button per card, got %q", got)
 	}
 }

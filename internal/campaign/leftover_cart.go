@@ -290,7 +290,7 @@ func RenderLeftoverRecoHTML(items []domain.FYPItem, firstName string, historical
     </td>
   </tr>
   <tr>
-    <td style="padding:18px 16px 20px;background-image:url('https://images2.imgbox.com/11/6f/MewvOpFD_o.png');background-size:cover;background-position:center top;background-repeat:no-repeat;background-color:rgba(255,255,255,0.5);background-blend-mode:lighten;">
+    <td style="padding:18px 16px 20px;background-image:url('https://kyoucdn.id/static/assets/LeftoverBGChatBW.png');background-size:cover;background-position:center top;background-repeat:no-repeat;background-color:rgba(255,255,255,0.5);background-blend-mode:lighten;">
       <div style="margin:0 auto 14px;width:72px;border-radius:14px;background:#e5e5e5;color:#7a7a7a;font-size:12px;font-weight:900;line-height:26px;text-align:center;">Hari ini</div>
       <table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;margin:0 0 12px 58px;">
         <tr><td style="padding:13px 16px;background:#ffffff;border-radius:18px;box-shadow:0 1px 3px rgba(0,0,0,0.08);color:#2b2b2b;font-size:15px;font-weight:700;line-height:1.45;">Hai, <strong>%s</strong>! Kouka di sini.</td></tr>

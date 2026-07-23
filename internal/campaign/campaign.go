@@ -264,7 +264,7 @@ func renderProductCard(name string, seriesName string, status string, url string
 	}
 
 	inner := fmt.Sprintf(
-		`<div style="overflow:hidden;width:180px;height:287px;border:1px solid #9ca3af;border-radius:8px;background:url('https://kyoucdn.id/static/assets/item%%20bg1.jpg') center/cover no-repeat;">%s<div style="padding:8px 10px 10px;text-align:left;"><div style="height:52px;overflow:hidden;"><p style="margin:0 0 2px;color:#2f2b28;font-size:10px;font-weight:400;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">%s</p><p style="margin:0 0 2px;color:#0f172a;font-size:12px;font-weight:900;line-height:1.3;white-space:normal;word-break:break-word;">%s</p>%s</div><div style="margin:10px 0 0;text-align:center;"><img src="https://images2.imgbox.com/ef/f8/mAoUYtqE_o.png" alt="Cek item" width="142" style="display:inline-block;width:142px;height:auto;border:0;"></div></div></div>`,
+		`<div style="overflow:hidden;width:180px;height:287px;border:1px solid #9ca3af;border-radius:8px;background:url('https://kyoucdn.id/static/assets/item%%20bg1.jpg') center/cover no-repeat;">%s<div style="padding:8px 10px 10px;text-align:left;"><div style="height:52px;overflow:hidden;"><p style="margin:0 0 2px;color:#2f2b28;font-size:10px;font-weight:400;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">%s</p><p style="margin:0 0 2px;color:#0f172a;font-size:12px;font-weight:900;line-height:1.3;white-space:normal;word-break:break-word;">%s</p>%s</div><div style="margin:10px 0 0;text-align:center;"><img src="https://kyoucdn.id/static/assets/PO_CTA_Email.png" alt="Cek item" width="142" style="display:inline-block;width:142px;height:auto;border:0;"></div></div></div>`,
 		imgHTML, safeSeries, safeName, versionP,
 	)
 
